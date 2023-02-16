@@ -16,6 +16,6 @@ git init
 git add -A
 git commit -m 'deploy'
 
-git push -f git@github.com:vkaswin/file-explorer.git master:gh-pages
+git push -f git@github.com:vkaswin/google-calender.git master:gh-pages
 
 cd -
