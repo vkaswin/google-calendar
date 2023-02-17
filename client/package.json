@@ -10,6 +10,7 @@
         "deploy": "sh deploy.sh"
     },
     "dependencies": {
+        "jwt-decode": "^3.1.2",
         "pinia": "^2.0.30",
         "vue": "^3.2.45",
         "vue-router": "^4.1.6"
