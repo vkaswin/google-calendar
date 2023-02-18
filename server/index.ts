@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "./src/middlewares/cors";
 import connect from "./src/database/config";
-import corn from "node-cron";
 
 dotenv.config();
 
@@ -10,7 +9,16 @@ const port = process.env.PORT;
 const app = express();
 
 app
-  .use(cors())
+  .use(
+    cors({
+      allowedOrigins:
+        process.env.NODE_ENV === "development"
+          ? ["http://localhost:3000"]
+          : ["https://vkaswin.github.io"],
+      allowedHeaders: ["Authorization"],
+      credentials: true,
+    })
+  )
   .use(express.json())
   .use(express.urlencoded({ extended: false }));
 

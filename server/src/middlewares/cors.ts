@@ -1,26 +1,30 @@
 import { Request, Response, NextFunction } from "express";
 
 type CORS = (options?: {
-  allowOrigins: string[];
+  allowedOrigins?: string[];
+  allowedHeaders?: string[];
+  credentials?: boolean;
 }) => (req: Request, res: Response, next: NextFunction) => void;
 
 const cors: CORS = (options) => (req, res, next) => {
-  let { allowOrigins = [] } = options || {};
+  let { allowedOrigins, allowedHeaders, credentials } = options || {};
 
   let origin = req.headers.origin;
   let method = req.method;
 
-  if (origin && allowOrigins.includes(origin)) {
+  if (origin && allowedOrigins && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Methods", method);
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
+    allowedHeaders &&
+      res.setHeader("Access-Control-Allow-Headers", allowedHeaders.join(", "));
+    credentials && res.setHeader("Access-Control-Allow-Credentials", "true");
   }
 
-  return next();
+  if (method === "OPTIONS") {
+    res.status(200).end();
+  } else {
+    next();
+  }
 };
 
 export default cors;
