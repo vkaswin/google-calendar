@@ -4,13 +4,14 @@ import { CalendarStore, CalendarView } from "@/types/calendar";
 const useCalendar = defineStore("calendar", {
   state: (): CalendarStore => {
     return {
-      calendarView: "week",
+      date: new Date(),
+      view: "week",
     };
   },
   getters: {},
   actions: {
-    setCalendarView(calendarView: CalendarView) {
-      this.calendarView = calendarView;
+    setView(view: CalendarView) {
+      this.view = view;
     },
   },
 });

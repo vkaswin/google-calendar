@@ -1,5 +1,6 @@
 export type CalendarView = "week" | "month" | "year";
 
 export type CalendarStore = {
-  calendarView: CalendarView;
+  date: Date;
+  view: CalendarView;
 };
