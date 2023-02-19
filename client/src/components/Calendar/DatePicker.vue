@@ -18,18 +18,12 @@ let weeks = ["S", "M", "T", "W", "T", "F", "S"];
 
 let [todayDate] = new Date().toISOString().split("T");
 
+let totalEntries = 35;
+
 let days = computed(() => {
   let dates: Dates[] = [];
 
-  let totalDays = new Date(
-    date.value.getFullYear(),
-    date.value.getMonth() + 1,
-    0
-  ).getDate();
-
-  let totalEntries = 35;
-
-  for (let i = 1; i <= totalDays; i++) {
+  for (let i = 1; i <= date.value.getTodayDaysInMonth(); i++) {
     let day = i.toString();
 
     dates.push({
@@ -40,7 +34,7 @@ let days = computed(() => {
     });
   }
 
-  console.log(dates, todayDate);
+  console.log(dates);
 
   return dates;
 });

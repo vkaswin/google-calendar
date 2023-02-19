@@ -1,6 +1,7 @@
 declare global {
   interface Date {
     getMonthName: () => string | undefined;
+    getTodayDaysInMonth: () => number;
   }
 }
 
@@ -33,6 +34,10 @@ Date.prototype.getMonthName = function () {
     default:
       return;
   }
+};
+
+Date.prototype.getTodayDaysInMonth = function () {
+  return new Date(this.getFullYear(), this.getMonth() + 1, 0).getDate();
 };
 
 export {};
