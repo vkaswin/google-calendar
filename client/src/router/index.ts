@@ -4,14 +4,14 @@ import useAuth from "@/store/useAuth";
 const RouteNames = {
   login: "login",
   register: "register",
-  calender: "calender",
+  calendar: "calendar",
   notFound: "not-found",
 };
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: { name: RouteNames.calender, replace: true },
+    redirect: { name: RouteNames.calendar, replace: true },
   },
   {
     path: "/auth",
@@ -30,12 +30,12 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: "/calender",
-    name: RouteNames.calender,
+    path: "/calendar",
+    name: RouteNames.calendar,
     meta: {
       requireAuth: false,
     },
-    component: () => import(`../pages/Calender.vue`),
+    component: () => import(`../pages/Calendar.vue`),
   },
   {
     path: "/:pathMatch(.*)*",
@@ -52,7 +52,7 @@ const router = createRouter({
 });
 
 router.beforeEach(({ meta: { requireAuth = false } = {}, name }, from) => {
-  const { user } = useAuth();
+  let { user } = useAuth();
 
   if (requireAuth && !user) return { name: RouteNames.login };
 

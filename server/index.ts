@@ -11,10 +11,7 @@ const app = express();
 app
   .use(
     cors({
-      allowedOrigins:
-        process.env.NODE_ENV === "development"
-          ? ["http://localhost:3000"]
-          : ["https://vkaswin.github.io"],
+      allowedOrigins: ["https://vkaswin.github.io"],
       allowedHeaders: ["Authorization"],
       credentials: true,
     })
