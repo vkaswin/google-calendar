@@ -1,40 +1,72 @@
 <script setup lang="ts">
 import { toRefs, computed } from "vue";
+import { getMonthName } from "@/utils";
 
 type DatePickerProps = {
-  date: Date;
+  selectedDate: Date;
+  staticDate?: Date;
+  showArrow?: boolean;
+  showYear?: boolean;
 };
 
-type Dates = {
-  date: string;
-  day: string;
+type DatePickerEmits = {
+  (event: "change", date: Date): void;
 };
 
-const props = defineProps<DatePickerProps>();
+let props = withDefaults(defineProps<DatePickerProps>(), {
+  showArrow: true,
+  showYear: true,
+});
 
-let { date } = toRefs(props);
+let emit = defineEmits<DatePickerEmits>();
+
+let { selectedDate, staticDate } = toRefs(props);
 
 let weeks = ["S", "M", "T", "W", "T", "F", "S"];
 
-let [todayDate] = new Date().toISOString().split("T");
+let totalEntries = 42;
 
-let totalEntries = 35;
+let todayDate = new Date();
 
-let days = computed(() => {
-  let dates: Dates[] = [];
+let currentDate = computed(() => {
+  return staticDate?.value || selectedDate.value;
+});
 
-  for (let i = 1; i <= date.value.getTodayDaysInMonth(); i++) {
-    let day = i.toString();
+let getTotalDaysInMonth = (date: Date) => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+};
 
-    dates.push({
-      day,
-      date: `${date.value.getFullYear()}-${(date.value.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${day.padStart(2, "0")}`,
-    });
+let getLastDayInMonth = (date: Date) => {
+  let temp = new Date(date);
+  date.setDate(1);
+  date.setMonth(date.getMonth() + 1);
+  date.setDate(temp.getDate() - 1);
+  return date.getDate();
+};
+
+let dates = computed(() => {
+  let dates: Date[] = [];
+  let temp = new Date(currentDate.value);
+
+  for (let i = 1; i <= getTotalDaysInMonth(currentDate.value); i++) {
+    temp.setDate(i);
+    dates.push(structuredClone(temp));
   }
 
-  console.log(dates);
+  temp.setDate(1);
+  temp.setMonth(currentDate.value.getMonth() - 1);
+  let limit = dates[0].getDay() + 1;
+  for (let i = 1, j = getLastDayInMonth(temp); i < limit; i++, j--) {
+    temp.setDate(j);
+    dates.unshift(structuredClone(temp));
+  }
+
+  temp.setMonth(currentDate.value.getMonth() + 1);
+  temp.setDate(1);
+  for (let i = dates.length, j = 1; i < totalEntries; i++, j++) {
+    temp.setDate(j);
+    dates.push(structuredClone(temp));
+  }
 
   return dates;
 });
@@ -43,8 +75,12 @@ let days = computed(() => {
 <template>
   <div :class="styles.container">
     <div :class="styles.header">
-      <span>{{ `${date.getMonthName()} ${date.getFullYear()}` }}</span>
-      <div :class="styles.arrow">
+      <span>{{
+        `${getMonthName(currentDate.getMonth())} ${
+          showYear ? currentDate.getFullYear() : ""
+        }`
+      }}</span>
+      <div v-if="showArrow" :class="styles.arrow">
         <i class="bx-chevron-left"></i>
         <i class="bx-chevron-right"></i>
       </div>
@@ -54,10 +90,18 @@ let days = computed(() => {
         week
       }}</span>
       <span
-        v-for="({ day, date }, index) in days"
-        :class="[styles.day, date === todayDate && styles.highlight]"
+        v-for="(date, index) in dates"
+        :class="[
+          styles.day,
+          date.toString() === todayDate.toString()
+            ? styles.highlight
+            : date.toString() === selectedDate.toString() && styles.active,
+          ,
+          currentDate.getMonth() !== date.getMonth() && styles.in_active,
+        ]"
         :key="index"
-        >{{ day }}</span
+        @click="emit('change', date)"
+        >{{ date.getDate() }}</span
       >
     </div>
   </div>
@@ -107,11 +151,22 @@ let days = computed(() => {
     }
     .day {
       color: #3c4043;
+      border-radius: 50%;
+      transition: background-color 0.25ms ease-in-out;
       cursor: pointer;
       &:is(.highlight) {
         background-color: #1967d2;
         color: white;
-        border-radius: 50%;
+      }
+      &:is(.active) {
+        background-color: #afcbfa;
+        color: #185abc;
+      }
+      &:is(.in_active) {
+        color: #70757a;
+      }
+      &:hover:not(.highlight, .active) {
+        background-color: #f1f3f4;
       }
     }
   }

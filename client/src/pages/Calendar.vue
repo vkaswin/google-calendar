@@ -9,7 +9,7 @@ import { storeToRefs } from "pinia";
 
 let calendarStore = useCalendar();
 
-let { setView } = calendarStore;
+let { setView, setDate } = calendarStore;
 
 let { view, date } = storeToRefs(calendarStore);
 
@@ -17,6 +17,11 @@ let expanded = ref(true);
 
 let toggleMenu = () => {
   expanded.value = !expanded.value;
+};
+
+let handleDateChange = (date: Date) => {
+  console.log(date);
+  setDate(date);
 };
 </script>
 
@@ -41,13 +46,17 @@ let toggleMenu = () => {
     </div>
     <div :class="styles.sidebar" :aria-expanded="expanded">
       <div :class="styles.date_picker">
-        <DatePicker :date="date" />
+        <DatePicker :selected-date="date" @change="handleDateChange" />
       </div>
     </div>
     <div :class="styles.calender" :aria-expanded="expanded">
       <WeekCalendar v-if="view === 'week'" />
       <MonthCalendar v-if="view === 'month'" />
-      <YearCalendar v-if="view === 'year'" />
+      <YearCalendar
+        v-if="view === 'year'"
+        :selected-date="date"
+        @change="setDate"
+      />
     </div>
   </div>
 </template>
