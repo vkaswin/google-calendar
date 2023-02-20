@@ -20,7 +20,6 @@ let toggleMenu = () => {
 };
 
 let handleDateChange = (date: Date) => {
-  console.log(date);
   setDate(date);
 };
 </script>
