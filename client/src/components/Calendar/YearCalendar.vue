@@ -47,6 +47,6 @@ let dates = computed(() => {
 .container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 30px;
+  gap: 35px;
 }
 </style>
