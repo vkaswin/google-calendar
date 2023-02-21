@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { toRefs, computed } from "vue";
-import { getMonthName } from "@/utils";
+import { toRefs, computed, ref } from "vue";
+import { getMonthName, getAllDates } from "@/utils";
 
 type DatePickerProps = {
   selectedDate: Date;
-  staticDate?: Date;
+  calenderDate?: Date;
   showArrow?: boolean;
   showYear?: boolean;
 };
@@ -16,60 +16,50 @@ type DatePickerEmits = {
 let props = withDefaults(defineProps<DatePickerProps>(), {
   showArrow: true,
   showYear: true,
+  calenderDate: () => new Date(),
 });
 
 let emit = defineEmits<DatePickerEmits>();
 
-let { selectedDate, staticDate } = toRefs(props);
+let { selectedDate, calenderDate } = toRefs(props);
+
+let currentDate = ref(calenderDate.value);
 
 let weeks = ["S", "M", "T", "W", "T", "F", "S"];
 
-let totalEntries = 42;
-
 let todayDate = new Date();
 
-let currentDate = computed(() => {
-  return staticDate?.value || selectedDate.value;
-});
+let dates = computed(() => getAllDates(currentDate.value));
 
-let getTotalDaysInMonth = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+let handleNext = () => {
+  let date = structuredClone(currentDate.value);
+  let month = date.getMonth();
+
+  if (month !== 11) {
+    date.setMonth(month + 1);
+  } else {
+    let year = date.getFullYear();
+    date.setFullYear(year + 1);
+    date.setMonth(0);
+  }
+
+  currentDate.value = date;
 };
 
-let getLastDayInMonth = (date: Date) => {
-  let temp = new Date(date);
-  date.setDate(1);
-  date.setMonth(date.getMonth() + 1);
-  date.setDate(temp.getDate() - 1);
-  return date.getDate();
+let handlePrevious = () => {
+  let date = structuredClone(currentDate.value);
+  let month = date.getMonth();
+
+  if (month !== 1) {
+    date.setMonth(month - 1);
+  } else {
+    let year = date.getFullYear();
+    date.setFullYear(year - 1);
+    date.setMonth(11);
+  }
+
+  currentDate.value = date;
 };
-
-let dates = computed(() => {
-  let dates: Date[] = [];
-  let temp = new Date(currentDate.value);
-
-  for (let i = 1; i <= getTotalDaysInMonth(currentDate.value); i++) {
-    temp.setDate(i);
-    dates.push(structuredClone(temp));
-  }
-
-  temp.setDate(1);
-  temp.setMonth(currentDate.value.getMonth() - 1);
-  let limit = dates[0].getDay() + 1;
-  for (let i = 1, j = getLastDayInMonth(temp); i < limit; i++, j--) {
-    temp.setDate(j);
-    dates.unshift(structuredClone(temp));
-  }
-
-  temp.setMonth(currentDate.value.getMonth() + 1);
-  temp.setDate(1);
-  for (let i = dates.length, j = 1; i < totalEntries; i++, j++) {
-    temp.setDate(j);
-    dates.push(structuredClone(temp));
-  }
-
-  return dates;
-});
 </script>
 
 <template>
@@ -81,8 +71,8 @@ let dates = computed(() => {
         }`
       }}</span>
       <div v-if="showArrow" :class="styles.arrow">
-        <i class="bx-chevron-left"></i>
-        <i class="bx-chevron-right"></i>
+        <i class="bx-chevron-left" @click="handlePrevious"></i>
+        <i class="bx-chevron-right" @click="handleNext"></i>
       </div>
     </div>
     <div :class="styles.date_picker">
@@ -132,7 +122,7 @@ let dates = computed(() => {
   }
   .date_picker {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, 28px);
     place-items: center;
     gap: 5px;
     .week,

@@ -1,11 +1,27 @@
 :root {
   --header-height: 70px;
-  --sidebar-width: 250px;
+  --sidebar-width: 260px;
+}
+
+html {
+  height: 100%;
 }
 
 body,
+#app {
+  height: inherit;
+}
+
+#app {
+  background-color: #fff;
+}
+
+body {
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+}
+
 input,
 textarea {
-  font-size: 16px;
   font-family: "Poppins", sans-serif;
 }

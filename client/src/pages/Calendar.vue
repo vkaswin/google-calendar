@@ -25,14 +25,14 @@ let handleDateChange = (date: Date) => {
 </script>
 
 <template>
-  <div :class="styles.container">
-    <div :class="styles.header">
-      <div :class="styles.logo">
-        <i class="bx-menu" @click="toggleMenu"></i>
-        <img src="@/assets/images/calendar.png" />
-        <span>Calender</span>
-      </div>
+  <div :class="styles.header">
+    <div :class="styles.logo">
+      <i class="bx-menu" @click="toggleMenu"></i>
+      <img src="@/assets/images/calendar.png" />
+      <span>Calender</span>
     </div>
+  </div>
+  <div :class="styles.container">
     <div :class="styles.create_btn" :aria-expanded="expanded">
       <svg viewBox="0 0 36 36">
         <path fill="#34A853" d="M16 16v14h4V20z"></path>
@@ -50,7 +50,7 @@ let handleDateChange = (date: Date) => {
     </div>
     <div :class="styles.calender" :aria-expanded="expanded">
       <WeekCalendar v-if="view === 'week'" />
-      <MonthCalendar v-if="view === 'month'" />
+      <MonthCalendar v-if="view === 'month'" :selected-date="date" />
       <YearCalendar
         v-if="view === 'year'"
         :selected-date="date"
@@ -61,49 +61,49 @@ let handleDateChange = (date: Date) => {
 </template>
 
 <style lang="scss" module="styles">
-.container {
-  overflow-x: hidden;
-
-  .header {
-    position: sticky;
+.header {
+  position: sticky;
+  display: flex;
+  align-items: center;
+  top: 0px;
+  left: 0px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #d9dbe0;
+  height: var(--header-height);
+  padding: 0px 15px;
+  z-index: 999;
+  .logo {
     display: flex;
     align-items: center;
-    top: 0px;
-    left: 0px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #d9dbe0;
-    height: var(--header-height);
-    padding: 0px 15px;
-    z-index: 999;
-    .logo {
+    gap: 10px;
+    i {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 10px;
-      i {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #606368;
-        font-size: 28px;
-        cursor: pointer;
-        &:hover {
-          background-color: #f0f0f0;
-        }
-      }
-      img {
-        width: 44px;
-        height: 40px;
-      }
-      span {
-        color: #3c4043;
-        font-family: "Poppins-Medium", sans-serif;
-        font-size: 20px;
+      justify-content: center;
+      color: #606368;
+      font-size: 28px;
+      cursor: pointer;
+      &:hover {
+        background-color: #f0f0f0;
       }
     }
+    img {
+      width: 44px;
+      height: 40px;
+    }
+    span {
+      color: #3c4043;
+      font-family: "Poppins-Medium", sans-serif;
+      font-size: 20px;
+    }
   }
+}
+.container {
+  overflow-x: hidden;
+  height: calc(100% - var(--header-height));
 
   .create_btn {
     position: absolute;
@@ -112,7 +112,7 @@ let handleDateChange = (date: Date) => {
     display: flex;
     align-items: center;
     gap: 5px;
-    background-color: #ffffff80;
+    background-color: rgba(255, 255, 255, 0.502);
     box-shadow: 0px 1px 2px 0px rgba(60, 64, 67, 0.3),
       0px 1px 3px 1px rgba(60, 64, 67, 0.15);
     height: 48px;
@@ -170,8 +170,11 @@ let handleDateChange = (date: Date) => {
 
   .calender {
     position: relative;
-    padding: 15px;
-    transition: left 0.25s ease-in-out;
+    padding: 10px;
+    transition-property: left, width;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    height: 100%;
   }
 
   .calender[aria-expanded="true"] {

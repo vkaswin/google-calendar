@@ -26,5 +26,5 @@ connect()
     });
   })
   .catch((error) => {
-    console.log(error);
+    console.log("🚀 ~ file: index.ts:29 ~ error:", error);
   });

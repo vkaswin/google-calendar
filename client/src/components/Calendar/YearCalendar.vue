@@ -34,7 +34,7 @@ let dates = computed(() => {
   <div :class="styles.container">
     <DatePicker
       v-for="date in dates"
-      :static-date="date"
+      :calender-date="date"
       :selected-date="selectedDate"
       :show-arrow="false"
       :show-year="false"
@@ -47,6 +47,6 @@ let dates = computed(() => {
 .container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 35px;
+  gap: 30px;
 }
 </style>

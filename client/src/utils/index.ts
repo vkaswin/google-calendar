@@ -44,6 +44,27 @@ const debounce = <T>(
   };
 };
 
+const getDayName = (day: number): string | undefined => {
+  switch (day) {
+    case 0:
+      return "Sunday";
+    case 1:
+      return "Monday";
+    case 2:
+      return "Tuesday";
+    case 3:
+      return "Thursday";
+    case 4:
+      return "Friday";
+    case 5:
+      return "Saturday";
+    case 6:
+      return "Sunday";
+    default:
+      return;
+  }
+};
+
 const getMonthName = (month: number): string | undefined => {
   switch (month) {
     case 0:
@@ -75,4 +96,50 @@ const getMonthName = (month: number): string | undefined => {
   }
 };
 
-export { cookie, debounce, getMonthName };
+const getTotalDaysInMonth = (date: Date) => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+};
+
+const getLastDayInMonth = (date: Date) => {
+  let temp = new Date(date);
+  date.setDate(1);
+  date.setMonth(date.getMonth() + 1);
+  date.setDate(temp.getDate() - 1);
+  return date.getDate();
+};
+
+const getAllDates = (date: Date): Date[] => {
+  let dates: Date[] = [];
+  let temp = new Date(date);
+
+  for (let i = 1; i <= getTotalDaysInMonth(date); i++) {
+    temp.setDate(i);
+    dates.push(structuredClone(temp));
+  }
+
+  temp.setDate(1);
+  temp.setMonth(date.getMonth() - 1);
+  let limit = dates[0].getDay() + 1;
+  for (let i = 1, j = getLastDayInMonth(temp); i < limit; i++, j--) {
+    temp.setDate(j);
+    dates.unshift(structuredClone(temp));
+  }
+
+  temp.setMonth(date.getMonth() + 1);
+  temp.setDate(1);
+  for (let i = dates.length, j = 1; i < 42; i++, j++) {
+    temp.setDate(j);
+    dates.push(structuredClone(temp));
+  }
+
+  return dates;
+};
+
+export {
+  cookie,
+  debounce,
+  getMonthName,
+  getAllDates,
+  getTotalDaysInMonth,
+  getLastDayInMonth,
+};
