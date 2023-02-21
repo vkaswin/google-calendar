@@ -1,24 +1,35 @@
 <script setup lang="ts">
-import { toRefs, ref, computed } from "vue";
-import { getAllDates } from "@/utils";
+import { toRefs, computed } from "vue";
+import { getAllDates, getDayName } from "@/utils";
 
 type MonthCalendarProps = {
   selectedDate: Date;
 };
 
+type MonthCalendarEmits = {
+  (event: "onChange", date: Date): void;
+};
+
 let props = defineProps<MonthCalendarProps>();
+
+let emit = defineEmits<MonthCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let currentDate = ref(new Date());
-
-let dates = computed(() => getAllDates(currentDate.value));
+let dates = computed(() => getAllDates(selectedDate.value));
 </script>
 
 <template>
   <div :class="styles.container">
-    <div v-for="(date, index) in dates" :class="styles.date" :key="index">
-      <span>{{ date.toDateString() }}</span>
+    <div v-for="(date, index) in dates" :class="styles.date_box" :key="index">
+      <div :class="styles.header">
+        <span v-if="index <= 6" :class="styles.week">{{
+          getDayName(date.getDay())
+        }}</span
+        ><span :class="styles.day" @click="emit('onChange', date)">{{
+          date.getDate()
+        }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -27,10 +38,45 @@ let dates = computed(() => getAllDates(currentDate.value));
 .container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  border-left: 1px solid rgb(218, 220, 224);
-  height: 100%;
-  .date {
-    border: 1px solid rgb(218, 220, 224);
+  grid-template-rows: repeat(6, 130px);
+  border-style: solid;
+  border-color: #c0c0c0;
+  border-width: 0px 0px 1px 1px;
+  .date_box {
+    border-style: solid;
+    border-color: #c0c0c0;
+    border-width: 1px 1px 0px 0px;
+    padding: 10px;
+    .header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      span {
+        font-family: "Poppins-Medium", sans-serif;
+      }
+      .week {
+        color: #70757a;
+        font-size: 14px;
+      }
+      .day {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        width: 24px;
+        height: 24px;
+        color: #3c4043;
+        font-size: 12px;
+        border-radius: 50%;
+        transition: background-color 0.25ms ease-in-out;
+        cursor: pointer;
+        &:hover {
+          background-color: #f1f3f4;
+        }
+      }
+    }
   }
 }
 </style>

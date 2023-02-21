@@ -5,7 +5,7 @@ const useCalendar = defineStore("calendar", {
   state: (): CalendarStore => {
     return {
       date: new Date(),
-      view: "year",
+      view: "month",
     };
   },
   getters: {},
@@ -15,6 +15,20 @@ const useCalendar = defineStore("calendar", {
     },
     setDate(date: Date) {
       this.date = date;
+    },
+    handleNext() {
+      console.log(
+        "🚀 ~ file: useCalendar.ts:22 ~ handleNext ~ this.date,this.view:",
+        this.date,
+        this.view
+      );
+    },
+    handlePrevious() {
+      console.log(
+        "🚀 ~ file: useCalendar.ts:22 ~ handlePrevious ~ this.date,this.view:",
+        this.date,
+        this.view
+      );
     },
   },
 });

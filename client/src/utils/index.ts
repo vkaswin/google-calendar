@@ -51,15 +51,15 @@ const getDayName = (day: number): string | undefined => {
     case 1:
       return "Monday";
     case 2:
-      return "Tuesday";
+      return "Wednesday";
     case 3:
-      return "Thursday";
+      return "Tuesday";
     case 4:
-      return "Friday";
+      return "Thursday";
     case 5:
-      return "Saturday";
+      return "Friday";
     case 6:
-      return "Sunday";
+      return "Saturday";
     default:
       return;
   }
@@ -139,6 +139,7 @@ export {
   cookie,
   debounce,
   getMonthName,
+  getDayName,
   getAllDates,
   getTotalDaysInMonth,
   getLastDayInMonth,

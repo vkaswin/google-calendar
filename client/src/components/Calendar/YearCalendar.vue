@@ -8,7 +8,7 @@ type YearCalendarProps = {
 };
 
 type YearCalendarEmits = {
-  (event: "change", date: Date): void;
+  (event: "onChange", date: Date): void;
 };
 
 let props = defineProps<YearCalendarProps>();
@@ -38,7 +38,7 @@ let dates = computed(() => {
       :selected-date="selectedDate"
       :show-arrow="false"
       :show-year="false"
-      @change="(event) => emit('change', event)"
+      @on-change="(event) => emit('onChange', event)"
     />
   </div>
 </template>

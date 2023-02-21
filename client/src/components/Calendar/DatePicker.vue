@@ -10,7 +10,7 @@ type DatePickerProps = {
 };
 
 type DatePickerEmits = {
-  (event: "change", date: Date): void;
+  (event: "onChange", date: Date): void;
 };
 
 let props = withDefaults(defineProps<DatePickerProps>(), {
@@ -60,6 +60,14 @@ let handlePrevious = () => {
 
   currentDate.value = date;
 };
+
+let setCurrentDate = (date: Date) => {
+  currentDate.value = date;
+};
+
+defineExpose({
+  setCurrentDate,
+});
 </script>
 
 <template>
@@ -83,14 +91,15 @@ let handlePrevious = () => {
         v-for="(date, index) in dates"
         :class="[
           styles.day,
-          date.toString() === todayDate.toString()
+          date.toLocaleDateString() === todayDate.toLocaleDateString()
             ? styles.highlight
-            : date.toString() === selectedDate.toString() && styles.active,
+            : date.toLocaleDateString() === selectedDate.toLocaleDateString() &&
+              styles.active,
           ,
           currentDate.getMonth() !== date.getMonth() && styles.in_active,
         ]"
         :key="index"
-        @click="emit('change', date)"
+        @click="emit('onChange', date)"
         >{{ date.getDate() }}</span
       >
     </div>
@@ -134,12 +143,6 @@ let handlePrevious = () => {
       width: 24px;
       height: 24px;
       font-family: "Poppins-Medium", sans-serif;
-    }
-    .week {
-      color: #70757a;
-      cursor: default;
-    }
-    .day {
       color: #3c4043;
       border-radius: 50%;
       transition: background-color 0.25ms ease-in-out;
@@ -158,6 +161,10 @@ let handlePrevious = () => {
       &:hover:not(.highlight, .active) {
         background-color: #f1f3f4;
       }
+    }
+    .week {
+      color: #70757a;
+      cursor: default;
     }
   }
 }
