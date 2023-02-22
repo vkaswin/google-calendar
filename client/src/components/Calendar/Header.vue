@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { getMonthName } from "@/utils";
 import { toRefs } from "vue";
+import { getMonthName } from "@/utils";
+import { CalendarView } from "@/types/calendar";
 
 type HeaderProps = {
   date: Date;
@@ -11,6 +12,7 @@ type HeaderEmits = {
   (event: "onToggle"): void;
   (event: "onNext"): void;
   (event: "onPrevious"): void;
+  (event: "onViewChange", view: CalendarView): void;
 };
 
 let props = defineProps<HeaderProps>();
@@ -39,7 +41,12 @@ let emit = defineEmits<HeaderEmits>();
         <span>{{
           `${getMonthName(date.getMonth())} ${date.getFullYear()}`
         }}</span>
+        <button @click="emit('onViewChange', 'month')">Dropdown</button>
       </div>
+    </div>
+    <div></div>
+    <div :class="styles.avatar">
+      <img src="" />
     </div>
   </div>
 </template>
@@ -54,7 +61,7 @@ let emit = defineEmits<HeaderEmits>();
   background-color: #ffffff;
   height: var(--header-height);
   padding: 0px 15px;
-  z-index: 999;
+  z-index: 1;
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
     0 2px 4px -1px rgba(0, 0, 0, 0.2);
   width: 100%;

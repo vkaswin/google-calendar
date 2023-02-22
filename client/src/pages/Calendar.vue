@@ -1,13 +1,30 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, defineAsyncComponent } from "vue";
 import Header from "@/components/Calendar/Header.vue";
 import SideBar from "@/components/Calendar/SideBar.vue";
-import WeekCalendar from "@/components/Calendar/WeekCalendar.vue";
-import MonthCalendar from "@/components/Calendar/MonthCalendar.vue";
-import YearCalendar from "@/components/Calendar/YearCalendar.vue";
-import DatePicker from "@/components/Calendar/DatePicker.vue";
+import Loader from "@/components/Calendar/Loader.vue";
 import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
+
+const DayCalendar = defineAsyncComponent({
+  loader: () => import(`@/components/Calendar/DayCalendar.vue`),
+  loadingComponent: Loader,
+});
+
+const WeekCalendar = defineAsyncComponent({
+  loader: () => import("@/components/Calendar/WeekCalendar.vue"),
+  loadingComponent: Loader,
+});
+
+const MonthCalendar = defineAsyncComponent({
+  loader: () => import("@/components/Calendar/MonthCalendar.vue"),
+  loadingComponent: Loader,
+});
+
+const YearCalendar = defineAsyncComponent({
+  loader: () => import("@/components/Calendar/YearCalendar.vue"),
+  loadingComponent: Loader,
+});
 
 let calendarStore = useCalendar();
 
@@ -17,7 +34,7 @@ let { view, date } = storeToRefs(calendarStore);
 
 let isOpen = ref(true);
 
-let datePicker = ref<InstanceType<typeof DatePicker>>();
+let sideBar = ref<InstanceType<typeof SideBar>>();
 
 let toggle = () => {
   isOpen.value = !isOpen.value;
@@ -25,7 +42,7 @@ let toggle = () => {
 
 let reset = () => {
   let date = new Date();
-  datePicker.value?.setCurrentDate(date);
+  sideBar.value?.datePicker?.setCurrentDate(date);
   setDate(date);
 };
 
@@ -41,17 +58,19 @@ let handleChange = (date: Date) => {
     @on-previous="handlePrevious"
     @on-reset="reset"
     @on-toggle="toggle"
+    @on-view-change="setView"
   />
-  <SideBar :date="date" :isOpen="isOpen" @on-change="setDate" />
+  <SideBar ref="sideBar" :date="date" :isOpen="isOpen" @on-change="setDate" />
   <div :class="styles.calender" :aria-expanded="isOpen">
-    <WeekCalendar v-if="view === 'week'" />
+    <DayCalendar v-if="view === 'day'" />
+    <WeekCalendar v-else-if="view === 'week'" />
     <MonthCalendar
-      v-if="view === 'month'"
+      v-else-if="view === 'month'"
       :selected-date="date"
       @on-change="handleChange"
     />
     <YearCalendar
-      v-if="view === 'year'"
+      v-else-if="view === 'year'"
       :selected-date="date"
       @on-change="setDate"
     />

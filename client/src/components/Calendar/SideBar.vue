@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRefs } from "vue";
+import { toRefs, ref } from "vue";
 import DatePicker from "./DatePicker.vue";
 
 type SideBarProps = {
@@ -16,6 +16,10 @@ let props = defineProps<SideBarProps>();
 let emit = defineEmits<SideBarEmits>();
 
 let { date, isOpen } = toRefs(props);
+
+let datePicker = ref<InstanceType<typeof DatePicker>>();
+
+defineExpose({ datePicker });
 </script>
 
 <template>
@@ -50,7 +54,6 @@ let { date, isOpen } = toRefs(props);
   box-shadow: 0px 1px 2px 0px rgba(60, 64, 67, 0.3),
     0px 1px 3px 1px rgba(60, 64, 67, 0.15);
   height: var(--create-btn-height);
-  z-index: 998;
   cursor: pointer;
   &:hover {
     box-shadow: 0px 4px 4px 0px rgba(60, 64, 67, 0.3),
