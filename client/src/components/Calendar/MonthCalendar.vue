@@ -40,11 +40,11 @@ let dates = computed(() => getAllDates(selectedDate.value));
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 130px);
   border-style: solid;
-  border-color: #c0c0c0;
+  border-color: rgb(218, 220, 224);
   border-width: 0px 0px 1px 1px;
   .date_box {
     border-style: solid;
-    border-color: #c0c0c0;
+    border-color: rgb(218, 220, 224);
     border-width: 1px 1px 0px 0px;
     padding: 10px;
     .header {
