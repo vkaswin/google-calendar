@@ -6,11 +6,6 @@ import Loader from "@/components/Calendar/Loader.vue";
 import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
 
-const DayCalendar = defineAsyncComponent({
-  loader: () => import(`@/components/Calendar/DayCalendar.vue`),
-  loadingComponent: Loader,
-});
-
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/Calendar/WeekCalendar.vue"),
   loadingComponent: Loader,
@@ -60,39 +55,44 @@ let handleChange = (date: Date) => {
     @on-toggle="toggle"
     @on-view-change="setView"
   />
-  <SideBar ref="sideBar" :date="date" :isOpen="isOpen" @on-change="setDate" />
-  <div :class="styles.calender" :aria-expanded="isOpen">
-    <DayCalendar v-if="view === 'day'" />
-    <WeekCalendar v-else-if="view === 'week'" />
-    <MonthCalendar
-      v-else-if="view === 'month'"
-      :selected-date="date"
-      @on-change="handleChange"
-    />
-    <YearCalendar
-      v-else-if="view === 'year'"
-      :selected-date="date"
-      @on-change="setDate"
-    />
+  <div :class="styles.container">
+    <SideBar ref="sideBar" :date="date" :isOpen="isOpen" @on-change="setDate" />
+    <div :class="styles.calendar" :aria-expanded="isOpen">
+      <WeekCalendar
+        v-if="view === 'week' || view === 'day'"
+        :selected-date="date"
+      />
+      <MonthCalendar
+        v-else-if="view === 'month'"
+        :selected-date="date"
+        @on-change="handleChange"
+      />
+      <YearCalendar
+        v-else-if="view === 'year'"
+        :selected-date="date"
+        @on-change="setDate"
+      />
+    </div>
   </div>
 </template>
 
 <style lang="scss" module="styles">
-.calender {
+.container {
   position: relative;
-  padding: calc(var(--header-height) + var(--base-padding)) var(--base-padding)
-    var(--base-padding) var(--base-padding);
-  transition-property: left, width;
-  transition-duration: 0.25s;
-  transition-timing-function: ease-in-out;
+  .calendar {
+    padding: 15px;
+    transition-property: left, width;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+  }
 }
 
-.calender[aria-expanded="true"] {
+.container[aria-expanded="true"] {
   width: calc(100% - var(--sidebar-width));
   left: var(--sidebar-width);
 }
 
-.calender[aria-expanded="false"] {
+.container[aria-expanded="false"] {
   width: 100%;
   left: 0px;
 }

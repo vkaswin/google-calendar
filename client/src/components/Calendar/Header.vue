@@ -53,7 +53,6 @@ let emit = defineEmits<HeaderEmits>();
 
 <style lang="scss" module="styles">
 .container {
-  position: fixed;
   display: flex;
   align-items: center;
   top: 0px;
@@ -61,7 +60,6 @@ let emit = defineEmits<HeaderEmits>();
   background-color: #ffffff;
   height: var(--header-height);
   padding: 0px 15px;
-  z-index: 1;
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
     0 2px 4px -1px rgba(0, 0, 0, 0.2);
   width: 100%;

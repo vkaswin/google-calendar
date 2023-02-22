@@ -5,15 +5,13 @@ const useCalendar = defineStore("calendar", {
   state: (): CalendarStore => {
     return {
       date: new Date(),
-      view: "year",
+      view: "week",
     };
   },
   getters: {},
   actions: {
     setView(view: CalendarView) {
-      console.log(view);
       this.view = view;
-      console.log(this.view);
     },
     setDate(date: Date) {
       this.date = date;
