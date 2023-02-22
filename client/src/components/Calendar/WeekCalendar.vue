@@ -35,68 +35,75 @@ let dates = computed(() => {
 </script>
 
 <template>
-  <div :class="styles.week_container">
-    <div
-      v-for="(date, index) in dates"
-      :key="index"
-      :class="[
-        styles.week_title,
-        todayDate.toLocaleDateString() === date.toLocaleDateString() &&
-          styles.highlight,
-      ]"
-    >
-      <span>{{ getDayName(date.getDay()) }}</span>
-      <span>{{ date.getDate() }}</span>
+  <div :class="styles.container">
+    <div :class="styles.week_wrapper">
+      <div
+        v-for="(date, index) in dates"
+        :key="index"
+        :class="[
+          styles.week_title,
+          todayDate.toLocaleDateString() === date.toLocaleDateString() &&
+            styles.highlight,
+        ]"
+      >
+        <span>{{ getDayName(date.getDay()) }}</span>
+        <span>{{ date.getDate() }}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" module="styles">
-.week_container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  .week_title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    &:is(.highlight) {
-      span {
-        &:first-child {
-          color: rgb(26, 115, 232);
-        }
-        &:last-child {
-          color: #fff;
-          background-color: rgb(26, 115, 232);
-        }
-      }
-    }
-    &:not(.highlight) {
-      span {
-        &:last-child {
-          &:hover {
-            background-color: #f1f3f4;
+.container {
+  height: 100%;
+  padding-top: 15px;
+  overflow-y: hidden;
+  .week_wrapper {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    .week_title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      &:is(.highlight) {
+        span {
+          &:first-child {
+            color: rgb(26, 115, 232);
+          }
+          &:last-child {
+            color: #fff;
+            background-color: rgb(26, 115, 232);
           }
         }
       }
-    }
-    span {
-      &:first-child {
-        color: #70757a;
-        font-size: 14px;
+      &:not(.highlight) {
+        span {
+          &:last-child {
+            &:hover {
+              background-color: #f1f3f4;
+            }
+          }
+        }
       }
-      &:last-child {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        color: #70757a;
-        font-size: 24px;
-        font-family: "Poppins-Medium", sans-serif;
-        transition: background-color, color 0.25s ease-in-out;
-        cursor: pointer;
+      span {
+        &:first-child {
+          color: #70757a;
+          font-size: 14px;
+        }
+        &:last-child {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          color: #70757a;
+          font-size: 24px;
+          font-family: "Poppins-Medium", sans-serif;
+          transition: background-color, color 0.25s ease-in-out;
+          cursor: pointer;
+        }
       }
     }
   }

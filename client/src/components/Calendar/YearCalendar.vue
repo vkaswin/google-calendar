@@ -47,5 +47,8 @@ let dates = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 30px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 15px 10px;
 }
 </style>

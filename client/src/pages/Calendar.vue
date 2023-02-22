@@ -79,21 +79,23 @@ let handleChange = (date: Date) => {
 <style lang="scss" module="styles">
 .container {
   position: relative;
+  display: flex;
+  height: calc(100% - var(--header-height));
   .calendar {
-    padding: 15px;
-    transition-property: left, width;
-    transition-duration: 0.25s;
-    transition-timing-function: ease-in-out;
+    height: 100%;
+    flex-grow: 1;
+    // transition-property: transform, width;
+    // transition-duration: 0.25s;
+    // transition-timing-function: ease-in-out;
   }
-}
+  .calendar[aria-expanded="true"] {
+    // width: calc(100% - var(--sidebar-width));
+    // transform: translateX(var(--sidebar-width));
+  }
 
-.container[aria-expanded="true"] {
-  width: calc(100% - var(--sidebar-width));
-  left: var(--sidebar-width);
-}
-
-.container[aria-expanded="false"] {
-  width: 100%;
-  left: 0px;
+  .calendar[aria-expanded="false"] {
+    // width: 100%;
+    // transform: translateX(0px);
+  }
 }
 </style>

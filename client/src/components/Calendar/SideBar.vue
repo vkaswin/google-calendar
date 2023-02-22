@@ -34,25 +34,23 @@ defineExpose({ datePicker });
       </svg>
       <span>Create</span>
     </div>
-    <div :class="styles.sidebar">
-      <DatePicker
-        ref="datePicker"
-        :selected-date="date"
-        @on-change="(date) => emit('onChange', date)"
-      />
-    </div>
+    <DatePicker
+      ref="datePicker"
+      :selected-date="date"
+      @on-change="(date) => emit('onChange', date)"
+    />
   </div>
 </template>
 
 <style lang="scss" module="styles">
 .container {
-  position: absolute;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  transition: left 0.25s ease-in-out;
-  width: 250px;
-  padding: 15px;
+  transition: transform 0.25s ease-in-out;
+  width: var(--sidebar-width);
+  padding: 15px 10px;
+  overflow-y: auto;
   .create_btn {
     display: flex;
     align-items: center;
@@ -81,10 +79,10 @@ defineExpose({ datePicker });
 }
 
 .container[aria-expanded="true"] {
-  left: 0px;
+  transform: translateX(0px);
 }
 
 .container[aria-expanded="false"] {
-  left: -250px;
+  transform: translateX(-250px);
 }
 </style>
