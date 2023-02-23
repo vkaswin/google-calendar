@@ -13,7 +13,6 @@ type HeaderProps = {
 
 type HeaderEmits = {
   (event: "onReset"): void;
-  (event: "onToggle"): void;
   (event: "onNext"): void;
   (event: "onPrevious"): void;
   (event: "onViewChange", view: CalendarView): void;
@@ -35,7 +34,6 @@ let userInitial = computed(() => {
 <template>
   <div :class="styles.container">
     <div :class="styles.logo">
-      <i class="bx-menu" @click="emit('onToggle')"></i>
       <img src="@/assets/images/calendar.png" />
       <span>Calender</span>
     </div>

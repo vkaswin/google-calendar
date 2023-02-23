@@ -37,13 +37,7 @@ let { view, date } = storeToRefs(calendar);
 
 let { user } = storeToRefs(auth);
 
-let isOpen = ref(true);
-
 let sideBar = ref<InstanceType<typeof SideBar>>();
-
-let toggle = () => {
-  isOpen.value = !isOpen.value;
-};
 
 let reset = () => {
   let date = new Date();
@@ -68,12 +62,11 @@ let handleChange = (date: Date) => {
     @on-next="handleNext"
     @on-previous="handlePrevious"
     @on-reset="reset"
-    @on-toggle="toggle"
     @on-view-change="setView"
   />
   <div :class="styles.container">
-    <SideBar ref="sideBar" :date="date" :isOpen="isOpen" @on-change="setDate" />
-    <div :class="styles.calendar" :aria-expanded="isOpen">
+    <SideBar ref="sideBar" :date="date" @on-change="setDate" />
+    <div :class="styles.calendar">
       <DayCalender v-if="view === 'day'" />
       <WeekCalendar
         v-else-if="view === 'week'"
@@ -100,20 +93,7 @@ let handleChange = (date: Date) => {
   gap: 15px;
   height: calc(100% - var(--header-height));
   .calendar {
-    height: 100%;
     flex-grow: 1;
-    // transition-property: transform, width;
-    // transition-duration: 0.25s;
-    // transition-timing-function: ease-in-out;
   }
-  //   .calendar[aria-expanded="true"] {
-  //     width: calc(100% - var(--sidebar-width));
-  //     transform: translateX(var(--sidebar-width));
-  //   }
-
-  //   .calendar[aria-expanded="false"] {
-  //     width: 100%;
-  //     transform: translateX(0px);
-  //   }
 }
 </style>

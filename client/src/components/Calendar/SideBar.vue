@@ -4,7 +4,6 @@ import DatePicker from "./DatePicker.vue";
 
 type SideBarProps = {
   date: Date;
-  isOpen: boolean;
 };
 
 type SideBarEmits = {
@@ -15,7 +14,7 @@ let props = defineProps<SideBarProps>();
 
 let emit = defineEmits<SideBarEmits>();
 
-let { date, isOpen } = toRefs(props);
+let { date } = toRefs(props);
 
 let datePicker = ref<InstanceType<typeof DatePicker>>();
 
@@ -23,7 +22,7 @@ defineExpose({ datePicker });
 </script>
 
 <template>
-  <div :class="styles.container" :aria-expanded="isOpen">
+  <div :class="styles.container">
     <div :class="styles.create_btn">
       <svg viewBox="0 0 36 36">
         <path fill="#34A853" d="M16 16v14h4V20z"></path>
@@ -76,13 +75,5 @@ defineExpose({ datePicker });
       color: #3d4043;
     }
   }
-}
-
-.container[aria-expanded="true"] {
-  transform: translateX(0px);
-}
-
-.container[aria-expanded="false"] {
-  transform: translateX(-250px);
 }
 </style>
