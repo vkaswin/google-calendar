@@ -49,12 +49,14 @@ let dates = computed(() => getAllDates(selectedDate.value));
     border-color: rgb(218, 220, 224);
     border-width: 1px 1px 0px 0px;
     padding: 10px;
-    &:nth-child(1),
-    &:nth-child(2),
-    &:nth-child(3),
-    &:nth-child(5),
-    &:nth-child(6),
-    &:nth-child(7) {
+    &:is(
+        :nth-child(1),
+        :nth-child(2),
+        :nth-child(3),
+        :nth-child(5),
+        :nth-child(6),
+        :nth-child(7)
+      ) {
       border-width: 0px 1px 0px 0px;
     }
     .header {

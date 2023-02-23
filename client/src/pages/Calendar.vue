@@ -5,6 +5,12 @@ import SideBar from "@/components/Calendar/SideBar.vue";
 import Loader from "@/components/Calendar/Loader.vue";
 import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
+import useAuth from "@/store/useAuth";
+
+const DayCalender = defineAsyncComponent({
+  loader: () => import("@/components/Calendar/DayCalendar.vue"),
+  loadingComponent: Loader,
+});
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/Calendar/WeekCalendar.vue"),
@@ -21,11 +27,15 @@ const YearCalendar = defineAsyncComponent({
   loadingComponent: Loader,
 });
 
-let calendarStore = useCalendar();
+let calendar = useCalendar();
 
-let { setView, setDate, handleNext, handlePrevious } = calendarStore;
+let auth = useAuth();
 
-let { view, date } = storeToRefs(calendarStore);
+let { setView, setDate, handleNext, handlePrevious } = calendar;
+
+let { view, date } = storeToRefs(calendar);
+
+let { user } = storeToRefs(auth);
 
 let isOpen = ref(true);
 
@@ -42,13 +52,19 @@ let reset = () => {
 };
 
 let handleChange = (date: Date) => {
-  console.log("🚀 ~ file: Calendar.vue:35 ~ handleChange ~ date:", date);
+  console.log(
+    "🚀 ~ file: Calendar.vue:35 ~ handleChange ~ view, date:",
+    view,
+    date
+  );
 };
 </script>
 
 <template>
   <Header
+    :user="user"
     :date="date"
+    :view="view"
     @on-next="handleNext"
     @on-previous="handlePrevious"
     @on-reset="reset"
@@ -58,8 +74,10 @@ let handleChange = (date: Date) => {
   <div :class="styles.container">
     <SideBar ref="sideBar" :date="date" :isOpen="isOpen" @on-change="setDate" />
     <div :class="styles.calendar" :aria-expanded="isOpen">
+      <DayCalender v-if="view === 'day'" />
       <WeekCalendar
-        v-if="view === 'week' || view === 'day'"
+        v-else-if="view === 'week'"
+        :view="view"
         :selected-date="date"
       />
       <MonthCalendar
@@ -70,7 +88,7 @@ let handleChange = (date: Date) => {
       <YearCalendar
         v-else-if="view === 'year'"
         :selected-date="date"
-        @on-change="setDate"
+        @on-change="handleChange"
       />
     </div>
   </div>
@@ -78,8 +96,8 @@ let handleChange = (date: Date) => {
 
 <style lang="scss" module="styles">
 .container {
-  position: relative;
   display: flex;
+  gap: 15px;
   height: calc(100% - var(--header-height));
   .calendar {
     height: 100%;
@@ -88,14 +106,14 @@ let handleChange = (date: Date) => {
     // transition-duration: 0.25s;
     // transition-timing-function: ease-in-out;
   }
-  .calendar[aria-expanded="true"] {
-    // width: calc(100% - var(--sidebar-width));
-    // transform: translateX(var(--sidebar-width));
-  }
+  //   .calendar[aria-expanded="true"] {
+  //     width: calc(100% - var(--sidebar-width));
+  //     transform: translateX(var(--sidebar-width));
+  //   }
 
-  .calendar[aria-expanded="false"] {
-    // width: 100%;
-    // transform: translateX(0px);
-  }
+  //   .calendar[aria-expanded="false"] {
+  //     width: 100%;
+  //     transform: translateX(0px);
+  //   }
 }
 </style>

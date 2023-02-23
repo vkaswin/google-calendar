@@ -19,7 +19,7 @@ const asyncHandler = <T>(
       res
         .status(error?.status || 500)
         .send({ message: error?.message || "Internal Server Error" });
-      console.log(error);
+      console.log("🚀 ~ file: asyncHandler.ts:19 ~ error:", error);
     }
   };
 };
