@@ -7,11 +7,6 @@ import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
 import useAuth from "@/store/useAuth";
 
-const DayCalender = defineAsyncComponent({
-  loader: () => import("@/components/Calendar/DayCalendar.vue"),
-  loadingComponent: Loader,
-});
-
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/Calendar/WeekCalendar.vue"),
   loadingComponent: Loader,
@@ -67,9 +62,8 @@ let handleChange = (date: Date) => {
   <div :class="styles.container">
     <SideBar ref="sideBar" :date="date" @on-change="setDate" />
     <div :class="styles.calendar">
-      <DayCalender v-if="view === 'day'" />
       <WeekCalendar
-        v-else-if="view === 'week'"
+        v-if="view === 'week' || view === 'day'"
         :view="view"
         :selected-date="date"
       />

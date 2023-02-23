@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { CalendarView } from "@/types/calendar";
 import { getDayName } from "@/utils";
 import { toRefs, computed } from "vue";
 
 type WeekCalendarProps = {
   selectedDate: Date;
+  view: CalendarView;
 };
 
 let props = defineProps<WeekCalendarProps>();
 
-let { selectedDate } = toRefs(props);
+let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
 
@@ -45,26 +47,28 @@ let dates = computed(() => {
 
   dates.push(structuredClone(date));
 
-  for (let i = date.getDay(); i < 6; i++) {
-    date.setDate(date.getDate() + 1);
-    dates.push(structuredClone(date));
-  }
+  if (view.value === "week") {
+    for (let i = date.getDay(); i < 6; i++) {
+      date.setDate(date.getDate() + 1);
+      dates.push(structuredClone(date));
+    }
 
-  date = selectedDate.value;
+    date = selectedDate.value;
 
-  for (let i = selectedDate.value.getDay(); i > 0; i--) {
-    date.setDate(date.getDate() - 1);
-    dates.unshift(structuredClone(date));
+    for (let i = selectedDate.value.getDay(); i > 0; i--) {
+      date.setDate(date.getDate() - 1);
+      dates.unshift(structuredClone(date));
+    }
   }
 
   return dates;
 });
 
-let togglePopup = (data?: { row: number; column: number }) => {
+let toggleWeek = (data?: { row: number; column: number }) => {
   if (data) {
     let { row, column } = data;
     console.log(
-      "🚀 ~ file: WeekCalendar.vue:66 ~ togglePopup ~ row,column:",
+      "🚀 ~ file: WeekCalendar.vue:66 ~ toggleWeek ~ row,column:",
       row,
       column
     );
@@ -72,10 +76,14 @@ let togglePopup = (data?: { row: number; column: number }) => {
     console.log("close popup");
   }
 };
+
+let toggleDay = (row: number) => {
+  console.log("🚀 ~ file: WeekCalendar.vue:81 ~ toggleDay ~ row:", row);
+};
 </script>
 
 <template>
-  <div :class="styles.container">
+  <div :class="styles.container" :data-view="view">
     <div :class="styles.week_wrapper">
       <div
         v-for="(date, index) in dates"
@@ -91,7 +99,7 @@ let togglePopup = (data?: { row: number; column: number }) => {
       </div>
     </div>
     <div :class="styles.cell_top">
-      <div v-for="index in 7" :key="index"></div>
+      <div v-if="view === 'week'" v-for="index in 7" :key="index"></div>
     </div>
     <div :class="styles.time_container">
       <div :class="styles.time_wrapper">
@@ -100,12 +108,18 @@ let togglePopup = (data?: { row: number; column: number }) => {
         </div>
       </div>
       <div :class="styles.cell_container">
-        <div :class="styles.cell_row" v-for="row in times.length" :key="row">
+        <div
+          :class="styles.cell_row"
+          v-for="row in times.length"
+          :key="row"
+          v-bind="{ ...(view === 'day' && { onClick: () => toggleDay(row) }) }"
+        >
           <div
+            v-if="view === 'week'"
             :class="styles.cell_column"
             v-for="column in 7"
             :key="column"
-            @click="togglePopup({ row, column })"
+            @click="toggleWeek({ row, column })"
           ></div>
         </div>
       </div>
@@ -243,6 +257,45 @@ let togglePopup = (data?: { row: number; column: number }) => {
         width: 1px;
         background-color: var(--light-gray);
       }
+    }
+  }
+}
+
+.container[data-view="day"] {
+  .week_wrapper {
+    grid-template-columns: 1fr;
+    .week_title {
+      align-items: flex-start;
+      margin-left: 50px;
+    }
+  }
+  .cell_container {
+    .cell_row {
+      grid-template-columns: 1fr;
+      border-color: var(--light-gray);
+      border-style: solid;
+      border-width: 0px 0px 1px 1px;
+    }
+  }
+  .cell_top {
+    background-color: var(--light-gray);
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      background-color: var(--light-gray);
+    }
+    &::after {
+      top: 0px;
+      left: -10px;
+      height: 1px;
+      width: 10px;
+    }
+    &::before {
+      top: -20px;
+      left: 0px;
+      height: 20px;
+      width: 1px;
     }
   }
 }
