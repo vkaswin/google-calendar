@@ -190,7 +190,7 @@ let handleTime = (row?: number, column?: number) => {
           color: #70757a;
           font-size: 24px;
           font-family: "Poppins-Medium", sans-serif;
-          transition: background-color, color 0.25s ease-in-out;
+          transition: background-color 0.25s ease-in-out;
           cursor: pointer;
         }
       }

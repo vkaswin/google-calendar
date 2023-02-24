@@ -16,20 +16,23 @@ type DatePickerEmits = {
 let props = withDefaults(defineProps<DatePickerProps>(), {
   showArrow: true,
   showYear: true,
-  calenderDate: () => new Date(),
 });
 
 let emit = defineEmits<DatePickerEmits>();
 
 let { selectedDate, calenderDate } = toRefs(props);
 
-let currentDate = ref(calenderDate.value);
+let currentDate = ref(new Date());
 
 let weeks = ["S", "M", "T", "W", "T", "F", "S"];
 
 let todayDate = new Date();
 
-let dates = computed(() => getAllDates(currentDate.value));
+let actualDate = computed(() =>
+  calenderDate && calenderDate.value ? calenderDate.value : currentDate.value
+);
+
+let dates = computed(() => getAllDates(actualDate.value));
 
 let handleNext = () => {
   let date = structuredClone(currentDate.value);
@@ -43,7 +46,7 @@ let handleNext = () => {
     date.setMonth(0);
   }
 
-  currentDate.value = date;
+  setCurrentDate(date);
 };
 
 let handlePrevious = () => {
@@ -58,7 +61,7 @@ let handlePrevious = () => {
     date.setMonth(11);
   }
 
-  currentDate.value = date;
+  setCurrentDate(date);
 };
 
 let setCurrentDate = (date: Date) => {
@@ -74,8 +77,8 @@ defineExpose({
   <div :class="styles.container">
     <div :class="styles.header">
       <span>{{
-        `${getMonthName(currentDate.getMonth())} ${
-          showYear ? currentDate.getFullYear() : ""
+        `${getMonthName(actualDate.getMonth())} ${
+          showYear ? actualDate.getFullYear() : ""
         }`
       }}</span>
       <div v-if="showArrow" :class="styles.arrow">
@@ -91,12 +94,13 @@ defineExpose({
         v-for="(date, index) in dates"
         :class="[
           styles.day,
-          date.toLocaleDateString() === todayDate.toLocaleDateString()
+          actualDate.getMonth() !== date.getMonth()
+            ? styles.in_active
+            : date.toLocaleDateString() === todayDate.toLocaleDateString()
             ? styles.highlight
             : date.toLocaleDateString() === selectedDate.toLocaleDateString() &&
               styles.active,
           ,
-          currentDate.getMonth() !== date.getMonth() && styles.in_active,
         ]"
         :key="index"
         @click="emit('onChange', date)"

@@ -18,12 +18,14 @@ let { selectedDate } = toRefs(props);
 
 let dates = computed(() => {
   let dates: Date[] = [];
-  let date = new Date();
+  let date = structuredClone(selectedDate.value);
 
   for (let i = 0; i < 12; i++) {
     date.setMonth(i);
     dates.push(structuredClone(date));
   }
+
+  console.log(dates);
 
   return dates;
 });

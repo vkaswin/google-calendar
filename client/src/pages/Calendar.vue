@@ -22,11 +22,11 @@ const YearCalendar = defineAsyncComponent({
   loadingComponent: Loader,
 });
 
-let calendar = useCalendar();
-
 let auth = useAuth();
 
-let { setView, setDate, handleNext, handlePrevious } = calendar;
+let calendar = useCalendar();
+
+let { setView, setDate } = calendar;
 
 let { view, date } = storeToRefs(calendar);
 
@@ -46,6 +46,54 @@ let handleChange = (date: Date) => {
     view,
     date
   );
+};
+
+const handleNext = () => {
+  let temp = structuredClone(date.value);
+
+  switch (view.value) {
+    case "day":
+      temp.setDate(temp.getDate() + 1);
+      break;
+    case "week":
+      temp.setDate(temp.getDate() + 7);
+      break;
+    case "month":
+      temp.setMonth(temp.getMonth() + 1);
+      break;
+    case "year":
+      temp.setFullYear(temp.getFullYear() + 1);
+      break;
+    default:
+      return;
+  }
+
+  sideBar.value?.datePicker?.setCurrentDate(temp);
+  setDate(temp);
+};
+
+const handlePrevious = () => {
+  let temp = structuredClone(date.value);
+
+  switch (view.value) {
+    case "day":
+      temp.setDate(temp.getDate() - 1);
+      break;
+    case "week":
+      temp.setDate(temp.getDate() - 7);
+      break;
+    case "month":
+      temp.setMonth(temp.getMonth() - 1);
+      break;
+    case "year":
+      temp.setFullYear(temp.getFullYear() - 1);
+      break;
+    default:
+      return;
+  }
+
+  sideBar.value?.datePicker?.setCurrentDate(temp);
+  setDate(temp);
 };
 </script>
 

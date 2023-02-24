@@ -48,7 +48,6 @@ let userInitial = computed(() => {
           `${getMonthName(date.getMonth())} ${date.getFullYear()}`
         }}</span>
       </div>
-      <!-- <button @click="emit('onViewChange', 'month')">{{ view }}</button> -->
       <select
         :value="view"
         @change="(event) => emit('onViewChange', (event.target as HTMLSelectElement).value as CalendarView)"
@@ -85,20 +84,6 @@ let userInitial = computed(() => {
     display: flex;
     align-items: center;
     gap: 10px;
-    i {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #606368;
-      font-size: 28px;
-      cursor: pointer;
-      &:hover {
-        background-color: #f0f0f0;
-      }
-    }
     img {
       width: 44px;
       height: 40px;
@@ -107,6 +92,7 @@ let userInitial = computed(() => {
       color: #3c4043;
       font-family: "Poppins-Medium", sans-serif;
       font-size: 20px;
+      cursor: default;
     }
   }
   .date_wrapper {

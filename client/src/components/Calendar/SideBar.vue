@@ -46,7 +46,6 @@ defineExpose({ datePicker });
   display: flex;
   flex-direction: column;
   gap: 15px;
-  transition: transform 0.25s ease-in-out;
   width: var(--sidebar-width);
   padding: 15px 10px;
   overflow-y: auto;
