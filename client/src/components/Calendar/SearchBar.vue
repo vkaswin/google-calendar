@@ -38,8 +38,9 @@
     justify-content: center;
     align-items: center;
     color: #606368;
-    font-size: 24px;
+    font-size: 22px;
     border-radius: 50%;
+    transition: background-color 0.25s ease-in-out;
     cursor: pointer;
     &:hover {
       background-color: #dadce0;

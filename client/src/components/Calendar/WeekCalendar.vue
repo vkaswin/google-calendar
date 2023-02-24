@@ -17,7 +17,7 @@ let todayDate = new Date();
 let columns = computed(() => (view.value === "week" ? 7 : 1));
 
 let times = [
-  null,
+  "12 PM",
   "1 AM",
   "2 AM",
   "3 AM",
@@ -68,11 +68,18 @@ let dates = computed(() => {
 
 let handleTime = (row?: number, column?: number) => {
   if (typeof row === "number" && typeof column === "number") {
-    console.log(times[row], dates.value[column]);
+    let time: string;
+    let date = dates.value[column];
+
+    if (row === times.length - 1) {
+      time = `${times[row]} - ${times[0]}`;
+    } else {
+      time = `${times[row]} - ${times[row + 1]}`;
+    }
     console.log(
-      "🚀 ~ file: WeekCalendar.vue:66 ~ handleTime ~ row,column:",
-      row,
-      column
+      "🚀 ~ file: WeekCalendar.vue:72 ~ handleTime ~ time, date",
+      time,
+      date
     );
   } else {
     console.log("close popup");
@@ -105,7 +112,7 @@ let handleTime = (row?: number, column?: number) => {
         :key="row"
       >
         <div :class="styles.time">
-          <span>{{ time }}</span>
+          <span v-if="row > 0">{{ time }}</span>
         </div>
         <div
           :class="styles.date"
