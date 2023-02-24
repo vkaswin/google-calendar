@@ -14,6 +14,8 @@ let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
 
+let columns = computed(() => (view.value === "week" ? 7 : 1));
+
 let times = [
   null,
   "1 AM",
@@ -53,7 +55,7 @@ let dates = computed(() => {
       dates.push(structuredClone(date));
     }
 
-    date = selectedDate.value;
+    date = structuredClone(selectedDate.value);
 
     for (let i = selectedDate.value.getDay(); i > 0; i--) {
       date.setDate(date.getDate() - 1);
@@ -64,11 +66,11 @@ let dates = computed(() => {
   return dates;
 });
 
-let toggleWeek = (data?: { row: number; column: number }) => {
-  if (data) {
-    let { row, column } = data;
+let handleTime = (row?: number, column?: number) => {
+  if (typeof row === "number" && typeof column === "number") {
+    console.log(times[row], dates.value[column]);
     console.log(
-      "🚀 ~ file: WeekCalendar.vue:66 ~ toggleWeek ~ row,column:",
+      "🚀 ~ file: WeekCalendar.vue:66 ~ handleTime ~ row,column:",
       row,
       column
     );
@@ -76,20 +78,17 @@ let toggleWeek = (data?: { row: number; column: number }) => {
     console.log("close popup");
   }
 };
-
-let toggleDay = (row: number) => {
-  console.log("🚀 ~ file: WeekCalendar.vue:81 ~ toggleDay ~ row:", row);
-};
 </script>
 
 <template>
   <div :class="styles.container" :data-view="view">
-    <div :class="styles.week_wrapper">
+    <div :class="styles.week_section">
+      <div></div>
       <div
         v-for="(date, index) in dates"
         :key="index"
         :class="[
-          styles.week_title,
+          styles.week,
           todayDate.toLocaleDateString() === date.toLocaleDateString() &&
             styles.highlight,
         ]"
@@ -98,30 +97,22 @@ let toggleDay = (row: number) => {
         <span>{{ date.getDate() }}</span>
       </div>
     </div>
-    <div :class="styles.cell_top">
-      <div v-if="view === 'week'" v-for="index in 7" :key="index"></div>
-    </div>
-    <div :class="styles.time_container">
-      <div :class="styles.time_wrapper">
-        <div :class="styles.time" v-for="(time, index) in times" :key="index">
+    <div :class="styles.divider"></div>
+    <div :class="styles.time_section">
+      <div
+        :class="styles.time_container"
+        v-for="(time, row) in times"
+        :key="row"
+      >
+        <div :class="styles.time">
           <span>{{ time }}</span>
         </div>
-      </div>
-      <div :class="styles.cell_container">
         <div
-          :class="styles.cell_row"
-          v-for="row in times.length"
-          :key="row"
-          v-bind="{ ...(view === 'day' && { onClick: () => toggleDay(row) }) }"
-        >
-          <div
-            v-if="view === 'week'"
-            :class="styles.cell_column"
-            v-for="column in 7"
-            :key="column"
-            @click="toggleWeek({ row, column })"
-          ></div>
-        </div>
+          :class="styles.date"
+          v-for="(_, column) in columns"
+          :key="column"
+          @click="handleTime(row, column)"
+        ></div>
       </div>
     </div>
   </div>
@@ -131,19 +122,32 @@ let toggleDay = (row: number) => {
 .container {
   height: 100%;
   padding-top: 15px;
-  overflow-y: hidden;
-  --week-wrapper-height: 69px;
+  --week-wrapper-height: 95px;
+  --divider-height: 1px;
   --light-gray: rgb(218, 220, 224);
-  .week_wrapper {
+  .week_section {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: 40px repeat(7, 1fr);
     height: var(--week-wrapper-height);
-    margin: 0px 0px 15px 40px;
-    .week_title {
+    padding-right: 15px;
+    .week {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      &:nth-child(2)::before {
+        left: 0px;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        left: -1px;
+        bottom: 0px;
+        height: 25px;
+        width: 1px;
+        background-color: var(--light-gray);
+      }
       &:is(.highlight) {
         span {
           &:first-child {
@@ -185,117 +189,62 @@ let toggleDay = (row: number) => {
       }
     }
   }
-  .time_container {
+  .divider {
     position: relative;
-    display: flex;
-    overflow-y: auto;
-    height: calc(100% - (var(--week-wrapper-height) + 15px));
-    .time_wrapper {
-      display: grid;
-      grid-template-columns: 40px;
-      grid-auto-rows: 50px;
-      .time {
-        display: flex;
-        gap: 10px;
-        margin-top: -5px;
-        span {
-          color: #70757a;
-          font-size: 10px;
-          font-family: "Poppins-Medium", sans-serif;
-        }
-      }
-    }
-    .cell_container {
-      flex-grow: 1;
-      .cell_row {
-        position: relative;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        grid-template-rows: 50px;
-        cursor: pointer;
-        &::after {
-          content: "";
-          position: absolute;
-          border-top: 1px solid var(--light-gray);
-          width: 10px;
-          left: -10px;
-          top: -1px;
-        }
-        .cell_column {
-          border-style: solid;
-          border-color: var(--light-gray);
-          border-width: 0px 0px 1px 1px;
-        }
-      }
-    }
+    left: 30px;
+    background-color: var(--light-gray);
+    height: var(--divider-height);
+    width: calc(100% - 45px);
   }
-  .cell_top {
-    position: sticky;
-    left: 40px;
-    width: calc(100% - 55px);
-    height: 1px;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    div {
-      position: relative;
-      border-top: 1px solid var(--light-gray);
-      &:first-child::after {
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: -10px;
-        height: 1px;
-        width: 10px;
-        background-color: var(--light-gray);
+  .time_section {
+    position: relative;
+    height: calc(100% - var(--week-wrapper-height) - var(--divider-height));
+    overflow-y: auto;
+    .time_container {
+      display: grid;
+      grid-template-columns: 40px repeat(v-bind(columns), 1fr);
+      grid-auto-rows: 50px;
+      &:not(:first-child) {
+        .time {
+          &::before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            right: 0px;
+            width: 10px;
+            height: 1px;
+            background-color: var(--light-gray);
+          }
+        }
       }
-      &::before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: 0px;
-        height: 20px;
-        width: 1px;
-        background-color: var(--light-gray);
+      .time {
+        position: relative;
+        color: #70757a;
+        font-size: 10px;
+        font-family: "Poppins-Medium", sans-serif;
+        margin-top: -5px;
+      }
+      .date {
+        border-color: var(--light-gray);
+        border-style: solid;
+        border-width: 0px 1px 1px 0px;
+        cursor: pointer;
+        &:nth-child(2) {
+          border-width: 0px 1px 1px 1px;
+        }
       }
     }
   }
 }
 
-.container[data-view="day"] {
-  .week_wrapper {
-    grid-template-columns: 1fr;
-    .week_title {
-      align-items: flex-start;
-      margin-left: 50px;
-    }
-  }
-  .cell_container {
-    .cell_row {
-      grid-template-columns: 1fr;
-      border-color: var(--light-gray);
-      border-style: solid;
-      border-width: 0px 0px 1px 1px;
-    }
-  }
-  .cell_top {
-    background-color: var(--light-gray);
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      background-color: var(--light-gray);
-    }
-    &::after {
-      top: 0px;
-      left: -10px;
-      height: 1px;
-      width: 10px;
-    }
-    &::before {
-      top: -20px;
-      left: 0px;
-      height: 20px;
-      width: 1px;
+.container[data-view="week"] {
+  .time_section {
+    .time_container {
+      .date {
+        &:last-child {
+          border-width: 0px 0px 1px 0px;
+        }
+      }
     }
   }
 }

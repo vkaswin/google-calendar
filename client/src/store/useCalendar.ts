@@ -5,7 +5,7 @@ const useCalendar = defineStore("calendar", {
   state: (): CalendarStore => {
     return {
       date: new Date(),
-      view: "day",
+      view: "week",
     };
   },
   getters: {},
