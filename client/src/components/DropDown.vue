@@ -24,9 +24,9 @@ let emit = defineEmits<DropDownEmits>();
 
 let { target, options } = toRefs(props);
 
-let reference = ref<Element>();
+let reference = ref<HTMLElement | null>(null);
 
-let popper = ref<HTMLDivElement>();
+let popper = ref<HTMLElement | null>(null);
 
 let popperInstance = ref<Instance>();
 
@@ -35,7 +35,7 @@ let isOpen = ref(false);
 onMounted(() => {
   if (!target?.value) return;
 
-  let element = document.querySelector(target.value);
+  let element = document.querySelector(target.value) as HTMLElement;
 
   if (!element) return;
 
@@ -73,8 +73,8 @@ let toggle = () => {
   isOpen.value = !isOpen.value;
 };
 
-let setPopper = (e: any) => {
-  popper.value = e;
+let setPopper = (element: any) => {
+  popper.value = element;
 };
 
 let handleClick = (value: string) => {

@@ -55,8 +55,6 @@ let dates = computed(() => {
   return dates;
 });
 
-watch(view, () => handleIndicator());
-
 onMounted(() => {
   window.addEventListener("resize", handleIndicator);
 
@@ -73,7 +71,7 @@ const updateIndicatorPosition = () => {
   indicator.value.style.top = `${top}px`;
 };
 
-const handleIndicator = () => {
+let updateIndicatorDimension = () => {
   let container = document.querySelector<HTMLDivElement>(
     `.${styles.time_slot_container}`
   );
@@ -94,7 +92,10 @@ const handleIndicator = () => {
 
   indicator.value.style.width =
     view.value === "week" ? `${element.clientWidth}px` : "calc(100% - 40px)";
+};
 
+const handleIndicator = () => {
+  updateIndicatorDimension();
   updateIndicatorPosition();
 };
 
@@ -114,6 +115,8 @@ let handleEvent = (date?: Date, time?: string) => {
     console.log("close popup");
   }
 };
+
+watch(view, handleIndicator, { flush: "post" });
 </script>
 
 <template>
