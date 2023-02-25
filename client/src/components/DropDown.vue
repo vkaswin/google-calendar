@@ -53,7 +53,7 @@ onUnmounted(() => {
   }
 });
 
-watch([() => reference.value, () => popper.value], () => {
+watch([reference, popper], () => {
   if (!reference.value || !popper.value || popperInstance.value) return;
 
   popperInstance.value = createPopper(reference.value, popper.value, {

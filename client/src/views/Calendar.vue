@@ -6,6 +6,8 @@ import Loader from "@/components/Loader.vue";
 import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
 import useAuth from "@/store/useAuth";
+import { useRouter } from "vue-router";
+import { CalendarView } from "@/types/calendar";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),
@@ -26,6 +28,8 @@ let auth = useAuth();
 
 let calendar = useCalendar();
 
+let router = useRouter();
+
 let { setView, setDate } = calendar;
 
 let { view, date } = storeToRefs(calendar);
@@ -38,14 +42,12 @@ let reset = () => {
   let date = new Date();
   sideBar.value?.datePicker?.setCurrentDate(date);
   setDate(date);
-};
-
-let handleChange = (date: Date) => {
-  console.log(
-    "🚀 ~ file: Calendar.vue:35 ~ handleChange ~ view, date:",
-    view,
-    date
-  );
+  router.push({
+    query: {
+      view: view.value,
+      date: date.toISOString().split("T")[0],
+    },
+  });
 };
 
 const handleNext = () => {
@@ -70,6 +72,12 @@ const handleNext = () => {
 
   sideBar.value?.datePicker?.setCurrentDate(temp);
   setDate(temp);
+  router.push({
+    query: {
+      view: view.value,
+      date: temp.toISOString().split("T")[0],
+    },
+  });
 };
 
 const handlePrevious = () => {
@@ -94,19 +102,52 @@ const handlePrevious = () => {
 
   sideBar.value?.datePicker?.setCurrentDate(temp);
   setDate(temp);
+  router.push({
+    query: {
+      view: view.value,
+      date: temp.toISOString().split("T")[0],
+    },
+  });
 };
 
-let handleChangeWeek = (date: Date) => {
-  setView("day");
-  setDate(date);
+let handleChange = (type: "date" | "week" | "month" | "year", date: Date) => {
+  console.log(
+    "🚀 ~ file: Calendar.vue:92 ~ handleChange ~ date, type",
+    date,
+    type
+  );
+  switch (type) {
+    case "date":
+      setDate(date);
+      break;
+    case "week":
+      setView("day");
+      setDate(date);
+      break;
+    case "month":
+      break;
+    case "year":
+      break;
+    default:
+      return;
+  }
+
+  router.push({
+    query: {
+      view: view.value,
+      date: date.toISOString().split("T")[0],
+    },
+  });
 };
 
-let handleChangeMonth = (date: Date) => {
-  console.log("🚀 ~ file: Calendar.vue:105 ~ handleChangeMonth ~ date:", date);
-};
-
-let handleChangeYear = (date: Date) => {
-  console.log("🚀 ~ file: Calendar.vue:110 ~ handleChangeYear ~ date:", date);
+let handleViewChange = (view: CalendarView) => {
+  setView(view);
+  router.push({
+    query: {
+      view,
+      date: date.value.toISOString().split("T")[0],
+    },
+  });
 };
 </script>
 
@@ -118,26 +159,30 @@ let handleChangeYear = (date: Date) => {
     @on-next="handleNext"
     @on-previous="handlePrevious"
     @on-reset="reset"
-    @on-view-change="setView"
+    @on-view-change="handleViewChange"
   />
   <div :class="styles.container">
-    <SideBar ref="sideBar" :date="date" @on-change="setDate" />
+    <SideBar
+      ref="sideBar"
+      :date="date"
+      @on-change="(date) => handleChange('date', date)"
+    />
     <div :class="styles.calendar">
       <WeekCalendar
         v-if="view === 'week' || view === 'day'"
         :view="view"
         :selected-date="date"
-        @on-change="handleChangeWeek"
+        @on-change="(date) => handleChange('week', date)"
       />
       <MonthCalendar
         v-else-if="view === 'month'"
         :selected-date="date"
-        @on-change="handleChangeMonth"
+        @on-change="(date) => handleChange('month', date)"
       />
       <YearCalendar
         v-else-if="view === 'year'"
         :selected-date="date"
-        @on-change="handleChangeYear"
+        @on-change="(date) => handleChange('year', date)"
       />
     </div>
   </div>

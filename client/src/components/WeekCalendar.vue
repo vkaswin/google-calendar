@@ -137,7 +137,7 @@ watch(view, handleIndicator, { flush: "post" });
           todayDate.toLocaleDateString() === date.toLocaleDateString() &&
             styles.highlight,
         ]"
-        @click="emit('onChange', date)"
+        @click="view === 'week' && emit('onChange', date)"
       >
         <span>{{ getDayName(date.getDay()) }}</span>
         <span>{{ date.getDate() }}</span>
