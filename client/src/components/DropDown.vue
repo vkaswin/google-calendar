@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRefs, ref, watch, onMounted, onUnmounted } from "vue";
+import { toRefs, ref, watch, onMounted, onUnmounted, CSSProperties } from "vue";
 import { createPopper, Instance } from "@popperjs/core";
 
 type Option = {
@@ -89,7 +89,7 @@ let handleClick = (value: string) => {
       :ref="setPopper"
       :class="styles.container"
       v-bind="{
-        style: popperInstance?.state?.styles?.popper,
+        style: { ...(popperInstance?.state?.styles?.popper) as CSSProperties },
         ...popperInstance?.state?.attributes?.popper,
       }"
     >
