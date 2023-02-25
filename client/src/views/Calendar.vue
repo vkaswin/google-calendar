@@ -95,6 +95,19 @@ const handlePrevious = () => {
   sideBar.value?.datePicker?.setCurrentDate(temp);
   setDate(temp);
 };
+
+let handleChangeWeek = (date: Date) => {
+  setView("day");
+  setDate(date);
+};
+
+let handleChangeMonth = (date: Date) => {
+  console.log("🚀 ~ file: Calendar.vue:105 ~ handleChangeMonth ~ date:", date);
+};
+
+let handleChangeYear = (date: Date) => {
+  console.log("🚀 ~ file: Calendar.vue:110 ~ handleChangeYear ~ date:", date);
+};
 </script>
 
 <template>
@@ -114,16 +127,17 @@ const handlePrevious = () => {
         v-if="view === 'week' || view === 'day'"
         :view="view"
         :selected-date="date"
+        @on-change="handleChangeWeek"
       />
       <MonthCalendar
         v-else-if="view === 'month'"
         :selected-date="date"
-        @on-change="handleChange"
+        @on-change="handleChangeMonth"
       />
       <YearCalendar
         v-else-if="view === 'year'"
         :selected-date="date"
-        @on-change="handleChange"
+        @on-change="handleChangeYear"
       />
     </div>
   </div>

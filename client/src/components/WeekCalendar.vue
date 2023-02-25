@@ -16,7 +16,13 @@ type WeekCalendarProps = {
   view: CalendarView;
 };
 
+type WeekCalendarEmits = {
+  (event: "onChange", date: Date): void;
+};
+
 let props = defineProps<WeekCalendarProps>();
+
+let emit = defineEmits<WeekCalendarEmits>();
 
 let styles = useCssModule("styles");
 
@@ -131,6 +137,7 @@ watch(view, handleIndicator, { flush: "post" });
           todayDate.toLocaleDateString() === date.toLocaleDateString() &&
             styles.highlight,
         ]"
+        @click="emit('onChange', date)"
       >
         <span>{{ getDayName(date.getDay()) }}</span>
         <span>{{ date.getDate() }}</span>
