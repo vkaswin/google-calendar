@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import {
+  toRefs,
+  watch,
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  useCssModule,
+} from "vue";
 import { CalendarView } from "@/types/calendar";
-import { getDayName } from "@/utils";
-import { toRefs, computed } from "vue";
+import { getDayName, timeSlots } from "@/utils";
 
 type WeekCalendarProps = {
   selectedDate: Date;
@@ -10,110 +18,19 @@ type WeekCalendarProps = {
 
 let props = defineProps<WeekCalendarProps>();
 
+let styles = useCssModule("styles");
+
 let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
 
+let indicator = ref<HTMLDivElement>();
+
+let intervalId: ReturnType<typeof setInterval>;
+
 let columns = computed(() => (view.value === "week" ? 7 : 1));
 
-let times = [
-  {
-    time: "12 PM - 1 AM",
-    label: "12 PM",
-  },
-  {
-    time: "1 AM - 2 AM",
-    label: "1 AM",
-  },
-  {
-    time: "2 AM - 3 AM",
-    label: "2 AM",
-  },
-  {
-    time: "3 AM - 4 AM",
-    label: "3 AM",
-  },
-  {
-    time: "4 AM - 5 AM",
-    label: "4 AM",
-  },
-  {
-    time: "5 AM - 6 AM",
-    label: "5 AM",
-  },
-  {
-    time: "6 AM - 7 AM",
-    label: "6 AM",
-  },
-  {
-    time: "7 AM - 8 AM",
-    label: "7 AM",
-  },
-  {
-    time: "8 AM - 9 AM",
-    label: "8 AM",
-  },
-  {
-    time: "9 AM - 10 AM",
-    label: "9 AM",
-  },
-  {
-    time: "10 AM - 11 AM",
-    label: "10 AM",
-  },
-  {
-    time: "11 AM - 12 AM",
-    label: "11 AM",
-  },
-  {
-    time: "12 AM - 1 PM",
-    label: "12 AM",
-  },
-  {
-    time: "1 PM - 2 PM",
-    label: "1 PM",
-  },
-  {
-    time: "2 PM - 3 PM",
-    label: "2 PM",
-  },
-  {
-    time: "3 PM - 4 PM",
-    label: "3 PM",
-  },
-  {
-    time: "4 PM - 5 PM",
-    label: "4 PM",
-  },
-  {
-    time: "5 PM - 6 PM",
-    label: "5 PM",
-  },
-  {
-    time: "6 PM - 7 PM",
-    label: "6 PM",
-  },
-  {
-    time: "7 PM - 9 PM",
-    label: "7 PM",
-  },
-  {
-    time: "8 PM - 9 PM",
-    label: "8 PM",
-  },
-  {
-    time: "9 PM - 10 PM",
-    label: "9 PM",
-  },
-  {
-    time: "10 PM - 11 PM",
-    label: "10 PM",
-  },
-  {
-    time: "11 PM - 12 PM",
-    label: "11 PM",
-  },
-];
+let slotHeight = "60px";
 
 let dates = computed(() => {
   let dates: Date[] = [];
@@ -136,6 +53,54 @@ let dates = computed(() => {
   }
 
   return dates;
+});
+
+watch(view, () => handleIndicator());
+
+onMounted(() => {
+  window.addEventListener("resize", handleIndicator);
+
+  handleIndicator();
+
+  intervalId = setInterval(updateIndicatorPosition, 60000);
+});
+
+const updateIndicatorPosition = () => {
+  if (!indicator.value) return;
+  let date = new Date();
+  let height = parseInt(slotHeight.replace("px", ""));
+  let top = date.getHours() * height + date.getMinutes();
+  indicator.value.style.top = `${top}px`;
+};
+
+const handleIndicator = () => {
+  let container = document.querySelector<HTMLDivElement>(
+    `.${styles.time_slot_container}`
+  );
+
+  if (!container) return;
+
+  let element = document.querySelector<HTMLDivElement>(`.${styles.highlight}`);
+
+  if (!element || !indicator.value) return;
+
+  indicator.value.style.left =
+    view.value === "week"
+      ? `${
+          element.getBoundingClientRect().left -
+          container.getBoundingClientRect().left
+        }px`
+      : "40px";
+
+  indicator.value.style.width =
+    view.value === "week" ? `${element.clientWidth}px` : "calc(100% - 40px)";
+
+  updateIndicatorPosition();
+};
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleIndicator);
+  clearInterval(intervalId);
 });
 
 let handleEvent = (date?: Date, time?: string) => {
@@ -167,12 +132,13 @@ let handleEvent = (date?: Date, time?: string) => {
         <span>{{ getDayName(date.getDay()) }}</span>
         <span>{{ date.getDate() }}</span>
       </div>
+      <div></div>
     </div>
     <div :class="styles.divider"></div>
-    <div :class="styles.time_section">
+    <div :class="styles.time_slot_section">
       <div
-        :class="styles.time_container"
-        v-for="({ label, time }, index) in times"
+        :class="styles.time_slot_container"
+        v-for="({ label, time }, index) in timeSlots"
         :key="index"
       >
         <div :class="styles.time">
@@ -185,6 +151,16 @@ let handleEvent = (date?: Date, time?: string) => {
           @click="handleEvent(dates[index - 1], time)"
         ></div>
       </div>
+      <div
+        ref="indicator"
+        v-show="
+          dates.some(
+            (date) =>
+              date.toLocaleDateString() === todayDate.toLocaleDateString()
+          )
+        "
+        :class="styles.indicator"
+      ></div>
     </div>
   </div>
 </template>
@@ -194,13 +170,13 @@ let handleEvent = (date?: Date, time?: string) => {
   height: 100%;
   padding-top: 15px;
   --week-wrapper-height: 95px;
+  --scrollbar-width: 8px;
   --divider-height: 1px;
   --light-gray: rgb(218, 220, 224);
   .week_section {
     display: grid;
-    grid-template-columns: 40px repeat(7, 1fr);
+    grid-template-columns: 40px repeat(7, 1fr) var(--scrollbar-width);
     height: var(--week-wrapper-height);
-    padding-right: 15px;
     .week {
       position: relative;
       display: flex;
@@ -267,14 +243,25 @@ let handleEvent = (date?: Date, time?: string) => {
     height: var(--divider-height);
     width: calc(100% - 45px);
   }
-  .time_section {
+  .time_slot_section {
     position: relative;
     height: calc(100% - var(--week-wrapper-height) - var(--divider-height));
     overflow-y: auto;
-    .time_container {
+    &::-webkit-scrollbar {
+      width: var(--scrollbar-width);
+      border-top-right-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background: white;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #bec1c6;
+      border-radius: 10px;
+    }
+    .time_slot_container {
       display: grid;
       grid-template-columns: 40px repeat(v-bind(columns), 1fr);
-      grid-auto-rows: 50px;
+      grid-auto-rows: v-bind(slotHeight);
       &:not(:first-child) {
         .time {
           &::before {
@@ -301,17 +288,38 @@ let handleEvent = (date?: Date, time?: string) => {
         border-width: 0px 1px 1px 0px;
         cursor: pointer;
         &:nth-child(2) {
-          border-width: 0px 1px 1px 1px;
+          border-width: 0px 0px 1px 1px;
         }
+      }
+    }
+    .indicator {
+      position: absolute;
+      height: 2px;
+      --bg-color: rgb(234, 67, 53);
+      background-color: var(--bg-color);
+      pointer-events: none;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0px;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        background-color: var(--bg-color);
+        border-radius: 50%;
       }
     }
   }
 }
 
 .container[data-view="week"] {
-  .time_section {
-    .time_container {
+  .time_slot_section {
+    .time_slot_container {
       .date {
+        &:nth-child(2) {
+          border-width: 0px 1px 1px 1px;
+        }
         &:last-child {
           border-width: 0px 0px 1px 0px;
         }

@@ -25,8 +25,6 @@ let dates = computed(() => {
     dates.push(structuredClone(date));
   }
 
-  console.log(dates);
-
   return dates;
 });
 </script>
