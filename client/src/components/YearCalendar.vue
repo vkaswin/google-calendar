@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs, computed } from "vue";
-import DatePicker from "./DatePicker.vue";
+import DatePicker from "@/components/DatePicker.vue";
 
 type YearCalendarProps = {
   selectedDate: Date;

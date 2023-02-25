@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { toRefs, computed } from "vue";
 import { getMonthName } from "@/utils";
-import SearchBar from "./SearchBar.vue";
+import SearchBar from "@/components/SearchBar.vue";
+import DropDown from "@/components/DropDown.vue";
 import { User } from "@/types/user";
 import { CalendarView } from "@/types/calendar";
 
@@ -23,6 +24,8 @@ let props = defineProps<HeaderProps>();
 let { date, user } = toRefs(props);
 
 let emit = defineEmits<HeaderEmits>();
+
+let options = ["day", "week", "month", "year"];
 
 let userInitial = computed(() => {
   if (!user.value) return;
@@ -48,7 +51,8 @@ let userInitial = computed(() => {
           `${getMonthName(date.getMonth())} ${date.getFullYear()}`
         }}</span>
       </div>
-      <select
+      <DropDown :options="options" />
+      <!-- <select
         :value="view"
         @change="(event) => emit('onViewChange', (event.target as HTMLSelectElement).value as CalendarView)"
       >
@@ -58,7 +62,7 @@ let userInitial = computed(() => {
         >
           {{ title }}
         </option>
-      </select>
+      </select> -->
     </div>
     <SearchBar />
     <div :class="styles.avatar">

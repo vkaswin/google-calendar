@@ -10,6 +10,7 @@
         "deploy": "sh deploy.sh"
     },
     "dependencies": {
+        "@popperjs/core": "^2.11.6",
         "jwt-decode": "^3.1.2",
         "pinia": "^2.0.30",
         "sass": "^1.58.3",

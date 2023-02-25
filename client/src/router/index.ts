@@ -20,24 +20,24 @@ const routes: RouteRecordRaw[] = [
       {
         path: "login",
         name: RouteNames.login,
-        component: () => import(`../pages/Login.vue`),
+        component: () => import(`../views/Login.vue`),
       },
       {
         path: "register",
         name: RouteNames.register,
-        component: () => import(`../pages/Register.vue`),
+        component: () => import(`../views/Register.vue`),
       },
     ],
   },
   {
     path: "/calendar",
     name: RouteNames.calendar,
-    component: () => import(`../pages/Calendar.vue`),
+    component: () => import(`../views/Calendar.vue`),
   },
   {
     path: "/:pathMatch(.*)*",
     name: RouteNames.notFound,
-    component: () => import("../pages/NotFound.vue"),
+    component: () => import("../views/NotFound.vue"),
   },
 ];
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { toRefs, ref } from "vue";
-import DatePicker from "./DatePicker.vue";
+import DatePicker from "@/components/DatePicker.vue";
 
 type SideBarProps = {
   date: Date;

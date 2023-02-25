@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { ref, defineAsyncComponent } from "vue";
-import Header from "@/components/Calendar/Header.vue";
-import SideBar from "@/components/Calendar/SideBar.vue";
-import Loader from "@/components/Calendar/Loader.vue";
+import Header from "@/components/Header.vue";
+import SideBar from "@/components/SideBar.vue";
+import Loader from "@/components/Loader.vue";
 import useCalendar from "@/store/useCalendar";
 import { storeToRefs } from "pinia";
 import useAuth from "@/store/useAuth";
 
 const WeekCalendar = defineAsyncComponent({
-  loader: () => import("@/components/Calendar/WeekCalendar.vue"),
+  loader: () => import("@/components/WeekCalendar.vue"),
   loadingComponent: Loader,
 });
 
 const MonthCalendar = defineAsyncComponent({
-  loader: () => import("@/components/Calendar/MonthCalendar.vue"),
+  loader: () => import("@/components/MonthCalendar.vue"),
   loadingComponent: Loader,
 });
 
 const YearCalendar = defineAsyncComponent({
-  loader: () => import("@/components/Calendar/YearCalendar.vue"),
+  loader: () => import("@/components/YearCalendar.vue"),
   loadingComponent: Loader,
 });
 
