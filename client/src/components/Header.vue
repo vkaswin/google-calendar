@@ -25,7 +25,12 @@ let { date, user } = toRefs(props);
 
 let emit = defineEmits<HeaderEmits>();
 
-let options = ["day", "week", "month", "year"];
+let options = [
+  { label: "Day", value: "day" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+  { label: "Year", value: "year" },
+];
 
 let userInitial = computed(() => {
   if (!user.value) return;
@@ -40,7 +45,7 @@ let userInitial = computed(() => {
       <img src="@/assets/images/calendar.png" />
       <span>Calender</span>
     </div>
-    <div :class="styles.date_wrapper">
+    <div :class="styles.date_section">
       <button :class="styles.reset" @click="emit('onReset')">Today</button>
       <div :class="styles.date">
         <div :class="styles.icon">
@@ -51,18 +56,15 @@ let userInitial = computed(() => {
           `${getMonthName(date.getMonth())} ${date.getFullYear()}`
         }}</span>
       </div>
-      <DropDown :options="options" />
-      <!-- <select
-        :value="view"
-        @change="(event) => emit('onViewChange', (event.target as HTMLSelectElement).value as CalendarView)"
-      >
-        <option
-          v-for="(title, index) in ['day', 'week', 'month', 'year']"
-          :key="index"
-        >
-          {{ title }}
-        </option>
-      </select> -->
+      <button id="view-dropdown" :class="styles.dropdown">
+        <span>{{ view }}</span>
+        <i class="bxs-down-arrow"></i>
+      </button>
+      <DropDown
+        target="#view-dropdown"
+        :options="options"
+        @on-change="(view) => emit('onViewChange', view as CalendarView)"
+      />
     </div>
     <SearchBar />
     <div :class="styles.avatar">
@@ -76,7 +78,7 @@ let userInitial = computed(() => {
 <style lang="scss" module="styles">
 .container {
   display: grid;
-  grid-template-columns: 0.3fr 0.8fr 1fr 0.2fr;
+  grid-template-columns: 0.3fr 0.9fr 1fr 0.2fr;
   align-items: center;
   align-content: center;
   gap: 15px;
@@ -99,19 +101,39 @@ let userInitial = computed(() => {
       cursor: default;
     }
   }
-  .date_wrapper {
-    display: flex;
+  .dropdown {
+    width: 100px;
+  }
+  .date_section {
+    display: grid;
+    grid-template-columns: 100px 1fr 120px;
     align-items: center;
     gap: 10px;
-    .reset {
+    button {
       color: rgb(60, 64, 67);
       font-family: "Poppins-Medium", sans-serif;
       padding: 7px 0px;
-      width: 80px;
       border: 1px solid #dadce0;
       background-color: #f9f9f9;
       border-radius: 4px;
+      width: 80px;
       cursor: pointer;
+
+      &:last-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 15px;
+        width: 100px;
+        span {
+          &::first-letter {
+            text-transform: capitalize;
+          }
+        }
+        i {
+          font-size: 10px;
+        }
+      }
     }
     .date {
       display: flex;
