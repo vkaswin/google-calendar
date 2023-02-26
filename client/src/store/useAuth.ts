@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { cookie } from "@/utils";
 import jwtDecode from "jwt-decode";
 import { User } from "@/types/user";
@@ -17,10 +17,10 @@ const useAuth = defineStore("auth", {
   getters: {},
   actions: {
     logout: function () {
-      //   let router = useRouter();
+      let router = useRouter();
       this.user = null;
       cookie.remove("auth_token");
-      //   router.push("/");
+      router.push("/");
     },
   },
 });
