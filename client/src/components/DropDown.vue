@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { toRefs, ref, watchEffect } from "vue";
 import usePopper from "@/composables/usePopper";
+import useClickOutSide from "@/composables/useClickOutSide";
 import { Placement } from "@popperjs/core";
 
 type DropDownProps = {
@@ -56,6 +57,20 @@ let setPopper = (el: any) => {
   if (!el) return;
   popper.value = el as HTMLElement;
 };
+
+useClickOutSide(reference, popper, (event) => {
+  if (!popper.value || !reference.value) return false;
+
+  let element = event.target as HTMLElement;
+
+  let close =
+    !popper.value.contains(element) ||
+    (popper.value.contains(element) && element.tagName === "BUTTON");
+
+  if (close) toggle();
+
+  return close;
+});
 </script>
 
 <template>

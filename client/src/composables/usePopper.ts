@@ -1,11 +1,10 @@
-import { ref, watch, onUnmounted, onMounted, Ref } from "vue";
+import { ref, watch, onUnmounted, Ref } from "vue";
 import {
   createPopper,
   Instance,
   OptionsGeneric,
   Modifier,
 } from "@popperjs/core";
-import useClickOutSide from "./useClickOutSide";
 
 type UsePopper = (
   reference: Ref<HTMLElement | null>,
@@ -15,10 +14,6 @@ type UsePopper = (
 
 const usePopper: UsePopper = (reference, popper, options) => {
   let popperInstance = ref<Instance | null>(null);
-
-  onMounted(() => {
-    useClickOutSide();
-  });
 
   onUnmounted(() => {
     if (!popperInstance.value) return;

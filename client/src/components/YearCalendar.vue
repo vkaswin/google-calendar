@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, watch, CSSProperties } from "vue";
+import { toRefs, computed, ref, watch } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { getDayName } from "@/utils";
 import usePopper from "@/composables/usePopper";
+import useClickOutSide from "@/composables/useClickOutSide";
 
 type YearCalendarProps = {
   selectedDate: Date;
@@ -60,12 +61,12 @@ let handleChange = (date: Date) => {
   if (changeView) return;
 
   if (!isOpen.value) {
-    isOpen.value = true;
+    toggle();
   }
 };
 
-let closePopup = () => {
-  isOpen.value = false;
+let toggle = () => {
+  isOpen.value = !isOpen.value;
 };
 
 let setPopper = (el: any) => {
@@ -93,6 +94,25 @@ watch(selectedDate, (date) => {
   // api call to fetch events by date
   console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", date);
 });
+
+useClickOutSide(reference, popper, (event) => {
+  if (!popper.value || !reference.value || !calendar.value) return false;
+
+  let element = event.target as HTMLElement;
+
+  let close =
+    !popper.value.contains(element) &&
+    !element.hasAttribute("data-date") &&
+    !calendar.value.contains(element) &&
+    !(
+      element.classList.contains("bx-chevron-right") ||
+      element.classList.contains("bx-chevron-left")
+    );
+
+  if (close) toggle();
+
+  return close;
+});
 </script>
 
 <template>
@@ -109,7 +129,7 @@ watch(selectedDate, (date) => {
       <div :class="styles.date">
         <span>{{ getDayName(selectedDate.getDay()) }}</span>
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
-        <i class="bx-x" @click="closePopup"></i>
+        <i class="bx-x" @click="toggle"></i>
       </div>
     </div>
   </div>
