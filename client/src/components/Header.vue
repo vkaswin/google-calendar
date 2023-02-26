@@ -77,12 +77,12 @@ let userInitial = computed(() => {
     </div>
     <SearchBar />
     <div :class="styles.avatar">
-      <div>
+      <div id="avatar">
         <span>{{ userInitial }}</span>
       </div>
     </div>
     <DropDown
-      :target="`.${styles.avatar}`"
+      target="#avatar"
       :class-name="styles.logout_btn"
       placement="bottom-end"
     >
