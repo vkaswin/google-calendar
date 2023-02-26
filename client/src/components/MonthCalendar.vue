@@ -26,7 +26,7 @@ let dates = computed(() => getAllDates(selectedDate.value));
         <span v-if="index <= 6" :class="styles.week">{{
           getDayName(date.getDay())
         }}</span
-        ><span :class="styles.day" @click="emit('onChange', date)">{{
+        ><span :class="styles.day" @dblclick="emit('onChange', date)">{{
           date.getDate()
         }}</span>
       </div>

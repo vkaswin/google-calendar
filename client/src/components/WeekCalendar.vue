@@ -36,6 +36,8 @@ let intervalId: ReturnType<typeof setInterval>;
 
 let columns = computed(() => (view.value === "week" ? 7 : 1));
 
+let timeSlotWidth = "65px";
+
 let slotHeight = "60px";
 
 let dates = computed(() => {
@@ -94,10 +96,12 @@ let updateIndicatorDimension = () => {
           element.getBoundingClientRect().left -
           container.getBoundingClientRect().left
         }px`
-      : "40px";
+      : timeSlotWidth;
 
   indicator.value.style.width =
-    view.value === "week" ? `${element.clientWidth}px` : "calc(100% - 40px)";
+    view.value === "week"
+      ? `${element.clientWidth}px`
+      : `calc(100% - ${timeSlotWidth})`;
 };
 
 const handleIndicator = () => {
@@ -122,13 +126,15 @@ let handleEvent = (date?: Date, time?: string) => {
   }
 };
 
-watch(view, handleIndicator, { flush: "post" });
+watch([view, selectedDate], handleIndicator, { flush: "post" });
 </script>
 
 <template>
   <div :class="styles.container" :data-view="view">
     <div :class="styles.week_section">
-      <div></div>
+      <div :class="styles.title">
+        <span>GMT+05:30</span>
+      </div>
       <div
         v-for="(date, index) in dates"
         :key="index"
@@ -179,14 +185,23 @@ watch(view, handleIndicator, { flush: "post" });
 .container {
   height: 100%;
   padding-top: 15px;
-  --week-wrapper-height: 95px;
+  --week-wrapper-height: 80px;
   --scrollbar-width: 8px;
   --divider-height: 1px;
   --light-gray: rgb(218, 220, 224);
   .week_section {
     display: grid;
-    grid-template-columns: 40px repeat(7, 1fr) var(--scrollbar-width);
+    grid-template-columns: v-bind(timeSlotWidth) repeat(7, 1fr) var(
+        --scrollbar-width
+      );
     height: var(--week-wrapper-height);
+    div:first-child {
+      display: flex;
+      align-items: flex-end;
+      font-size: 10px;
+      color: #70757a;
+      padding-bottom: 5px;
+    }
     .week {
       position: relative;
       display: flex;
@@ -227,7 +242,7 @@ watch(view, handleIndicator, { flush: "post" });
       }
       span {
         &:first-child {
-          color: #70757a;
+          color: rgb(60, 64, 67);
           font-size: 14px;
         }
         &:last-child {
@@ -237,7 +252,7 @@ watch(view, handleIndicator, { flush: "post" });
           width: 45px;
           height: 45px;
           border-radius: 50%;
-          color: #70757a;
+          color: rgb(60, 64, 67);
           font-size: 24px;
           font-family: "Poppins-Medium", sans-serif;
           transition: background-color 0.25s ease-in-out;
@@ -270,7 +285,7 @@ watch(view, handleIndicator, { flush: "post" });
     }
     .time_slot_container {
       display: grid;
-      grid-template-columns: 40px repeat(v-bind(columns), 1fr);
+      grid-template-columns: v-bind(timeSlotWidth) repeat(v-bind(columns), 1fr);
       grid-auto-rows: v-bind(slotHeight);
       &:not(:first-child) {
         .time {
@@ -291,6 +306,9 @@ watch(view, handleIndicator, { flush: "post" });
         font-size: 10px;
         font-family: "Poppins-Medium", sans-serif;
         margin-top: -5px;
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 15px;
       }
       .date {
         border-color: var(--light-gray);

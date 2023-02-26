@@ -3,7 +3,7 @@ import { toRefs, ref } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
 
 type SideBarProps = {
-  date: Date;
+  selectedDate: Date;
 };
 
 type SideBarEmits = {
@@ -14,7 +14,7 @@ let props = defineProps<SideBarProps>();
 
 let emit = defineEmits<SideBarEmits>();
 
-let { date } = toRefs(props);
+let { selectedDate } = toRefs(props);
 
 let datePicker = ref<InstanceType<typeof DatePicker>>();
 
@@ -35,7 +35,7 @@ defineExpose({ datePicker });
     </div>
     <DatePicker
       ref="datePicker"
-      :selected-date="date"
+      :selected-date="selectedDate"
       @on-change="(date) => emit('onChange', date)"
     />
   </div>
