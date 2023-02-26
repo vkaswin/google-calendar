@@ -125,10 +125,10 @@ const handlePrevious = () => {
   });
 };
 
-let handleChange = (date: Date) => {
-  console.log("🚀 ~ file: Calendar.vue:92 ~ handleChange ~ date", date);
-
-  calendarView.value = "day";
+let handleChange = (date: Date, changeView: boolean = true) => {
+  if (changeView) {
+    calendarView.value = "day";
+  }
 
   sideBar.value?.datePicker?.setCurrentDate(date);
 
@@ -181,7 +181,7 @@ let handleViewChange = (view: CalendarView) => {
       <YearCalendar
         v-else-if="calendarView === 'year'"
         :selected-date="selectedDate"
-        @on-change="(date) => handleChange(date)"
+        @on-change="(date, changeView) => handleChange(date, changeView)"
       />
     </div>
   </div>

@@ -73,10 +73,6 @@ let toggle = () => {
   isOpen.value = !isOpen.value;
 };
 
-let setPopper = (element: any) => {
-  popper.value = element;
-};
-
 let handleClick = (value: string) => {
   toggle();
   emit("onChange", value);
@@ -86,7 +82,7 @@ let handleClick = (value: string) => {
 <template>
   <Teleport v-if="isOpen" to="body">
     <div
-      :ref="setPopper"
+      ref="popper"
       :class="styles.container"
       v-bind="{
         style: { ...(popperInstance?.state?.styles?.popper) as CSSProperties },
