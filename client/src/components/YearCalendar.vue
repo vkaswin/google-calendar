@@ -43,7 +43,7 @@ let dates = computed(() => {
 let handleChange = (date: Date) => {
   let changeView =
     selectedDate.value.toISOString().split("T")[0] ===
-    date.toISOString().split("T")[0];
+      date.toISOString().split("T")[0] && isOpen.value;
 
   emit("onChange", date, changeView);
 
@@ -66,10 +66,16 @@ let closePopup = () => {
   isOpen.value = false;
 };
 
+let setPopper = (el: any) => {
+  if (!el) return;
+  popper.value = el as HTMLElement;
+};
+
 watch([reference, popper], ([reference, popper]) => {
   if (!reference || !popper) return;
 
   if (popperInstance.value) {
+    popperInstance.value.state.elements.reference = reference;
     popperInstance.value.state.elements.reference = reference;
     popperInstance.value.update();
   } else {
@@ -99,8 +105,8 @@ watch([reference, popper], ([reference, popper]) => {
       @on-change="handleChange"
     />
     <div
-      v-if="isOpen"
-      ref="popper"
+      v-show="isOpen"
+      :ref="setPopper"
       :class="styles.popup"
       v-bind="{
         style: { ...(popperInstance?.state?.styles?.popper) as CSSProperties },

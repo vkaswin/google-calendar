@@ -53,22 +53,6 @@ onUnmounted(() => {
   }
 });
 
-watch([reference, popper], () => {
-  if (!reference.value || !popper.value || popperInstance.value) return;
-
-  popperInstance.value = createPopper(reference.value, popper.value, {
-    placement: "bottom-start",
-    modifiers: [
-      {
-        name: "offset",
-        options: {
-          offset: [0, 10],
-        },
-      },
-    ],
-  });
-});
-
 let toggle = () => {
   isOpen.value = !isOpen.value;
 };
@@ -77,12 +61,39 @@ let handleClick = (value: string) => {
   toggle();
   emit("onChange", value);
 };
+
+let setPopper = (el: any) => {
+  if (!el) return;
+  popper.value = el as HTMLElement;
+};
+
+watch([reference, popper], ([reference, popper]) => {
+  if (!reference || !popper) return;
+
+  if (popperInstance.value) {
+    popperInstance.value.state.elements.popper = popper;
+    popperInstance.value.state.elements.reference = reference;
+    popperInstance.value.update();
+  } else {
+    popperInstance.value = createPopper(reference, popper, {
+      placement: "bottom-start",
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, 10],
+          },
+        },
+      ],
+    });
+  }
+});
 </script>
 
 <template>
   <Teleport v-if="isOpen" to="body">
     <div
-      ref="popper"
+      :ref="setPopper"
       :class="styles.container"
       v-bind="{
         style: { ...(popperInstance?.state?.styles?.popper) as CSSProperties },
