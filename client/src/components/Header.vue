@@ -30,7 +30,7 @@ let options = [
   { label: "Week", value: "week" },
   { label: "Month", value: "month" },
   { label: "Year", value: "year" },
-];
+] as const;
 
 let userInitial = computed(() => {
   if (!user.value) return;
@@ -61,10 +61,19 @@ let userInitial = computed(() => {
         <i class="bxs-down-arrow"></i>
       </button>
       <DropDown
-        target="#view-dropdown"
-        :options="options"
-        @on-change="(view) => emit('onViewChange', view as CalendarView)"
-      />
+        :target="`.${styles.dropdown}`"
+        :class-name="styles.view_btn"
+        placement="bottom-start"
+      >
+        <button
+          v-for="({ label, value }, index) in options"
+          :key="index"
+          :class="styles.item"
+          @click="emit('onViewChange', value)"
+        >
+          {{ label }}
+        </button>
+      </DropDown>
     </div>
     <SearchBar />
     <div :class="styles.avatar">
@@ -72,6 +81,16 @@ let userInitial = computed(() => {
         <span>{{ userInitial }}</span>
       </div>
     </div>
+    <DropDown
+      :target="`.${styles.avatar}`"
+      :class-name="styles.logout_btn"
+      placement="bottom-end"
+    >
+      <button>
+        <i class="bx-log-out-circle"></i>
+        <span>Logout</span>
+      </button>
+    </DropDown>
   </div>
 </template>
 
@@ -118,7 +137,6 @@ let userInitial = computed(() => {
       border-radius: 4px;
       width: 80px;
       cursor: pointer;
-
       &:last-child {
         display: flex;
         justify-content: space-between;
@@ -172,6 +190,24 @@ let userInitial = computed(() => {
         color: white;
         font-size: 18px;
       }
+    }
+  }
+}
+
+.view_btn {
+  width: 100px;
+}
+
+.logout_btn {
+  width: 120px;
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 120px;
+    i {
+      color: inherit;
+      font-size: 22px;
     }
   }
 }

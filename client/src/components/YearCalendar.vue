@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, watch, watchEffect, CSSProperties } from "vue";
-import { createPopper, Instance } from "@popperjs/core";
+import { toRefs, computed, ref, watch, CSSProperties } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { getDayName } from "@/utils";
+import usePopper from "@/composables/usePopper";
 
 type YearCalendarProps = {
   selectedDate: Date;
@@ -20,13 +20,23 @@ let { selectedDate } = toRefs(props);
 
 let isOpen = ref(false);
 
+let reference = ref<HTMLElement | null>(null);
+
 let popper = ref<HTMLElement | null>(null);
 
 let calendar = ref<HTMLElement | null>(null);
 
-let reference = ref<Element | null>(null);
-
-let popperInstance = ref<Instance | null>(null);
+usePopper(reference, popper, {
+  placement: "bottom",
+  modifiers: [
+    {
+      name: "offset",
+      options: {
+        offset: [0, 10],
+      },
+    },
+  ],
+});
 
 let dates = computed(() => {
   let dates: Date[] = [];
@@ -47,19 +57,11 @@ let handleChange = (date: Date) => {
 
   emit("onChange", date, changeView);
 
-  if (changeView || !calendar.value) return;
+  if (changeView) return;
 
   if (!isOpen.value) {
     isOpen.value = true;
   }
-
-  let element = calendar.value.querySelector(
-    `[data-date='${date.toLocaleDateString()}']`
-  );
-
-  if (!element) return;
-
-  reference.value = element;
 };
 
 let closePopup = () => {
@@ -71,31 +73,25 @@ let setPopper = (el: any) => {
   popper.value = el as HTMLElement;
 };
 
+watch(
+  [isOpen, selectedDate],
+  () => {
+    if (!calendar.value) return;
+
+    let element = calendar.value.querySelector<HTMLElement>(
+      `[data-date='${selectedDate.value.toLocaleDateString()}']`
+    );
+
+    if (!element) return;
+
+    reference.value = element;
+  },
+  { flush: "post" }
+);
+
 watch(selectedDate, (date) => {
   // api call to fetch events by date
-  console.log(date);
-});
-
-watch([reference, popper], ([reference, popper]) => {
-  if (!reference || !popper) return;
-
-  if (popperInstance.value) {
-    popperInstance.value.state.elements.reference = reference;
-    popperInstance.value.state.elements.reference = reference;
-    popperInstance.value.update();
-  } else {
-    popperInstance.value = createPopper(reference, popper, {
-      placement: "bottom",
-      modifiers: [
-        {
-          name: "offset",
-          options: {
-            offset: [0, 10],
-          },
-        },
-      ],
-    });
-  }
+  console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", date);
 });
 </script>
 
@@ -109,15 +105,7 @@ watch([reference, popper], ([reference, popper]) => {
       :show-year="false"
       @on-change="handleChange"
     />
-    <div
-      v-show="isOpen"
-      :ref="setPopper"
-      :class="styles.popup"
-      v-bind="{
-        style: { ...(popperInstance?.state?.styles?.popper) as CSSProperties },
-        ...popperInstance?.state?.attributes?.popper,
-      }"
-    >
+    <div v-if="isOpen" :ref="setPopper" :class="styles.popup">
       <div :class="styles.date">
         <span>{{ getDayName(selectedDate.getDay()) }}</span>
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
@@ -138,6 +126,9 @@ watch([reference, popper], ([reference, popper]) => {
   padding: 15px 10px;
 }
 .popup {
+  position: absolute;
+  top: 0px;
+  left: 0px;
   background-color: #fff;
   box-shadow: 0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%);
   padding: 15px;
