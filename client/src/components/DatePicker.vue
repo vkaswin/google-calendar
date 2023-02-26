@@ -103,10 +103,12 @@ defineExpose({
           ,
         ]"
         :key="index"
-        @click="emit('onChange', date)"
         v-bind="{
           ...(actualDate.getMonth() === date.getMonth()
-            ? { 'data-date': date.toLocaleDateString() }
+            ? {
+                'data-date': date.toLocaleDateString(),
+                onClick: () => emit('onChange', date),
+              }
             : {}),
         }"
         >{{ date.getDate() }}</span

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, watch, CSSProperties } from "vue";
+import { toRefs, computed, ref, watch, watchEffect, CSSProperties } from "vue";
 import { createPopper, Instance } from "@popperjs/core";
 import DatePicker from "@/components/DatePicker.vue";
 import { getDayName } from "@/utils";
@@ -70,6 +70,11 @@ let setPopper = (el: any) => {
   if (!el) return;
   popper.value = el as HTMLElement;
 };
+
+watch(selectedDate, (date) => {
+  // api call to fetch events by date
+  console.log(date);
+});
 
 watch([reference, popper], ([reference, popper]) => {
   if (!reference || !popper) return;
@@ -169,8 +174,8 @@ watch([reference, popper], ([reference, popper]) => {
       align-items: center;
       top: -5px;
       right: 0px;
-      width: 25px;
-      height: 25px;
+      width: 30px;
+      height: 30px;
       font-size: 24px;
       border-radius: 50%;
       background-color: transparent;
@@ -178,7 +183,7 @@ watch([reference, popper], ([reference, popper]) => {
       transition: background-color 0.25s ease-in-out;
       cursor: pointer;
       &:hover {
-        background-color: #f9f9f9;
+        background-color: #f1f3f4;
       }
     }
   }
