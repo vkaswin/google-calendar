@@ -2,15 +2,18 @@
 import Input from "@/components/Input.vue";
 import { RouteNames } from "@/router";
 import { useVuelidate } from "@vuelidate/core";
-import { required, email } from "@vuelidate/validators";
+import { required, email, helpers } from "@vuelidate/validators";
 import { reactive } from "vue";
 
 let formState = reactive({ email: "", password: "" });
 
 let rules = {
-  email: { required, email },
+  email: {
+    required: helpers.withMessage("Please enter email", required),
+    email: helpers.withMessage("Invalid email", email),
+  },
   password: {
-    required,
+    required: helpers.withMessage("Please enter password", required),
   },
 };
 
