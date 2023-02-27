@@ -1,6 +1,26 @@
 <script setup lang="ts">
 import Input from "@/components/Input.vue";
 import { RouteNames } from "@/router";
+import { useVuelidate } from "@vuelidate/core";
+import { required, email } from "@vuelidate/validators";
+import { reactive } from "vue";
+
+let formState = reactive({ email: "", password: "" });
+
+let rules = {
+  email: { required, email },
+  password: {
+    required,
+  },
+};
+
+const $v = useVuelidate(rules, formState);
+
+let handleSubmit = async () => {
+  let isValid = await $v.value.$validate();
+  if (!isValid) return;
+  console.log(formState);
+};
 </script>
 
 <template>
@@ -12,23 +32,25 @@ import { RouteNames } from "@/router";
       <div :class="styles.field">
         <label>Email Id</label>
         <!-- /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/ -->
-        <Input />
+        <!-- <Input /> -->
+        <input v-model="formState.email" />
       </div>
-      <!-- <span v-if="formErrors?.email" :class="styles.error_msg">{{
-        formErrors.email
-      }}</span> -->
+      <span v-if="$v.email.$error" :class="styles.error_msg">{{
+        $v.email.$errors[0].$message
+      }}</span>
     </div>
     <div>
       <div :class="styles.field">
         <label>Password</label>
-        <Input />
+        <!-- <Input /> -->
+        <input v-model="formState.password" />
       </div>
-      <!-- <span v-if="formErrors?.password" :class="styles.error_msg">{{
-        formErrors.password
-      }}</span> -->
+      <span v-if="$v.password.$error" :class="styles.error_msg">{{
+        $v.password.$errors[0].$message
+      }}</span>
     </div>
     <div :class="styles.cta">
-      <button @click="">Login</button>
+      <button @click="handleSubmit">Login</button>
       <span>
         Dont't have an account ? &nbsp;
         <router-link :to="{ name: `${RouteNames.register}` }"></router-link>
