@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
 import useAuth from "@/store/useAuth";
-import Calendar from "./views/Calendar.vue";
 
 let auth = useAuth();
 
@@ -17,6 +16,5 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- <router-view /> -->
-  <calendar />
+  <router-view />
 </template>

@@ -15,29 +15,29 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/auth",
-    component: () => import(`../layouts/AuthLayout.vue`),
+    component: () => import(/* webpackChunkName: "AuthLayout" */"../layouts/AuthLayout.vue"),
     children: [
       {
         path: "login",
         name: RouteNames.login,
-        component: () => import(`../views/Login.vue`),
+        component: () => import(/* webpackChunkName: "Login" */"../views/Login.vue"),
       },
       {
         path: "register",
         name: RouteNames.register,
-        component: () => import(`../views/Register.vue`),
+        component: () => import(/* webpackChunkName: "Register" */"../views/Register.vue"),
       },
     ],
   },
   {
     path: "/calendar",
     name: RouteNames.calendar,
-    component: () => import(`../views/Calendar.vue`),
+    component: () => import(/* webpackChunkName: "Calendar" */"../views/Calendar.vue"),
   },
   {
     path: "/:pathMatch(.*)*",
     name: RouteNames.notFound,
-    component: () => import("../views/NotFound.vue"),
+    component: () => import(/* webpackChunkName: "NotFound" */"../views/NotFound.vue"),
   },
 ];
 
