@@ -2,7 +2,7 @@
 import { toRefs, computed } from "vue";
 import { getMonthName } from "@/utils";
 import SearchBar from "@/components/SearchBar.vue";
-import DropDown from "@/components/DropDown.vue";
+import Popper from "@/components/Popper.vue";
 import { User } from "@/types/user";
 import { CalendarView } from "@/types/calendar";
 
@@ -60,7 +60,7 @@ let userInitial = computed(() => {
         <span>{{ view }}</span>
         <i class="bxs-down-arrow"></i>
       </button>
-      <DropDown
+      <Popper
         :target="`.${styles.dropdown}`"
         :class-name="styles.view_btn"
         placement="bottom-start"
@@ -73,7 +73,7 @@ let userInitial = computed(() => {
         >
           {{ label }}
         </button>
-      </DropDown>
+      </Popper>
     </div>
     <SearchBar />
     <div :class="styles.avatar">
@@ -81,7 +81,7 @@ let userInitial = computed(() => {
         <span>{{ userInitial }}</span>
       </div>
     </div>
-    <DropDown
+    <Popper
       target="#avatar"
       :class-name="styles.logout_btn"
       placement="bottom-end"
@@ -90,7 +90,7 @@ let userInitial = computed(() => {
         <i class="bx-log-out-circle"></i>
         <span>Logout</span>
       </button>
-    </DropDown>
+    </Popper>
   </div>
 </template>
 
