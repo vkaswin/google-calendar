@@ -95,23 +95,15 @@ watch(selectedDate, (date) => {
   console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", date);
 });
 
-useClickOutSide(reference, popper, (event) => {
+useClickOutSide(popper, toggle, (event) => {
   if (!popper.value || !reference.value || !calendar.value) return false;
 
   let element = event.target as HTMLElement;
 
-  let close =
-    !popper.value.contains(element) &&
-    !element.hasAttribute("data-date") &&
-    !calendar.value.contains(element) &&
-    !(
-      element.classList.contains("bx-chevron-right") ||
-      element.classList.contains("bx-chevron-left")
-    );
-
-  if (close) toggle();
-
-  return close;
+  return (
+    (!popper.value.contains(element) && !element.hasAttribute("data-date")) ||
+    (popper.value.contains(element) && element.classList.contains("bx-x"))
+  );
 });
 </script>
 
@@ -129,7 +121,7 @@ useClickOutSide(reference, popper, (event) => {
       <div :class="styles.date">
         <span>{{ getDayName(selectedDate.getDay()) }}</span>
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
-        <i class="bx-x" @click="toggle"></i>
+        <i class="bx-x"></i>
       </div>
     </div>
   </div>

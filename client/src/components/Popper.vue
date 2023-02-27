@@ -58,18 +58,15 @@ let setPopper = (el: any) => {
   popper.value = el as HTMLElement;
 };
 
-useClickOutSide(reference, popper, (event) => {
+useClickOutSide(popper, toggle, (event) => {
   if (!popper.value || !reference.value) return false;
 
   let element = event.target as HTMLElement;
 
-  let close =
+  return (
     !popper.value.contains(element) ||
-    (popper.value.contains(element) && element.tagName === "BUTTON");
-
-  if (close) toggle();
-
-  return close;
+    (popper.value.contains(element) && element.tagName === "BUTTON")
+  );
 });
 </script>
 
