@@ -115,6 +115,21 @@ q:after {
   content: none;
 }
 
+input,
+textarea,
+button {
+  font-family: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
 a {
   margin: 0px;
   padding: 0px;
