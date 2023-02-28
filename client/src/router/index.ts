@@ -2,8 +2,8 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import useAuth from "@/store/useAuth";
 
 const RouteNames = {
-  login: "login",
-  register: "register",
+  signIn: "signIn",
+  signUp: "signUp",
   calendar: "calendar",
   notFound: "not-found",
 };
@@ -11,26 +11,19 @@ const RouteNames = {
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: { name: RouteNames.login, replace: true },
+    redirect: { name: RouteNames.signIn, replace: true },
   },
   {
-    path: "/auth",
+    path: "/sign-in",
+    name: RouteNames.signIn,
     component: () =>
-      import(/* webpackChunkName: "AuthLayout" */ "../layouts/AuthLayout.vue"),
-    children: [
-      {
-        path: "login",
-        name: RouteNames.login,
-        component: () =>
-          import(/* webpackChunkName: "Login" */ "../views/Login.vue"),
-      },
-      {
-        path: "register",
-        name: RouteNames.register,
-        component: () =>
-          import(/* webpackChunkName: "Register" */ "../views/Register.vue"),
-      },
-    ],
+      import(/* webpackChunkName: "Login" */ "../views/SignIn.vue"),
+  },
+  {
+    path: "/sign-up",
+    name: RouteNames.signUp,
+    component: () =>
+      import(/* webpackChunkName: "Register" */ "../views/SignUp.vue"),
   },
   {
     path: "/calendar",
@@ -46,7 +39,7 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-let authPages = [RouteNames.login, RouteNames.register];
+let authPages = [RouteNames.signIn, RouteNames.signUp];
 
 const router = createRouter({
   history: createWebHashHistory(),

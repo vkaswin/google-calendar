@@ -13,7 +13,6 @@ const useClickOutSide: UseClickOutSide = (element, cb, handler) => {
   });
 
   let handleClick = (event: MouseEvent) => {
-    console.log("click");
     let close = handler(event);
 
     if (!close) return;

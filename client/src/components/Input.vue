@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, toRefs, Ref } from "vue";
+import { toRefs, Ref } from "vue";
 
 type InputProps = {
   label?: string;
-  type?: "text" | "password" | "number" | "email" | "search";
+  type?: "text" | "password" | "number";
   error?: boolean;
   errorMessage?: string | Ref<string>;
 };
@@ -13,6 +13,7 @@ type InputEmits = {
 };
 
 let props = withDefaults(defineProps<InputProps>(), {
+  label: "Field Name",
   type: "text",
   error: false,
 });
@@ -21,8 +22,6 @@ let emit = defineEmits<InputEmits>();
 
 let { label, type, error, errorMessage } = toRefs(props);
 
-let mask = ref(true);
-
 let handleInput = (event: Event) => {
   emit("update:modelValue", (event.target as HTMLInputElement).value);
 };
@@ -30,14 +29,13 @@ let handleInput = (event: Event) => {
 
 <template>
   <div :class="styles.container">
-    <label v-if="label">{{ label }}</label>
-    <div :class="styles.input_field">
-      <input :type="type" @input="handleInput" />
-      <div v-if="type === 'password'" :class="styles.icon">
-        <i className="bx-hide" v-if="mask" @click="mask = false"></i>
-        <i className="bx-show" v-else @click="mask = true"></i>
-      </div>
-      <span v-if="error" :class="styles.error_msg">{{ errorMessage }}</span>
+    <div :class="styles.input_field" :aria-invalid="error">
+      <label>{{ label }}</label>
+      <input :type="type" @input="handleInput" placeholder="Enter" />
+    </div>
+    <div v-if="error" :class="styles.error_msg">
+      <i class="bx-error-circle"></i>
+      <span>{{ errorMessage }}</span>
     </div>
   </div>
 </template>
@@ -46,23 +44,58 @@ let handleInput = (event: Event) => {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  label {
-    font-size: 16px;
+  gap: 5px;
+  .input_field:has(input:focus, input:not(:placeholder-shown)),
+  .input_field[aria-invalid="true"] {
+    label {
+      top: 0px;
+      left: 7px;
+      transform: translateY(-10px);
+      color: #1a73e8;
+      font-size: 12px;
+      background-color: white;
+    }
+    input {
+      outline: 2px solid #1a73e8;
+    }
+  }
+  .input_field[aria-invalid="true"] {
+    label {
+      color: #d93025 !important;
+    }
+    input {
+      outline: 2px solid #d50000 !important;
+    }
   }
   .input_field {
     position: relative;
+    label {
+      position: absolute;
+      padding: 0px 5px;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      background-color: transparent;
+      color: #5f6368;
+      font-size: 14px;
+    }
     input {
-      background-color: #f8f9fa;
-      border: 1px solid #9e9e9e;
+      background-color: #fff;
+      outline: 1px solid #dadce0;
+      border: 1px solid transparent;
       border-radius: 4px;
       width: 100%;
-      height: 35px;
-      padding: 5px 10px;
-      outline: none;
+      height: 36px;
+      padding: 0px 10px;
+      transition: outline 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      &::placeholder {
+        color: transparent;
+      }
     }
     input[type="password"] {
-      padding: 5px 10px;
+      padding: 5px 35px 5px 10px;
     }
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button {
@@ -82,10 +115,16 @@ let handleInput = (event: Event) => {
     }
   }
   .error_msg {
-    display: block;
-    margin-top: 5px;
-    color: #da3025;
-    font-size: 14px;
+    display: flex;
+    gap: 5px;
+    color: #d93025;
+    i {
+      font-size: 16px;
+      margin-top: 2px;
+    }
+    span {
+      font-size: 14px;
+    }
   }
 }
 </style>
