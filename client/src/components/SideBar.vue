@@ -56,7 +56,7 @@ defineExpose({ datePicker });
     background-color: rgba(255, 255, 255, 0.502);
     box-shadow: 0px 1px 2px 0px rgba(60, 64, 67, 0.3),
       0px 1px 3px 1px rgba(60, 64, 67, 0.15);
-    height: 48px;
+    min-height: 48px;
     width: 130px;
     border-radius: 25px;
     padding: 0px 15px;

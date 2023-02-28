@@ -37,12 +37,14 @@ let userInitial = computed(() => {
   let [firstName, lastName] = user.value.name.split(" ");
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
 });
+
+let iconUrl = `https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_${new Date().getDate()}_2x.png`;
 </script>
 
 <template>
   <div :class="styles.container">
     <div :class="styles.logo">
-      <img src="@/assets/images/calendar.png" />
+      <img :src="iconUrl" />
       <span>Calender</span>
     </div>
     <div :class="styles.date_section">

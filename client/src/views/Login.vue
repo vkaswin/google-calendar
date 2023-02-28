@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Input from "@/components/Input.vue";
-import { RouteNames } from "@/router";
+import { reactive } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers } from "@vuelidate/validators";
-import { reactive } from "vue";
+import { RouteNames } from "@/router";
+import Input from "@/components/Input.vue";
 
 let formState = reactive({ email: "", password: "" });
 
@@ -33,31 +33,33 @@ let handleSubmit = async () => {
   <div :class="styles.container">
     <div>
       <div :class="styles.field">
-        <label>Email Id</label>
-        <!-- /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/ -->
-        <!-- <Input /> -->
-        <input v-model="formState.email" />
+        <Input
+          label="Email Id"
+          type="number"
+          v-model="formState.email"
+          :error="$v.email.$error"
+          :error-message="$v.email.$errors[0]?.$message"
+        />
       </div>
-      <span v-if="$v.email.$error" :class="styles.error_msg">{{
-        $v.email.$errors[0].$message
-      }}</span>
     </div>
     <div>
       <div :class="styles.field">
-        <label>Password</label>
-        <!-- <Input /> -->
-        <input v-model="formState.password" />
+        <Input
+          label="Password"
+          type="password"
+          v-model="formState.password"
+          :error="$v.password.$error"
+          :error-message="$v.password.$errors[0]?.$message"
+        />
       </div>
-      <span v-if="$v.password.$error" :class="styles.error_msg">{{
-        $v.password.$errors[0].$message
-      }}</span>
     </div>
     <div :class="styles.cta">
       <button @click="handleSubmit">Login</button>
       <span>
         Dont't have an account ? &nbsp;
-        <router-link :to="{ name: `${RouteNames.register}` }"></router-link>
-        <span>Sign Up Here</span>
+        <router-link :to="{ name: `${RouteNames.register}` }">
+          <span>Sign Up Here</span>
+        </router-link>
       </span>
     </div>
   </div>
@@ -83,12 +85,6 @@ let handleSubmit = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
-  .error_msg {
-    display: block;
-    margin-top: 5px;
-    color: #da3025;
-    font-size: 14px;
   }
 }
 .cta {
