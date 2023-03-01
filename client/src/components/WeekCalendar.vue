@@ -8,7 +8,7 @@ import {
   onUnmounted,
   useCssModule,
 } from "vue";
-import { CalendarView } from "@/types/calendar";
+import { CalendarView } from "@/types/Calendar";
 import { getDayName, timeSlots } from "@/utils";
 
 type WeekCalendarProps = {
@@ -185,7 +185,7 @@ watch([view, selectedDate], handleIndicator, { flush: "post" });
 .container {
   height: 100%;
   padding-top: 15px;
-  --week-wrapper-height: 80px;
+  --week-wrapper-height: 90px;
   --scrollbar-width: 8px;
   --divider-height: 1px;
   --light-gray: rgb(218, 220, 224);

@@ -65,7 +65,9 @@ useClickOutSide(popper, toggle, (event) => {
 
   return (
     !popper.value.contains(element) ||
-    (popper.value.contains(element) && element.tagName === "BUTTON")
+    (popper.value.contains(element) &&
+      (element.tagName === "BUTTON" ||
+        element.parentElement?.tagName === "BUTTON"))
   );
 });
 </script>

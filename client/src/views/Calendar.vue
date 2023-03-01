@@ -6,7 +6,7 @@ import SideBar from "@/components/SideBar.vue";
 import Loader from "@/components/Loader.vue";
 import { storeToRefs } from "pinia";
 import useAuth from "@/store/useAuth";
-import { CalendarView } from "@/types/calendar";
+import { CalendarView } from "@/types/Calendar";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),
@@ -28,6 +28,8 @@ let auth = useAuth();
 let router = useRouter();
 
 let route = useRoute();
+
+let { logout } = auth;
 
 let { user } = storeToRefs(auth);
 
@@ -159,6 +161,7 @@ let handleViewChange = (view: CalendarView) => {
     @on-previous="handlePrevious"
     @on-reset="reset"
     @on-view-change="handleViewChange"
+    @on-logout="logout"
   />
   <div :class="styles.container">
     <SideBar

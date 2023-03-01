@@ -12,18 +12,20 @@ const useClickOutSide: UseClickOutSide = (element, cb, handler) => {
     setTimeout(() => document.addEventListener("click", handleClick), 0);
   });
 
+  let removeClickEvent = () => {
+    document.removeEventListener("click", handleClick);
+  };
+
   let handleClick = (event: MouseEvent) => {
     let close = handler(event);
 
     if (!close) return;
 
-    document.removeEventListener("click", handleClick);
+    removeClickEvent();
     cb();
   };
 
-  onUnmounted(() => {
-    document.removeEventListener("click", handleClick);
-  });
+  onUnmounted(removeClickEvent);
 };
 
 export default useClickOutSide;

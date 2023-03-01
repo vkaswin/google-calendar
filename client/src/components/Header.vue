@@ -3,8 +3,8 @@ import { toRefs, computed } from "vue";
 import { getMonthName } from "@/utils";
 import SearchBar from "@/components/SearchBar.vue";
 import Popper from "@/components/Popper.vue";
-import { User } from "@/types/user";
-import { CalendarView } from "@/types/calendar";
+import { User } from "@/types/User";
+import { CalendarView } from "@/types/Calendar";
 
 type HeaderProps = {
   user: User | null;
@@ -17,6 +17,7 @@ type HeaderEmits = {
   (event: "onNext"): void;
   (event: "onPrevious"): void;
   (event: "onViewChange", view: CalendarView): void;
+  (event: "onLogout"): void;
 };
 
 let props = defineProps<HeaderProps>();
@@ -88,7 +89,7 @@ let iconUrl = `https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calend
       :class-name="styles.logout_btn"
       placement="bottom-end"
     >
-      <button>
+      <button @click="emit('onLogout')">
         <i class="bx-log-out-circle"></i>
         <span>Logout</span>
       </button>

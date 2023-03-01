@@ -49,10 +49,10 @@ const router = createRouter({
 router.beforeEach(({ meta: { requireAuth = false } = {}, name }, from) => {
   let { user } = useAuth();
 
-  //   if (requireAuth && !user) return { name: RouteNames.login };
+  if (requireAuth && !user) return { name: RouteNames.signIn };
 
-  //   if (name && typeof name === "string" && authPages.includes(name) && user)
-  //     return { path: "/" };
+  if (name && typeof name === "string" && authPages.includes(name) && user)
+    return { name: RouteNames.calendar };
 });
 
 export { router as default, RouteNames };

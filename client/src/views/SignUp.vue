@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import useAuth from "@/store/useAuth";
 import { useVuelidate } from "@vuelidate/core";
 import {
   required,
@@ -10,6 +11,8 @@ import {
 } from "@vuelidate/validators";
 import { RouteNames } from "@/router";
 import Input from "@/components/Input.vue";
+
+let { signUp } = useAuth();
 
 let formState = reactive({
   firstName: "",
@@ -66,22 +69,18 @@ let rules = {
 const $v = useVuelidate(rules, formState);
 
 let handleSubmit = async () => {
-  try {
-    let isValid = await $v.value.$validate();
+  let isValid = await $v.value.$validate();
 
-    if (!isValid) return;
+  if (!isValid) return;
 
-    let { firstName, lastName, ...rest } = formState;
+  let { firstName, lastName, ...rest } = formState;
 
-    let data = {
-      name: `${firstName} ${lastName}`,
-      ...rest,
-    };
+  let data = {
+    name: `${firstName} ${lastName}`,
+    ...rest,
+  };
 
-    console.log(data);
-  } catch (err) {
-    console.log(err);
-  }
+  signUp(data);
 };
 </script>
 

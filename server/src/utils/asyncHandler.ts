@@ -1,4 +1,5 @@
 import { Response, Request, NextFunction } from "express";
+import { ZodError } from "zod";
 
 class CustomError extends Error {
   status!: number;
@@ -16,9 +17,11 @@ const asyncHandler = <T>(
     try {
       await cb(req, res, next);
     } catch (error: any) {
-      res
-        .status(error?.status || 500)
-        .send({ message: error?.message || "Internal Server Error" });
+      let status = error?.status || (error instanceof ZodError ? 400 : 500);
+      let message = error?.message || "Internal Server Error";
+
+      res.status(status).send({ message });
+
       console.log("🚀 ~ file: asyncHandler.ts:19 ~ error:", error);
     }
   };

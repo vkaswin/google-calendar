@@ -1,42 +1,39 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user";
-import { asyncHandler, CustomError } from "@/utils/asyncHandler";
-import { generateJwtToken } from "@/utils";
+import { asyncHandler, CustomError } from "../utils/asyncHandler";
+import { RegisterSchema, LoginSchema } from "../schema/user";
+import { generateJwtToken } from "../utils";
 
-const register = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+const signUp = asyncHandler(async (req, res) => {
+  let { email, name, password } = RegisterSchema.parse(req.body);
 
-  if (!name || !email || !password)
-    throw new CustomError({ message: "Please add all fields", status: 400 });
+  let isExist = await User.findOne({ email });
 
-  let existingUser = await User.findOne({ email });
-
-  if (existingUser)
+  if (isExist)
     throw new CustomError({ message: "User already exists", status: 400 });
 
-  const salt = await bcrypt.genSalt();
-  const hashPassword = await bcrypt.hash(password, salt);
+  let salt = await bcrypt.genSalt();
+  let hashPassword = await bcrypt.hash(password, salt);
 
-  const user = await User.create({
+  let user = await User.create({
     name,
     email,
     password: hashPassword,
   });
 
+  let token = generateJwtToken({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+  });
+
   res.status(200).send({
-    token: generateJwtToken({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    }),
+    token,
   });
 });
 
-const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password)
-    throw new CustomError({ message: "Please add all fields", status: 400 });
+const signIn = asyncHandler(async (req, res) => {
+  let { email, password } = LoginSchema.parse(req.body);
 
   let user = await User.findOne({ email });
 
@@ -47,13 +44,15 @@ const login = asyncHandler(async (req, res) => {
   if (!isPasswordMatched)
     throw new CustomError({ message: "Wrong Password", status: 400 });
 
+  let token = generateJwtToken({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+  });
+
   res.status(200).send({
-    token: generateJwtToken({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    }),
+    token,
   });
 });
 
-export { register, login };
+export { signIn, signUp };
