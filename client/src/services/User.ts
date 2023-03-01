@@ -1,9 +1,10 @@
 import axios from "./axios";
+import { User } from "./config";
 import { SignIn, SignUp, AuthResponse } from "@/types/User";
 
 const signInUser = (data: SignIn) => {
   return axios<AuthResponse>({
-    url: "http://localhost:8000/api/user/sign-in",
+    url: User.signIn,
     method: "post",
     data,
   });
@@ -11,7 +12,7 @@ const signInUser = (data: SignIn) => {
 
 const signUpUser = (data: SignUp) => {
   return axios<AuthResponse>({
-    url: "http://localhost:8000/api/user/sign-up",
+    url: User.signUp,
     method: "post",
     data,
   });

@@ -1,13 +1,11 @@
 const baseURL =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:8000"
-    : "https://google-form-two.vercel.app";
+  process.env.NODE_ENV === "development" ? "http://localhost:8000" : "";
 
 const userUrl = `${baseURL}/api/user`;
 
 const User = {
-  login: `${userUrl}/login`,
-  register: `${userUrl}/register`,
+  signIn: `${userUrl}/sign-in`,
+  signUp: `${userUrl}/sign-up`,
 };
 
 export { User };
