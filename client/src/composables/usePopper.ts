@@ -11,7 +11,7 @@ type UsePopper = (
   reference: Ref<HTMLElement | VirtualElement | null>,
   popper: Ref<HTMLElement | null>,
   options?: Partial<OptionsGeneric<Partial<Modifier<any, any>>>>
-) => void;
+) => Ref<Instance | null>;
 
 const usePopper: UsePopper = (reference, popper, options) => {
   let popperInstance = ref<Instance | null>(null);
@@ -41,6 +41,8 @@ const usePopper: UsePopper = (reference, popper, options) => {
     },
     { flush: "post" }
   );
+
+  return popperInstance;
 };
 
 export default usePopper;

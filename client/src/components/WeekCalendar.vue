@@ -7,13 +7,10 @@ import {
   onMounted,
   onUnmounted,
   useCssModule,
-  reactive,
 } from "vue";
 import EventPopup from "./EventPopup.vue";
 import { CalendarView, EventDetail } from "@/types/Calendar";
 import { getDayName, timeSlots } from "@/utils";
-import { useVuelidate } from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
 
 type WeekCalendarProps = {
   selectedDate: Date;
@@ -28,18 +25,13 @@ let props = defineProps<WeekCalendarProps>();
 
 let emit = defineEmits<WeekCalendarEmits>();
 
+let eventPopup = ref<InstanceType<typeof EventPopup>>();
+
 let styles = useCssModule("styles");
 
 let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
-
-let eventDetail = reactive<EventDetail>({
-  date: "",
-  description: "",
-  title: "",
-  time: "",
-});
 
 let calendarContainer: HTMLDivElement;
 
@@ -50,8 +42,6 @@ let indicator = ref<HTMLDivElement>();
 let intervalId: ReturnType<typeof setInterval>;
 
 let columns = computed(() => (view.value === "week" ? 7 : 1));
-
-let isOpen = ref(false);
 
 let timeSlotWidth = "65px";
 
@@ -80,18 +70,7 @@ let dates = computed(() => {
   return dates;
 });
 
-let rules = {
-  title: {
-    required: helpers.withMessage("Please enter title", required),
-  },
-  description: {
-    required: helpers.withMessage("Please enter description", required),
-  },
-  time: {},
-  date: {},
-};
-
-const $v = useVuelidate(rules, eventDetail);
+let placement = computed(() => (view.value === "day" ? "bottom" : "left"));
 
 onMounted(() => {
   window.addEventListener("resize", handleIndicator);
@@ -139,20 +118,18 @@ const handleIndicator = () => {
   updateIndicatorPosition();
 };
 
-let closePopup = () => {
-  isOpen.value = false;
+let handleNewEvent = async (data: EventDetail) => {
+  console.log("🚀 ~ file: WeekCalendar.vue:120 ~ handleNewEvent ~ data:", data);
 };
 
-let openPopup = () => {
-  isOpen.value = true;
-};
-
-let handleSubmit = async () => {
-  let isValid = await $v.value.$validate();
-  if (!isValid) return;
-};
-
-watch([view, selectedDate], handleIndicator, { flush: "post" });
+watch(
+  [view, selectedDate],
+  () => {
+    eventPopup.value?.closePopup();
+    handleIndicator();
+  },
+  { flush: "post" }
+);
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleIndicator);
@@ -160,19 +137,23 @@ onUnmounted(() => {
 });
 
 let handleEvent = (date: Date, time: string) => {
-  console.log(
-    "🚀 ~ file: WeekCalendar.vue:72 ~ handleTime ~ date, time",
-    date,
-    time
-  );
   let element = document.querySelector(
     `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
   ) as HTMLElement;
 
   reference.value = element;
-  eventDetail.date = date.toISOString();
-  eventDetail.time = time;
-  if (!isOpen.value) openPopup();
+
+  if (eventPopup.value?.eventDetail) {
+    eventPopup.value.eventDetail.date = date.toISOString();
+    eventPopup.value.eventDetail.time = time;
+  }
+
+  if (!eventPopup.value?.isOpen) eventPopup.value?.openPopup();
+};
+
+let handleViewChange = (date: Date) => {
+  eventPopup.value?.closePopup();
+  if (view.value === "week") emit("onChange", date);
 };
 </script>
 
@@ -190,7 +171,7 @@ let handleEvent = (date: Date, time: string) => {
           todayDate.toLocaleDateString() === date.toLocaleDateString() &&
             styles.highlight,
         ]"
-        @click="view === 'week' && emit('onChange', date)"
+        @click="handleViewChange(date)"
       >
         <span>{{ getDayName(date.getDay()) }}</span>
         <span>{{ date.getDate() }}</span>
@@ -217,13 +198,13 @@ let handleEvent = (date: Date, time: string) => {
         >
           <div
             v-if="
-              isOpen &&
-              eventDetail.date === dates[index - 1].toISOString() &&
-              eventDetail.time == time
+              eventPopup?.isOpen &&
+              eventPopup?.eventDetail.date === dates[index - 1].toISOString() &&
+              eventPopup?.eventDetail.time == time
             "
             :class="styles.event_card"
           >
-            <span>{{ eventDetail.title || "(No Title)" }}</span>
+            <span>{{ eventPopup?.eventDetail.title || "(No Title)" }}</span>
             <span>{{ time }}</span>
           </div>
         </div>
@@ -240,15 +221,13 @@ let handleEvent = (date: Date, time: string) => {
       ></div>
     </div>
   </div>
-  <Teleport :to="calendarContainer" v-if="isOpen">
-    <EventPopup
-      :form-state="$v"
-      :reference="reference"
-      :event-detail="eventDetail"
-      @on-submit="handleSubmit"
-      @on-close="closePopup"
-    />
-  </Teleport>
+  <EventPopup
+    ref="eventPopup"
+    :container="calendarContainer"
+    :placement="placement"
+    :reference="reference"
+    @on-new-event="handleNewEvent"
+  />
 </template>
 
 <style lang="scss" module="styles">

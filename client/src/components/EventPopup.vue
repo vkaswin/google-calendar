@@ -1,36 +1,92 @@
 <script lang="ts" setup>
-import { ref, toRefs, computed, Ref } from "vue";
+import { ref, toRefs, computed, reactive, watch } from "vue";
 import usePopper from "@/composables/usePopper";
+import { Placement } from "@popperjs/core";
 import { EventDetail } from "@/types/Calendar";
 import { getMonthName } from "@/utils";
-import { Validation } from "@vuelidate/core";
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
+import { createEvent } from "@/services/Calender";
+import { toast } from "vue3-toastify";
 
 type EventPopupProps = {
-  eventDetail: Partial<EventDetail>;
+  placement?: Placement;
   reference: HTMLElement | null;
-  formState: Validation;
+  container: HTMLElement;
 };
 
 type EventPopupEmits = {
-  (event: "onSubmit"): void;
+  (event: "onNewEvent", data: EventDetail): void;
   (event: "onClose"): void;
 };
 
-let props = defineProps<EventPopupProps>();
+let props = withDefaults(defineProps<EventPopupProps>(), { placement: "left" });
+
+let isOpen = ref(false);
+
+let eventDetail = reactive<EventDetail>({
+  date: "",
+  description: "",
+  time: "",
+  title: "",
+});
 
 let emit = defineEmits<EventPopupEmits>();
 
-let { formState, reference, eventDetail } = toRefs(props);
+let { reference, placement, container } = toRefs(props);
+
+let rules = {
+  title: {
+    required: helpers.withMessage("Please enter title", required),
+  },
+  description: {
+    required: helpers.withMessage("Please enter description", required),
+  },
+  time: {},
+  date: {},
+};
+
+const $v = useVuelidate(rules, eventDetail);
 
 let popper = ref<HTMLElement | null>(null);
 
 let date = computed(() => {
-  if (!eventDetail.value.date || eventDetail.value.date.length === 0) return;
-  return new Date(eventDetail.value.date);
+  if (!eventDetail.date || eventDetail.date.length === 0) return;
+  return new Date(eventDetail.date);
 });
 
-usePopper(reference, popper, {
-  placement: "left",
+let openPopup = () => {
+  isOpen.value = true;
+};
+
+let closePopup = () => {
+  isOpen.value = false;
+};
+
+let reset = () => {
+  closePopup();
+  eventDetail = {
+    date: "",
+    description: "",
+    time: "",
+    title: "",
+  };
+};
+
+let handleSubmit = async () => {
+  try {
+    let isValid = await $v.value.$validate();
+    if (!isValid) return;
+    let { data } = await createEvent(eventDetail);
+    reset();
+    emit("onNewEvent", data);
+  } catch (err: any) {
+    toast.error(err?.message || "Error");
+  }
+};
+
+let popperInstance = usePopper(reference, popper, {
+  placement: placement.value,
   modifiers: [
     {
       name: "offset",
@@ -40,49 +96,63 @@ usePopper(reference, popper, {
     },
   ],
 });
+
+watch(placement, (placement) => {
+  popperInstance.value?.setOptions({ placement });
+});
+
+defineExpose({
+  isOpen,
+  eventDetail,
+  openPopup,
+  closePopup,
+  reset,
+});
 </script>
 
 <template>
-  <div ref="popper" :class="styles.container">
-    <div :class="styles.popup">
-      <div>
-        <div :class="styles.title">
-          <input placeholder="Add Title" v-model="eventDetail.title" />
+  <Teleport :to="container" v-if="isOpen">
+    <div ref="popper" :class="styles.container">
+      <div :class="styles.popup">
+        <div>
+          <div :class="styles.title">
+            <input placeholder="Add Title" v-model="eventDetail.title" />
+          </div>
+          <div v-if="$v.title?.$error" :class="styles.error_msg">
+            <i class="bx-error-circle"></i>
+            <span>{{ $v.title?.$errors[0]?.$message }}</span>
+          </div>
         </div>
-        <div v-if="formState?.title?.$error" :class="styles.error_msg">
-          <i class="bx-error-circle"></i>
-          <span>{{ formState.title?.$errors[0]?.$message }}</span>
+        <div :class="styles.date">
+          <i class="bx-time-five"></i>
+          <div v-if="eventDetail" :class="styles.wrap_field">
+            <span v-if="date">{{
+              ` ${getMonthName(
+                date.getMonth()
+              )} ${date.getDate()}, ${date.getFullYear()}`
+            }}</span>
+            <div :class="styles.dropdown">
+              {{ eventDetail.time }}
+            </div>
+          </div>
         </div>
-      </div>
-      <div :class="styles.date">
-        <i class="bx-time-five"></i>
-        <div v-if="eventDetail" :class="styles.wrap_field">
-          <span v-if="date">{{
-            ` ${getMonthName(
-              date.getMonth()
-            )} ${date.getDate()}, ${date.getFullYear()}`
-          }}</span>
-          <div :class="styles.dropdown">
-            {{ eventDetail.time }}
+        <div :class="styles.description">
+          <textarea
+            placeholder="Add description"
+            v-model="eventDetail.description"
+          ></textarea>
+          <div v-if="$v.description?.$error" :class="styles.error_msg">
+            <i class="bx-error-circle"></i>
+            <span>{{ $v.description?.$errors[0].$message }}</span>
           </div>
         </div>
       </div>
-      <div :class="styles.description">
-        <textarea
-          placeholder="Add description"
-          v-model="eventDetail.description"
-        ></textarea>
-        <div v-if="formState?.description?.$error" :class="styles.error_msg">
-          <i class="bx-error-circle"></i>
-          <span>{{ formState.description?.$errors[0].$message }}</span>
-        </div>
+      <div :class="styles.submit">
+        <button @click="handleSubmit">Save</button>
       </div>
+      <i class="bx-x" :class="styles.close_icon" @click="closePopup"></i>
     </div>
-    <div :class="styles.submit">
-      <button @click="emit('onSubmit')">Save</button>
-    </div>
-    <i class="bx-x" :class="styles.close_icon" @click="emit('onClose')"></i>
-  </div>
+  </Teleport>
 </template>
 
 <style lang="scss" module="styles">

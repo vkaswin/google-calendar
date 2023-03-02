@@ -4,6 +4,7 @@ import jwtDecode from "jwt-decode";
 import { User, SignIn, SignUp } from "@/types/User";
 import { signInUser, signUpUser } from "@/services/User";
 import router, { RouteNames } from "@/router";
+import { toast } from "vue3-toastify";
 
 const useAuth = defineStore("auth", {
   state: () => {
@@ -30,6 +31,7 @@ const useAuth = defineStore("auth", {
         cookie.set({ name: "auth_token", value: token, days: 14 });
         router.push({ name: RouteNames.calendar });
       } catch (err: any) {
+        toast.error(err?.message || "Error");
         if (err?.message === "User not exist")
           router.push({ name: RouteNames.signUp });
       }
