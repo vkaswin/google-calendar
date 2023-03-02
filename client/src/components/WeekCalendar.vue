@@ -7,9 +7,13 @@ import {
   onMounted,
   onUnmounted,
   useCssModule,
+  reactive,
 } from "vue";
-import { CalendarView } from "@/types/Calendar";
+import EventPopup from "./EventPopup.vue";
+import { CalendarView, EventDetail } from "@/types/Calendar";
 import { getDayName, timeSlots } from "@/utils";
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
 
 type WeekCalendarProps = {
   selectedDate: Date;
@@ -30,11 +34,24 @@ let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
 
+let eventDetail = reactive<EventDetail>({
+  date: "",
+  description: "",
+  title: "",
+  time: "",
+});
+
+let calendarContainer: HTMLDivElement;
+
+let reference = ref<HTMLElement | null>(null);
+
 let indicator = ref<HTMLDivElement>();
 
 let intervalId: ReturnType<typeof setInterval>;
 
 let columns = computed(() => (view.value === "week" ? 7 : 1));
+
+let isOpen = ref(false);
 
 let timeSlotWidth = "65px";
 
@@ -62,6 +79,19 @@ let dates = computed(() => {
 
   return dates;
 });
+
+let rules = {
+  title: {
+    required: helpers.withMessage("Please enter title", required),
+  },
+  description: {
+    required: helpers.withMessage("Please enter description", required),
+  },
+  time: {},
+  date: {},
+};
+
+const $v = useVuelidate(rules, eventDetail);
 
 onMounted(() => {
   window.addEventListener("resize", handleIndicator);
@@ -109,24 +139,41 @@ const handleIndicator = () => {
   updateIndicatorPosition();
 };
 
+let closePopup = () => {
+  isOpen.value = false;
+};
+
+let openPopup = () => {
+  isOpen.value = true;
+};
+
+let handleSubmit = async () => {
+  let isValid = await $v.value.$validate();
+  if (!isValid) return;
+};
+
+watch([view, selectedDate], handleIndicator, { flush: "post" });
+
 onUnmounted(() => {
   window.removeEventListener("resize", handleIndicator);
   clearInterval(intervalId);
 });
 
-let handleEvent = (date?: Date, time?: string) => {
-  if (date && time) {
-    console.log(
-      "🚀 ~ file: WeekCalendar.vue:72 ~ handleTime ~ date, time",
-      date,
-      time
-    );
-  } else {
-    console.log("close popup");
-  }
-};
+let handleEvent = (date: Date, time: string) => {
+  console.log(
+    "🚀 ~ file: WeekCalendar.vue:72 ~ handleTime ~ date, time",
+    date,
+    time
+  );
+  let element = document.querySelector(
+    `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
+  ) as HTMLElement;
 
-watch([view, selectedDate], handleIndicator, { flush: "post" });
+  reference.value = element;
+  eventDetail.date = date.toISOString();
+  eventDetail.time = time;
+  if (!isOpen.value) openPopup();
+};
 </script>
 
 <template>
@@ -151,7 +198,7 @@ watch([view, selectedDate], handleIndicator, { flush: "post" });
       <div></div>
     </div>
     <div :class="styles.divider"></div>
-    <div :class="styles.time_slot_section">
+    <div ref="calendarContainer" :class="styles.time_slot_section">
       <div
         :class="styles.time_slot_container"
         v-for="({ label, time }, index) in timeSlots"
@@ -164,8 +211,22 @@ watch([view, selectedDate], handleIndicator, { flush: "post" });
           :class="styles.date"
           v-for="index in columns"
           :key="index"
+          :data-date="dates[index - 1].toLocaleDateString()"
+          :data-time="time"
           @click="handleEvent(dates[index - 1], time)"
-        ></div>
+        >
+          <div
+            v-if="
+              isOpen &&
+              eventDetail.date === dates[index - 1].toISOString() &&
+              eventDetail.time == time
+            "
+            :class="styles.event_card"
+          >
+            <span>{{ eventDetail.title || "(No Title)" }}</span>
+            <span>{{ time }}</span>
+          </div>
+        </div>
       </div>
       <div
         ref="indicator"
@@ -179,6 +240,15 @@ watch([view, selectedDate], handleIndicator, { flush: "post" });
       ></div>
     </div>
   </div>
+  <Teleport :to="calendarContainer" v-if="isOpen">
+    <EventPopup
+      :form-state="$v"
+      :reference="reference"
+      :event-detail="eventDetail"
+      @on-submit="handleSubmit"
+      @on-close="closePopup"
+    />
+  </Teleport>
 </template>
 
 <style lang="scss" module="styles">
@@ -311,12 +381,41 @@ watch([view, selectedDate], handleIndicator, { flush: "post" });
         padding-right: 15px;
       }
       .date {
+        position: relative;
         border-color: var(--light-gray);
         border-style: solid;
         border-width: 0px 1px 1px 0px;
         cursor: pointer;
         &:nth-child(2) {
           border-width: 0px 0px 1px 1px;
+        }
+        .event_card {
+          position: absolute;
+          inset: 2px;
+          background-color: rgb(3, 155, 229);
+          border-color: rgb(3, 155, 229);
+          box-shadow: 0px 6px 10px 0px rgb(0 0 0 / 14%),
+            0px 1px 18px 0px rgb(0 0 0 / 12%), 0px 3px 5px -1px rgb(0 0 0 / 20%);
+          border-radius: 4px;
+          padding: 5px;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          span {
+            color: white;
+            &:first-child {
+              font-size: 14px;
+              font-family: "Poppins-Medium", sans-serif;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 1;
+              overflow: hidden;
+              word-break: break-all;
+            }
+            &:last-child {
+              font-size: 12px;
+            }
+          }
         }
       }
     }

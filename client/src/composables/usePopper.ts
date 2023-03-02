@@ -4,10 +4,11 @@ import {
   Instance,
   OptionsGeneric,
   Modifier,
+  VirtualElement,
 } from "@popperjs/core";
 
 type UsePopper = (
-  reference: Ref<HTMLElement | null>,
+  reference: Ref<HTMLElement | VirtualElement | null>,
   popper: Ref<HTMLElement | null>,
   options?: Partial<OptionsGeneric<Partial<Modifier<any, any>>>>
 ) => void;
