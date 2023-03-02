@@ -69,42 +69,36 @@ let toggle = () => {
   isOpen.value = !isOpen.value;
 };
 
-let setPopper = (el: any) => {
-  if (!el) return;
-  popper.value = el as HTMLElement;
-};
-
-watch(
-  [isOpen, selectedDate],
-  () => {
-    if (!calendar.value) return;
-
-    let element = calendar.value.querySelector<HTMLElement>(
-      `[data-date='${selectedDate.value.toLocaleDateString()}']`
-    );
-
-    if (!element) return;
-
-    reference.value = element;
-  },
-  { flush: "post" }
-);
-
-watch(selectedDate, (date) => {
-  // api call to fetch events by date
-  console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", date);
-});
-
-useClickOutSide(popper, toggle, (event) => {
-  if (!popper.value || !reference.value || !calendar.value) return false;
+let unRegister = useClickOutSide(popper, toggle, (event) => {
+  if (!popper.value) return;
 
   let element = event.target as HTMLElement;
 
-  return (
-    (!popper.value.contains(element) && !element.hasAttribute("data-date")) ||
-    (popper.value.contains(element) && element.classList.contains("bx-x"))
-  );
+  return !popper.value.contains(element) && !element.hasAttribute("data-date");
 });
+
+watch(isOpen, (isOpen) => {
+  if (!isOpen) unRegister();
+});
+
+watch(
+  selectedDate,
+  async (selectedDate) => {
+    if (!calendar.value) return;
+
+    let element = calendar.value.querySelector<HTMLElement>(
+      `[data-date='${selectedDate.toLocaleDateString()}']`
+    );
+
+    if (element) {
+      reference.value = element;
+    }
+
+    // api call to fetch events by date
+    console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", selectedDate);
+  },
+  { flush: "post" }
+);
 </script>
 
 <template>
@@ -117,11 +111,11 @@ useClickOutSide(popper, toggle, (event) => {
       :show-year="false"
       @on-change="handleChange"
     />
-    <div v-if="isOpen" :ref="setPopper" :class="styles.popup">
+    <div v-if="isOpen" ref="popper" :class="styles.popup">
       <div :class="styles.date">
         <span>{{ getDayName(selectedDate.getDay()) }}</span>
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
-        <i class="bx-x"></i>
+        <i class="bx-x" @click="toggle"></i>
       </div>
     </div>
   </div>

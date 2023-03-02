@@ -38,14 +38,12 @@ let userInitial = computed(() => {
   let [firstName, lastName] = user.value.name.split(" ");
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
 });
-
-let iconUrl = `https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_${new Date().getDate()}_2x.png`;
 </script>
 
 <template>
   <div :class="styles.container">
     <div :class="styles.logo">
-      <img :src="iconUrl" />
+      <img :src="`/images/${new Date().getDate()}.png`" />
       <span>Calender</span>
     </div>
     <div :class="styles.date_section">
@@ -67,12 +65,18 @@ let iconUrl = `https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calend
         :target="`.${styles.dropdown}`"
         :class-name="styles.view_btn"
         placement="bottom-start"
+        v-slot="{ toggle }"
       >
         <button
           v-for="({ label, value }, index) in options"
           :key="index"
           :class="styles.item"
-          @click="emit('onViewChange', value)"
+          @click="
+            () => {
+              toggle();
+              emit('onViewChange', value);
+            }
+          "
         >
           {{ label }}
         </button>
@@ -88,8 +92,16 @@ let iconUrl = `https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calend
       target="#avatar"
       :class-name="styles.logout_btn"
       placement="bottom-end"
+      v-slot="{ toggle }"
     >
-      <button @click="emit('onLogout')">
+      <button
+        @click="
+          () => {
+            toggle();
+            emit('onLogout');
+          }
+        "
+      >
         <i class="bx-log-out-circle"></i>
         <span>Logout</span>
       </button>

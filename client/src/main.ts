@@ -21,7 +21,7 @@ if (document) {
   let favicon = document.head.querySelector<HTMLLinkElement>("[rel='icon']");
 
   if (favicon) {
-    favicon.href = `https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_${date.getDate()}.ico`;
+    favicon.href = `/favicon/${date.getDate()}.ico`;
   }
 }
 
