@@ -153,7 +153,6 @@ let handleSubmit = async () => {
       </div>
       <div :class="styles.poster">
         <img src="/images/account.svg" />
-        <span>One account. All of Google working for you.</span>
       </div>
     </div>
   </div>
@@ -254,11 +253,6 @@ let handleSubmit = async () => {
         max-width: 100%;
         height: auto;
         object-fit: contain;
-      }
-      span {
-        color: #202124;
-        font-size: 16px;
-        text-align: center;
       }
     }
   }

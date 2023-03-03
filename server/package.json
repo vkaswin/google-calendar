@@ -1,7 +1,7 @@
 {
     "name": "calendar-app",
     "version": "1.0.0",
-    "description": "Google Calendar",
+    "description": "Calendar App",
     "main": "index.ts",
     "scripts": {
         "build": "tsc",

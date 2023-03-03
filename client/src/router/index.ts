@@ -30,6 +30,9 @@ const routes: RouteRecordRaw[] = [
     name: RouteNames.calendar,
     component: () =>
       import(/* webpackChunkName: "Calendar" */ "../views/Calendar.vue"),
+    meta: {
+      requireAuth: true,
+    },
   },
   {
     path: "/:pathMatch(.*)*",

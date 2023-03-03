@@ -40,7 +40,7 @@ let handleSubmit = async () => {
       <div>
         <div :class="styles.logo">
           <span>Sign In</span>
-          <span>to continue to Gmail</span>
+          <span>to continue</span>
         </div>
         <div :class="styles.form">
           <Input
