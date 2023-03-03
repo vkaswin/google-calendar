@@ -89,7 +89,7 @@ let handleSubmit = async () => {
     <div :class="styles.wrapper">
       <div>
         <div :class="styles.logo">
-          <span>Create your Google Account</span>
+          <span>Create your Account</span>
         </div>
         <div :class="styles.form">
           <div :class="styles.wrap_field">
@@ -152,7 +152,7 @@ let handleSubmit = async () => {
         </div>
       </div>
       <div :class="styles.poster">
-        <img src="https://ssl.gstatic.com/accounts/signup/glif/account.svg" />
+        <img src="/images/account.svg" />
         <span>One account. All of Google working for you.</span>
       </div>
     </div>
