@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted, onUnmounted } from "vue";
 import useAuth from "@/store/useAuth";
 import { useVuelidate } from "@vuelidate/core";
 import {
@@ -67,6 +67,18 @@ let rules = {
 };
 
 const $v = useVuelidate(rules, formState);
+
+onMounted(() => {
+  document.addEventListener("keydown", handleKeyDown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeyDown);
+});
+
+let handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Enter") handleSubmit();
+};
 
 let handleSubmit = async () => {
   let isValid = await $v.value.$validate();

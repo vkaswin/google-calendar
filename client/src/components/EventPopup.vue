@@ -17,7 +17,6 @@ type EventPopupProps = {
 
 type EventPopupEmits = {
   (event: "onNewEvent", data: EventDetail): void;
-  (event: "onClose"): void;
 };
 
 let props = withDefaults(defineProps<EventPopupProps>(), { placement: "left" });
@@ -65,12 +64,11 @@ let closePopup = () => {
 
 let reset = () => {
   closePopup();
-  eventDetail = {
-    date: "",
-    description: "",
-    time: "",
-    title: "",
-  };
+  eventDetail.date = "";
+  eventDetail.description = "";
+  eventDetail.time = "";
+  eventDetail.title = "";
+  $v.value.$reset();
 };
 
 let handleSubmit = async () => {
@@ -150,7 +148,7 @@ defineExpose({
       <div :class="styles.submit">
         <button @click="handleSubmit">Save</button>
       </div>
-      <i class="bx-x" :class="styles.close_icon" @click="closePopup"></i>
+      <i class="bx-x" :class="styles.close_icon" @click="reset"></i>
     </div>
   </Teleport>
 </template>

@@ -137,7 +137,7 @@ onUnmounted(() => {
 });
 
 let handleEvent = (date: Date, time: string) => {
-  let element = document.querySelector(
+  let element = calendarContainer.querySelector(
     `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
   ) as HTMLElement;
 
