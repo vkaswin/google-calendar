@@ -14,17 +14,26 @@ const routes: RouteRecordRaw[] = [
     redirect: { name: RouteNames.signIn, replace: true },
   },
   {
-    path: "/sign-in",
-    name: RouteNames.signIn,
+    path: "/auth",
+    redirect: "/",
     component: () =>
-      import(/* webpackChunkName: "Login" */ "../views/SignIn.vue"),
+      import(/* webpackChunkName: "AuthLayout" */ "../layouts/AuthLayout.vue"),
+    children: [
+      {
+        path: "sign-in",
+        name: RouteNames.signIn,
+        component: () =>
+          import(/* webpackChunkName: "Login" */ "../views/SignIn.vue"),
+      },
+      {
+        path: "sign-up",
+        name: RouteNames.signUp,
+        component: () =>
+          import(/* webpackChunkName: "Register" */ "../views/SignUp.vue"),
+      },
+    ],
   },
-  {
-    path: "/sign-up",
-    name: RouteNames.signUp,
-    component: () =>
-      import(/* webpackChunkName: "Register" */ "../views/SignUp.vue"),
-  },
+
   {
     path: "/calendar",
     name: RouteNames.calendar,

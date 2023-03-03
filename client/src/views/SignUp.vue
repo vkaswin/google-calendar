@@ -98,174 +98,166 @@ let handleSubmit = async () => {
 
 <template>
   <div :class="styles.container">
-    <div :class="styles.wrapper">
-      <div>
-        <div :class="styles.logo">
-          <span>Create your Account</span>
+    <div>
+      <div :class="styles.logo">
+        <span>Create your Account</span>
+      </div>
+      <div :class="styles.form">
+        <div :class="styles.wrap_field">
+          <Input
+            label="First name"
+            v-model="formState.firstName"
+            :error="$v.firstName.$error"
+            :error-message="$v.firstName.$errors[0]?.$message"
+          />
+          <Input
+            label="Last name"
+            v-model="formState.lastName"
+            :error="$v.lastName.$error"
+            :error-message="$v.lastName.$errors[0]?.$message"
+          />
         </div>
-        <div :class="styles.form">
+        <Input
+          label="Email Id"
+          v-model="formState.email"
+          :error="$v.email.$error"
+          :error-message="$v.email.$errors?.[0]?.$message"
+        />
+        <div :class="styles.password_field">
           <div :class="styles.wrap_field">
             <Input
-              label="First name"
-              v-model="formState.firstName"
-              :error="$v.firstName.$error"
-              :error-message="$v.firstName.$errors[0]?.$message"
+              label="Password"
+              :type="showPassword ? 'text' : 'password'"
+              v-model="formState.password"
+              :error="$v.password.$error"
+              :error-message="$v.password.$errors[0]?.$message"
             />
             <Input
-              label="Last name"
-              v-model="formState.lastName"
-              :error="$v.lastName.$error"
-              :error-message="$v.lastName.$errors[0]?.$message"
+              label="Confirm"
+              :type="showPassword ? 'text' : 'password'"
+              v-model="formState.confirm"
+              :error="$v.confirm.$error"
+              :error-message="$v.confirm.$errors[0]?.$message"
             />
           </div>
-          <Input
-            label="Email Id"
-            v-model="formState.email"
-            :error="$v.email.$error"
-            :error-message="$v.email.$errors?.[0]?.$message"
-          />
-          <div :class="styles.password_field">
-            <div :class="styles.wrap_field">
-              <Input
-                label="Password"
-                :type="showPassword ? 'text' : 'password'"
-                v-model="formState.password"
-                :error="$v.password.$error"
-                :error-message="$v.password.$errors[0]?.$message"
-              />
-              <Input
-                label="Confirm"
-                :type="showPassword ? 'text' : 'password'"
-                v-model="formState.confirm"
-                :error="$v.confirm.$error"
-                :error-message="$v.confirm.$errors[0]?.$message"
-              />
-            </div>
-            <span :class="styles.password_note"
-              >Use 8 or more characters with a mix of letters, numbers,
-              uppercase & symbols</span
-            >
-            <div :class="styles.show_field">
-              <input
-                id="show-password"
-                type="checkbox"
-                v-model="showPassword"
-                :checked="showPassword"
-              />
-              <label for="show-password">Show password</label>
-            </div>
-          </div>
-          <div :class="styles.cta">
-            <router-link :to="{ name: RouteNames.signIn }">
-              Sign in instead
-            </router-link>
-            <button @click="handleSubmit">Create Account</button>
+          <span :class="styles.password_note"
+            >Use 8 or more characters with a mix of letters, numbers, uppercase
+            & symbols</span
+          >
+          <div :class="styles.show_field">
+            <input
+              id="show-password"
+              type="checkbox"
+              v-model="showPassword"
+              :checked="showPassword"
+            />
+            <label for="show-password">Show password</label>
           </div>
         </div>
+        <div :class="styles.cta">
+          <router-link :to="{ name: RouteNames.signIn }">
+            Sign in instead
+          </router-link>
+          <button @click="handleSubmit">Create Account</button>
+        </div>
       </div>
-      <div :class="styles.poster">
-        <img src="/images/account.svg" />
-      </div>
+    </div>
+    <div :class="styles.poster">
+      <img src="/images/account.svg" />
     </div>
   </div>
 </template>
 
 <style lang="scss" module="styles">
 .container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-  .wrapper {
-    display: grid;
-    grid-template-columns: 0.6fr 0.4fr;
+  display: grid;
+  grid-template-columns: 0.6fr 0.4fr;
+  gap: 15px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 768px;
+  padding: 30px;
+  margin: 30px 0px;
+  .logo {
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    background-color: #fff;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 768px;
-    padding: 30px;
-    margin: 30px 0px;
-    .logo {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      span {
-        color: #202124;
-        font-size: 24px;
-      }
+    span {
+      color: #202124;
+      font-size: 24px;
     }
-    .form {
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 30px;
+    .wrap_field {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .password_field {
       display: flex;
       flex-direction: column;
-      gap: 30px;
-      margin-top: 30px;
-      .wrap_field {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+      gap: 10px;
+      .password_note {
+        color: #5f6368;
+        font-size: 14px;
       }
-      .password_field {
+      .show_field {
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        .password_note {
-          color: #5f6368;
-          font-size: 14px;
-        }
-        .show_field {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-top: 10px;
-          input {
-            accent-color: #1a73e8;
-            width: 15px;
-            height: 15px;
-            cursor: pointer;
-          }
-          label {
-            color: #202124;
-            font-size: 14px;
-            cursor: pointer;
-          }
-        }
-      }
-      .cta {
-        display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 15px;
-        margin-top: 40px;
-        a {
-          color: #1a73e8;
-          font-size: 14px;
-          font-family: "Poppins-Medium", sans-serif;
+        gap: 10px;
+        margin-top: 10px;
+        input {
+          accent-color: #1a73e8;
+          width: 15px;
+          height: 15px;
+          cursor: pointer;
         }
-        button {
-          background-color: #1a73e8;
-          color: white;
-          width: 150px;
-          height: 36px;
-          font-family: "Poppins-Medium", sans-serif;
-          border: none;
-          border-radius: 4px;
+        label {
+          color: #202124;
+          font-size: 14px;
+          cursor: pointer;
         }
       }
     }
-    .poster {
+    .cta {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: center;
       gap: 15px;
-      img {
-        display: block;
-        margin: 0px auto;
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
+      margin-top: 40px;
+      a {
+        color: #1a73e8;
+        font-size: 14px;
+        font-family: "Poppins-Medium", sans-serif;
       }
+      button {
+        background-color: #1a73e8;
+        color: white;
+        width: 150px;
+        height: 36px;
+        font-family: "Poppins-Medium", sans-serif;
+        border: none;
+        border-radius: 4px;
+      }
+    }
+  }
+  .poster {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    img {
+      display: block;
+      margin: 0px auto;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
     }
   }
 }
