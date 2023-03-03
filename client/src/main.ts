@@ -14,7 +14,7 @@ let pinia = createPinia();
 if (document) {
   let date = new Date();
 
-  document.title = `Calendar App - ${getMonthName(
+  document.title = `Google Calendar - ${getMonthName(
     date.getMonth()
   )} ${date.getFullYear()}`;
 

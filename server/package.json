@@ -1,5 +1,5 @@
 {
-    "name": "calendar-app",
+    "name": "google-calendar",
     "version": "1.0.0",
     "description": "Calendar App",
     "main": "index.ts",

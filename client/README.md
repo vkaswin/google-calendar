@@ -1,4 +1,4 @@
-# calendar-app
+# google-calendar
 
 ## Project setup
 
