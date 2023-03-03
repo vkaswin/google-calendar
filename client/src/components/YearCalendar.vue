@@ -60,9 +60,7 @@ let handleChange = (date: Date) => {
 
   if (changeView) return;
 
-  if (!isOpen.value) {
-    toggle();
-  }
+  if (!isOpen.value) toggle();
 };
 
 let toggle = () => {
