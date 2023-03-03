@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { toRefs, ref } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
+import EventPopup from "@/components/EventPopup.vue";
+import { EventDetail } from "@/types/Calendar";
 
 type SideBarProps = {
   selectedDate: Date;
@@ -18,12 +20,27 @@ let { selectedDate } = toRefs(props);
 
 let datePicker = ref<InstanceType<typeof DatePicker>>();
 
+let eventPopup = ref<InstanceType<typeof EventPopup>>();
+
+let handleEvent = () => {
+  if (eventPopup.value?.eventDetail) {
+    eventPopup.value.eventDetail.date = new Date().toISOString();
+    // eventPopup.value.eventDetail.time = time;
+  }
+
+  if (!eventPopup.value?.isOpen) eventPopup.value?.openPopup();
+};
+
+let handleNewEvent = async (data: EventDetail) => {
+  console.log("🚀 ~ file: WeekCalendar.vue:120 ~ handleNewEvent ~ data:", data);
+};
+
 defineExpose({ datePicker });
 </script>
 
 <template>
   <div :class="styles.container">
-    <div :class="styles.create_btn">
+    <div :class="styles.create_btn" @click="handleEvent">
       <svg viewBox="0 0 36 36">
         <path fill="#34A853" d="M16 16v14h4V20z"></path>
         <path fill="#4285F4" d="M30 16H20l-4 4h14z"></path>
@@ -39,6 +56,7 @@ defineExpose({ datePicker });
       @on-change="(date) => emit('onChange', date)"
     />
   </div>
+  <EventPopup ref="eventPopup" @on-new-event="handleNewEvent" />
 </template>
 
 <style lang="scss" module="styles">

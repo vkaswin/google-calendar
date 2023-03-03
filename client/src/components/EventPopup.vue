@@ -11,15 +11,18 @@ import { toast } from "vue3-toastify";
 
 type EventPopupProps = {
   placement?: Placement;
-  reference: HTMLElement | null;
-  container: HTMLElement;
+  reference?: HTMLElement | null;
+  container?: HTMLElement;
 };
 
 type EventPopupEmits = {
   (event: "onNewEvent", data: EventDetail): void;
 };
 
-let props = withDefaults(defineProps<EventPopupProps>(), { placement: "left" });
+let props = withDefaults(defineProps<EventPopupProps>(), {
+  placement: "left",
+  reference: null,
+});
 
 let isOpen = ref(false);
 
@@ -75,9 +78,12 @@ let handleSubmit = async () => {
   try {
     let isValid = await $v.value.$validate();
     if (!isValid) return;
-    let { data } = await createEvent(eventDetail);
+    let {
+      data: { message, data },
+    } = await createEvent(eventDetail);
     reset();
     emit("onNewEvent", data);
+    toast.success(message);
   } catch (err: any) {
     toast.error(err?.message || "Error");
   }
@@ -109,8 +115,11 @@ defineExpose({
 </script>
 
 <template>
-  <Teleport :to="container" v-if="isOpen">
-    <div ref="popper" :class="styles.container">
+  <Teleport :to="container || 'body'" v-if="isOpen">
+    <div
+      ref="popper"
+      :class="[styles.container, !reference && styles.align_center]"
+    >
       <div :class="styles.popup">
         <div>
           <div :class="styles.title">
@@ -163,6 +172,11 @@ defineExpose({
     0 11px 15px -7px rgb(0 0 0 / 20%);
   border-radius: 8px;
   width: 420px;
+  &:is(.align_center) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
   .popup {
     display: flex;
     flex-direction: column;

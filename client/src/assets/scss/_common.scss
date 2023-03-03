@@ -21,3 +21,11 @@ body {
   font-size: 16px;
   font-family: "Poppins", sans-serif;
 }
+
+[data-testid="toast-content"] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  word-break: break-word;
+}
