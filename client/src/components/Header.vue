@@ -43,7 +43,7 @@ let userInitial = computed(() => {
 <template>
   <div :class="styles.container">
     <div :class="styles.logo">
-      <img :src="`/images/dates/${new Date().getDate()}.png`" />
+      <img :src="`${$publicPath}images/dates/${new Date().getDate()}.png`" />
       <span>Calender</span>
     </div>
     <div :class="styles.date_section">

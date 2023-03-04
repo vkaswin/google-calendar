@@ -11,6 +11,15 @@ import "vue3-toastify/dist/index.css";
 let app = createApp(App);
 let pinia = createPinia();
 
+declare module "vue" {
+  interface ComponentCustomProperties {
+    $publicPath?: string;
+  }
+}
+
+let publicPath =
+  process.env.NODE_ENV === "production" ? "/google-calendar/" : "/";
+
 if (document) {
   let date = new Date();
 
@@ -21,9 +30,11 @@ if (document) {
   let favicon = document.head.querySelector<HTMLLinkElement>("[rel='icon']");
 
   if (favicon) {
-    favicon.href = `/favicon/${date.getDate()}.ico`;
+    favicon.href = `${publicPath}favicon/${date.getDate()}.ico`;
   }
 }
+
+app.config.globalProperties.$publicPath = publicPath;
 
 app
   .use(pinia)
