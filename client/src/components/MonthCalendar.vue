@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { toRefs, computed, ref } from "vue";
+import { toRefs, computed, inject, onMounted } from "vue";
 import { getAllDates, getDayName } from "@/utils";
-import EventPopup from "./EventPopup.vue";
-import { EventDetail } from "@/types/Calendar";
+import { EventPopUpType } from "@/types/Calendar";
 
 type MonthCalendarProps = {
   selectedDate: Date;
@@ -20,29 +19,27 @@ let { selectedDate } = toRefs(props);
 
 let calendarContainer: HTMLElement;
 
-let eventPopup = ref<InstanceType<typeof EventPopup>>();
-
-let reference = ref<HTMLElement | null>(null);
+let eventPopup = inject<EventPopUpType>("eventPopup");
 
 let dates = computed(() => getAllDates(selectedDate.value));
+
+onMounted(() => {
+  if (!eventPopup?.value) return;
+  eventPopup.value.container = calendarContainer;
+});
 
 let handleEvent = (date: Date) => {
   let element = calendarContainer.querySelector(
     `[data-date='${date.toLocaleDateString()}']`
   ) as HTMLElement;
 
-  reference.value = element;
+  if (!eventPopup?.value) return;
 
-  if (eventPopup.value?.eventDetail) {
-    eventPopup.value.eventDetail.date = date.toISOString();
-    // eventPopup.value.eventDetail.time = time;
-  }
+  eventPopup.value.reference = element;
+  eventPopup.value.eventDetail.date = date.toISOString();
+  // eventPopup.value.eventDetail.time = time;
 
-  if (!eventPopup.value?.isOpen) eventPopup.value?.openPopup();
-};
-
-let handleNewEvent = (data: EventDetail) => {
-  console.log(data);
+  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
 };
 </script>
 
@@ -65,12 +62,6 @@ let handleNewEvent = (data: EventDetail) => {
       </div>
     </div>
   </div>
-  <EventPopup
-    ref="eventPopup"
-    :container="calendarContainer"
-    :reference="reference"
-    @on-new-event="handleNewEvent"
-  />
 </template>
 
 <style lang="scss" module="styles">
@@ -89,14 +80,12 @@ let handleNewEvent = (data: EventDetail) => {
     border-width: 1px 1px 0px 0px;
     padding: 10px;
     cursor: pointer;
-    &:is(
-        :nth-child(1),
-        :nth-child(2),
-        :nth-child(3),
-        :nth-child(5),
-        :nth-child(6),
-        :nth-child(7)
-      ) {
+    &:nth-child(1),
+    &:nth-child(2),
+    &:nth-child(3),
+    &:nth-child(5),
+    &:nth-child(6),
+    &:nth-child(7) {
       border-width: 0px 1px 0px 0px;
     }
     .header {

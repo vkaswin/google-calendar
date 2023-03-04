@@ -1,28 +1,27 @@
 <script lang="ts" setup>
-import { ref, toRefs, computed, reactive, watch } from "vue";
+import { ref, computed, reactive, watch, toRefs } from "vue";
 import usePopper from "@/composables/usePopper";
-import { Placement } from "@popperjs/core";
-import { EventDetail } from "@/types/Calendar";
+import { CalendarView, EventDetail } from "@/types/Calendar";
 import { getMonthName } from "@/utils";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { createEvent } from "@/services/Calender";
 import { toast } from "vue3-toastify";
+import { is } from "@babel/types";
 
 type EventPopupProps = {
-  placement?: Placement;
-  reference?: HTMLElement | null;
-  container?: HTMLElement;
+  view: CalendarView;
 };
 
 type EventPopupEmits = {
   (event: "onNewEvent", data: EventDetail): void;
 };
 
-let props = withDefaults(defineProps<EventPopupProps>(), {
-  placement: "left",
-  reference: null,
-});
+let props = defineProps<EventPopupProps>();
+
+let emit = defineEmits<EventPopupEmits>();
+
+let { view } = toRefs(props);
 
 let isOpen = ref(false);
 
@@ -32,10 +31,6 @@ let eventDetail = reactive<EventDetail>({
   time: "",
   title: "",
 });
-
-let emit = defineEmits<EventPopupEmits>();
-
-let { reference, placement, container } = toRefs(props);
 
 let rules = {
   title: {
@@ -47,6 +42,12 @@ let rules = {
   time: {},
   date: {},
 };
+
+let placement = ref<"left" | "bottom">(
+  view.value === "day" ? "bottom" : "left"
+);
+let container = ref<HTMLElement | null>(null);
+let reference = ref<HTMLElement | null>(null);
 
 const $v = useVuelidate(rules, eventDetail);
 
@@ -107,6 +108,9 @@ watch(placement, (placement) => {
 
 defineExpose({
   isOpen,
+  reference,
+  placement,
+  container,
   eventDetail,
   openPopup,
   closePopup,
@@ -172,11 +176,11 @@ defineExpose({
     0 11px 15px -7px rgb(0 0 0 / 20%);
   border-radius: 8px;
   width: 420px;
-  &:is(.align_center) {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  //   &:is(.align_center) {
+  //     top: 50%;
+  //     left: 50%;
+  //     transform: translate(-50%, -50%);
+  //   }
   .popup {
     display: flex;
     flex-direction: column;

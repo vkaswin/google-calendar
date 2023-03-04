@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, defineAsyncComponent, watch } from "vue";
+import { ref, defineAsyncComponent, watch, provide } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import Header from "@/components/Header.vue";
 import SideBar from "@/components/SideBar.vue";
 import Loader from "@/components/Loader.vue";
 import { storeToRefs } from "pinia";
 import useAuth from "@/store/useAuth";
-import { CalendarView } from "@/types/Calendar";
+import { CalendarView, EventPopUpType } from "@/types/Calendar";
+import EventPopup from "@/components/EventPopup.vue";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),
@@ -43,6 +44,10 @@ let calendarView = ref<CalendarView>(
   (route.query.view as CalendarView) || "week"
 );
 
+let eventPopup = ref({} as EventPopUpType);
+
+provide("eventPopup", eventPopup);
+
 watch(
   [() => route.query.view, () => route.query.date],
   ([view = "week", date = new Date().toISOString().split("T")[0]]) => {
@@ -52,6 +57,11 @@ watch(
 
     if (calendarView.value !== view) {
       calendarView.value = view as CalendarView;
+    }
+
+    if (eventPopup.value) {
+      if (eventPopup.value.isOpen) eventPopup.value.closePopup();
+      eventPopup.value.placement = view === "day" ? "bottom" : "left";
     }
   }
 );
@@ -166,6 +176,7 @@ let handleViewChange = (view: CalendarView) => {
   <div :class="styles.container">
     <SideBar
       ref="sideBar"
+      :view="calendarView"
       :selected-date="selectedDate"
       @on-change="(date) => handleChange(date)"
     />
@@ -188,6 +199,7 @@ let handleViewChange = (view: CalendarView) => {
       />
     </div>
   </div>
+  <EventPopup ref="eventPopup" :view="calendarView" />
 </template>
 
 <style lang="scss" module="styles">

@@ -7,9 +7,10 @@ import {
   onMounted,
   onUnmounted,
   useCssModule,
+  inject,
+  watchEffect,
 } from "vue";
-import EventPopup from "./EventPopup.vue";
-import { CalendarView, EventDetail } from "@/types/Calendar";
+import { CalendarView, EventPopUpType } from "@/types/Calendar";
 import { getDayName, timeSlots } from "@/utils";
 
 type WeekCalendarProps = {
@@ -25,7 +26,7 @@ let props = defineProps<WeekCalendarProps>();
 
 let emit = defineEmits<WeekCalendarEmits>();
 
-let eventPopup = ref<InstanceType<typeof EventPopup>>();
+let eventPopup = inject<EventPopUpType>("eventPopup");
 
 let styles = useCssModule("styles");
 
@@ -34,8 +35,6 @@ let { view, selectedDate } = toRefs(props);
 let todayDate = new Date();
 
 let calendarContainer: HTMLDivElement;
-
-let reference = ref<HTMLElement | null>(null);
 
 let indicator = ref<HTMLDivElement>();
 
@@ -70,14 +69,19 @@ let dates = computed(() => {
   return dates;
 });
 
-let placement = computed(() => (view.value === "day" ? "bottom" : "left"));
+watchEffect(() => {
+  if (!eventPopup?.value) return;
+  eventPopup.value.placement = view.value === "day" ? "bottom" : "left";
+});
 
 onMounted(() => {
   window.addEventListener("resize", handleIndicator);
-
   handleIndicator();
-
   intervalId = setInterval(updateIndicatorPosition, 60000);
+
+  if (!eventPopup) return;
+
+  eventPopup.value.container = calendarContainer;
 });
 
 const updateIndicatorPosition = () => {
@@ -118,14 +122,9 @@ const handleIndicator = () => {
   updateIndicatorPosition();
 };
 
-let handleNewEvent = async (data: EventDetail) => {
-  console.log("🚀 ~ file: WeekCalendar.vue:120 ~ handleNewEvent ~ data:", data);
-};
-
 watch(
   [view, selectedDate],
   () => {
-    eventPopup.value?.closePopup();
     handleIndicator();
   },
   { flush: "post" }
@@ -141,18 +140,16 @@ let handleEvent = (date: Date, time: string) => {
     `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
   ) as HTMLElement;
 
-  reference.value = element;
+  if (!eventPopup?.value) return;
 
-  if (eventPopup.value?.eventDetail) {
-    eventPopup.value.eventDetail.date = date.toISOString();
-    eventPopup.value.eventDetail.time = time;
-  }
+  eventPopup.value.reference = element;
+  eventPopup.value.eventDetail.date = date.toISOString();
+  eventPopup.value.eventDetail.time = time;
 
-  if (!eventPopup.value?.isOpen) eventPopup.value?.openPopup();
+  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
 };
 
 let handleViewChange = (date: Date) => {
-  eventPopup.value?.closePopup();
   if (view.value === "week") emit("onChange", date);
 };
 </script>
@@ -221,13 +218,6 @@ let handleViewChange = (date: Date) => {
       ></div>
     </div>
   </div>
-  <EventPopup
-    ref="eventPopup"
-    :container="calendarContainer"
-    :placement="placement"
-    :reference="reference"
-    @on-new-event="handleNewEvent"
-  />
 </template>
 
 <style lang="scss" module="styles">

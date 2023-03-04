@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { toRefs, ref } from "vue";
+import { toRefs, ref, inject } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
-import EventPopup from "@/components/EventPopup.vue";
-import { EventDetail } from "@/types/Calendar";
+import { CalendarView, EventPopUpType } from "@/types/Calendar";
+import { timeSlots } from "@/utils";
 
 type SideBarProps = {
+  view: CalendarView;
   selectedDate: Date;
 };
 
@@ -16,23 +17,32 @@ let props = defineProps<SideBarProps>();
 
 let emit = defineEmits<SideBarEmits>();
 
-let { selectedDate } = toRefs(props);
+let { selectedDate, view } = toRefs(props);
 
 let datePicker = ref<InstanceType<typeof DatePicker>>();
 
-let eventPopup = ref<InstanceType<typeof EventPopup>>();
+let eventPopup = inject<EventPopUpType>("eventPopup");
 
-let handleEvent = () => {
-  if (eventPopup.value?.eventDetail) {
-    eventPopup.value.eventDetail.date = new Date().toISOString();
-    // eventPopup.value.eventDetail.time = time;
+let handlePopup = () => {
+  if (!eventPopup) return;
+
+  let element: HTMLElement;
+  if (view.value === "week" || view.value === "day") {
+    let time = timeSlots[new Date().getHours()].time;
+    eventPopup.value.eventDetail.time = time;
+    element = eventPopup.value.container?.querySelector(
+      `[data-date='${selectedDate.value.toLocaleDateString()}'][data-time='${time}']`
+    ) as HTMLElement;
+  } else {
+    element = eventPopup.value.container?.querySelector(
+      `[data-date=${selectedDate.value.toLocaleDateString()}]`
+    ) as HTMLElement;
   }
 
-  if (!eventPopup.value?.isOpen) eventPopup.value?.openPopup();
-};
-
-let handleNewEvent = async (data: EventDetail) => {
-  console.log("🚀 ~ file: WeekCalendar.vue:120 ~ handleNewEvent ~ data:", data);
+  eventPopup.value.eventDetail.date = selectedDate.value.toISOString();
+  eventPopup.value.reference = element;
+  eventPopup.value.openPopup();
+  element.scrollIntoView({ behavior: "smooth" });
 };
 
 defineExpose({ datePicker });
@@ -40,7 +50,11 @@ defineExpose({ datePicker });
 
 <template>
   <div :class="styles.container">
-    <div :class="styles.create_btn" @click="handleEvent">
+    <button
+      :class="styles.create_btn"
+      @click="handlePopup"
+      :disabled="eventPopup?.isOpen"
+    >
       <svg viewBox="0 0 36 36">
         <path fill="#34A853" d="M16 16v14h4V20z"></path>
         <path fill="#4285F4" d="M30 16H20l-4 4h14z"></path>
@@ -49,14 +63,13 @@ defineExpose({ datePicker });
         <path fill="none" d="M0 0h36v36H0z"></path>
       </svg>
       <span>Create</span>
-    </div>
+    </button>
     <DatePicker
       ref="datePicker"
       :selected-date="selectedDate"
       @on-change="(date) => emit('onChange', date)"
     />
   </div>
-  <EventPopup ref="eventPopup" @on-new-event="handleNewEvent" />
 </template>
 
 <style lang="scss" module="styles">
@@ -78,8 +91,13 @@ defineExpose({ datePicker });
     width: 130px;
     border-radius: 25px;
     padding: 0px 15px;
+    border: none;
     cursor: pointer;
-    &:hover {
+    &:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+    &:hover:not(:disabled) {
       box-shadow: 0px 4px 4px 0px rgba(60, 64, 67, 0.3),
         0px 8px 12px 6px rgba(60, 64, 67, 0.15);
       background-color: #f6fafe;
