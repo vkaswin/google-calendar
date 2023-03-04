@@ -14,6 +14,9 @@ const eventSchema = new mongoose.Schema(
     time: {
       type: String,
     },
+    color: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

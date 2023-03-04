@@ -372,6 +372,7 @@ let handleViewChange = (date: Date) => {
           display: flex;
           flex-direction: column;
           gap: 5px;
+          z-index: 1;
           span {
             color: white;
             &:first-child {

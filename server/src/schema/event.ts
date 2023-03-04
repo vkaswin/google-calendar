@@ -5,6 +5,7 @@ let EventSchema = z.object({
   time: z.string(),
   description: z.string(),
   date: z.string(),
+  color: z.string(),
 });
 
 export { EventSchema };

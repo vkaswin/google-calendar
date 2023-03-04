@@ -60,7 +60,7 @@ watch(
     }
 
     if (eventPopup.value) {
-      if (eventPopup.value.isOpen) eventPopup.value.closePopup();
+      if (eventPopup.value.isOpen) eventPopup.value.reset();
       eventPopup.value.placement = view === "day" ? "bottom" : "left";
     }
   }

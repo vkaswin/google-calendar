@@ -3,7 +3,7 @@ import { ref, computed, reactive, watch, toRefs } from "vue";
 import usePopper from "@/composables/usePopper";
 import TimeSlot from "./TimeSlot.vue";
 import { CalendarView, EventDetail } from "@/types/Calendar";
-import { getMonthName } from "@/utils";
+import { getMonthName, eventCardColors } from "@/utils";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { createEvent } from "@/services/Calender";
@@ -30,6 +30,7 @@ let eventDetail = reactive<EventDetail>({
   description: "",
   time: "",
   title: "",
+  color: "",
 });
 
 let rules = {
@@ -42,14 +43,26 @@ let rules = {
   time: {
     required: helpers.withMessage("Please select any time", required),
   },
-  date: {},
 };
 
 let placement = ref<"left" | "bottom">(
   view.value === "day" ? "bottom" : "left"
 );
 let container = ref<HTMLElement | null>(null);
+
 let reference = ref<HTMLElement | null>(null);
+
+let options = {
+  placement: placement.value,
+  modifiers: [
+    {
+      name: "offset",
+      options: {
+        offset: [0, 5],
+      },
+    },
+  ],
+};
 
 const $v = useVuelidate(rules, eventDetail);
 
@@ -74,6 +87,7 @@ let reset = () => {
   eventDetail.description = "";
   eventDetail.time = "";
   eventDetail.title = "";
+  eventDetail.color = eventCardColors[0];
   $v.value.$reset();
 };
 
@@ -83,7 +97,7 @@ let handleSubmit = async () => {
     if (!isValid) return;
     let {
       data: { message, data },
-    } = await createEvent(eventDetail);
+    } = await createEvent({ ...eventDetail });
     reset();
     emit("onNewEvent", data);
     toast.success(message);
@@ -92,20 +106,14 @@ let handleSubmit = async () => {
   }
 };
 
-let popperInstance = usePopper(reference, popper, {
-  placement: placement.value,
-  modifiers: [
-    {
-      name: "offset",
-      options: {
-        offset: [0, 5],
-      },
-    },
-  ],
-});
+let popperInstance = usePopper(reference, popper, options);
 
 watch(placement, (placement) => {
-  popperInstance.value?.setOptions({ placement });
+  if (popperInstance.value) {
+    popperInstance.value.setOptions({ placement });
+  } else {
+    options.placement = placement;
+  }
 });
 
 let handleTimeChange = (time: string) => {

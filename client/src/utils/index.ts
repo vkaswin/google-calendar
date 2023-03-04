@@ -137,106 +137,122 @@ const getAllDates = (date: Date): Date[] => {
 
 const timeSlots = [
   {
-    time: "12 PM - 1 AM",
+    time: "12:00 PM - 1:00 AM",
     label: "12 PM",
   },
   {
-    time: "1 AM - 2 AM",
+    time: "1:00 AM - 2:00 AM",
     label: "1 AM",
   },
   {
-    time: "2 AM - 3 AM",
+    time: "2:00 AM - 3:00 AM",
     label: "2 AM",
   },
   {
-    time: "3 AM - 4 AM",
+    time: "3:00 AM - 4:00 AM",
     label: "3 AM",
   },
   {
-    time: "4 AM - 5 AM",
+    time: "4:00 AM - 5:00 AM",
     label: "4 AM",
   },
   {
-    time: "5 AM - 6 AM",
+    time: "5:00 AM - 6:00 AM",
     label: "5 AM",
   },
   {
-    time: "6 AM - 7 AM",
+    time: "6:00 AM - 7:00 AM",
     label: "6 AM",
   },
   {
-    time: "7 AM - 8 AM",
+    time: "7:00 AM - 8:00 AM",
     label: "7 AM",
   },
   {
-    time: "8 AM - 9 AM",
+    time: "8:00 AM - 9:00 AM",
     label: "8 AM",
   },
   {
-    time: "9 AM - 10 AM",
+    time: "9:00 AM - 10:00 AM",
     label: "9 AM",
   },
   {
-    time: "10 AM - 11 AM",
+    time: "10:00 AM - 11:00 AM",
     label: "10 AM",
   },
   {
-    time: "11 AM - 12 AM",
+    time: "11:00 AM - 12:00 AM",
     label: "11 AM",
   },
   {
-    time: "12 AM - 1 PM",
+    time: "12:00 AM - 1:00 PM",
     label: "12 AM",
   },
   {
-    time: "1 PM - 2 PM",
+    time: "1:00 PM - 2:00 PM",
     label: "1 PM",
   },
   {
-    time: "2 PM - 3 PM",
+    time: "2:00 PM - 3:00 PM",
     label: "2 PM",
   },
   {
-    time: "3 PM - 4 PM",
+    time: "3:00 PM - 4:00 PM",
     label: "3 PM",
   },
   {
-    time: "4 PM - 5 PM",
+    time: "4:00 PM - 5:00 PM",
     label: "4 PM",
   },
   {
-    time: "5 PM - 6 PM",
+    time: "5:00 PM - 6:00 PM",
     label: "5 PM",
   },
   {
-    time: "6 PM - 7 PM",
+    time: "6:00 PM - 7:00 PM",
     label: "6 PM",
   },
   {
-    time: "7 PM - 9 PM",
+    time: "7:00 PM - 8:00 PM",
     label: "7 PM",
   },
   {
-    time: "8 PM - 9 PM",
+    time: "8:00 PM - 9:00 PM",
     label: "8 PM",
   },
   {
-    time: "9 PM - 10 PM",
+    time: "9:00 PM - 10:00 PM",
     label: "9 PM",
   },
   {
-    time: "10 PM - 11 PM",
+    time: "10:00 PM - 11:00 PM",
     label: "10 PM",
   },
   {
-    time: "11 PM - 12 PM",
+    time: "11:00 PM - 12:00 PM",
     label: "11 PM",
   },
+];
+
+let eventCardColors = [
+  "#4185F4",
+  "#D50000",
+  "#E67C73",
+  "#F4511E",
+  "#F6BF26",
+  "#33B679",
+  "#0B8043",
+  "#039BE5",
+  "#3F51B5",
+  "#7986CB",
+  "#8E24AA",
+  "#616161",
 ];
 
 export {
   cookie,
   timeSlots,
+  eventCardColors,
   debounce,
   getMonthName,
   getDayName,

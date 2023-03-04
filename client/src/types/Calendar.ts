@@ -9,6 +9,7 @@ export type EventDetail = {
   description: string;
   time: string;
   title: string;
+  color: string;
 };
 
 export type EventPopUpType = Ref<InstanceType<typeof EventPopup>>;
