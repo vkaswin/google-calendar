@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref, computed, reactive, watch, toRefs } from "vue";
 import usePopper from "@/composables/usePopper";
+import TimeSlot from "./TimeSlot.vue";
 import { CalendarView, EventDetail } from "@/types/Calendar";
 import { getMonthName } from "@/utils";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 import { createEvent } from "@/services/Calender";
 import { toast } from "vue3-toastify";
-import { is } from "@babel/types";
 
 type EventPopupProps = {
   view: CalendarView;
@@ -39,7 +39,9 @@ let rules = {
   description: {
     required: helpers.withMessage("Please enter description", required),
   },
-  time: {},
+  time: {
+    required: helpers.withMessage("Please select any time", required),
+  },
   date: {},
 };
 
@@ -106,6 +108,20 @@ watch(placement, (placement) => {
   popperInstance.value?.setOptions({ placement });
 });
 
+let handleTimeChange = (time: string) => {
+  if (view.value !== "day" && view.value !== "week") return;
+
+  let date = new Date(eventDetail.date);
+  let element = container.value?.querySelector<HTMLElement>(
+    `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
+  );
+
+  if (!element) return;
+
+  reference.value = element;
+  element?.scrollIntoView({ behavior: "smooth", inline: "center" });
+};
+
 defineExpose({
   isOpen,
   reference,
@@ -135,16 +151,26 @@ defineExpose({
           </div>
         </div>
         <div :class="styles.date">
-          <i class="bx-time-five"></i>
-          <div v-if="eventDetail" :class="styles.wrap_field">
-            <span v-if="date">{{
-              ` ${getMonthName(
-                date.getMonth()
-              )} ${date.getDate()}, ${date.getFullYear()}`
-            }}</span>
-            <div :class="styles.dropdown">
-              {{ eventDetail.time }}
+          <div>
+            <i class="bx-time-five"></i>
+            <div v-if="eventDetail">
+              <span v-if="date">{{
+                ` ${getMonthName(
+                  date.getMonth()
+                )} ${date.getDate()}, ${date.getFullYear()}`
+              }}</span>
+              <div :class="styles.dropdown">
+                <TimeSlot
+                  v-model="eventDetail.time"
+                  :defaultValue="eventDetail.time"
+                  @update:modelValue="handleTimeChange"
+                />
+              </div>
             </div>
+          </div>
+          <div v-if="$v.time?.$error" :class="styles.error_msg">
+            <i class="bx-error-circle"></i>
+            <span>{{ $v.time?.$errors[0]?.$message }}</span>
           </div>
         </div>
         <div :class="styles.description">
@@ -176,11 +202,6 @@ defineExpose({
     0 11px 15px -7px rgb(0 0 0 / 20%);
   border-radius: 8px;
   width: 420px;
-  //   &:is(.align_center) {
-  //     top: 50%;
-  //     left: 50%;
-  //     transform: translate(-50%, -50%);
-  //   }
   .popup {
     display: flex;
     flex-direction: column;
@@ -228,24 +249,29 @@ defineExpose({
     }
     .date {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 5px;
       margin: 20px 0px;
-      .wrap_field {
+      div:first-child {
         display: flex;
         align-items: center;
-        gap: 15px;
-        span {
-          font-size: 14px;
+        gap: 10px;
+        i {
+          color: rgb(95, 99, 104);
+          font-size: 24px;
         }
-      }
-      i {
-        color: rgb(95, 99, 104);
-        font-size: 24px;
-      }
-      span {
-        color: rgb(60, 64, 67);
-        font-size: 16px;
+        span {
+          color: rgb(60, 64, 67);
+          font-size: 16px;
+        }
+        div:last-child {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          span {
+            font-size: 14px;
+          }
+        }
       }
     }
     .description {

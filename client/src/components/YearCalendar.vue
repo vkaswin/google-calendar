@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, watch } from "vue";
+import { toRefs, computed, ref, watch, inject, onMounted } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { getDayName } from "@/utils";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
+import { EventPopUpType } from "@/types/Calendar";
 
 type YearCalendarProps = {
   selectedDate: Date;
@@ -19,13 +20,20 @@ let emit = defineEmits<YearCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
+let calendarContainer: HTMLElement;
+
 let isOpen = ref(false);
 
 let reference = ref<HTMLElement | null>(null);
 
 let popper = ref<HTMLElement | null>(null);
 
-let calendar = ref<HTMLElement | null>(null);
+let eventPopup = inject<EventPopUpType>("eventPopup");
+
+onMounted(() => {
+  if (!eventPopup) return;
+  eventPopup.value.container = calendarContainer;
+});
 
 usePopper(reference, popper, {
   placement: "bottom",
@@ -82,9 +90,7 @@ watch(isOpen, (isOpen) => {
 watch(
   selectedDate,
   async (selectedDate) => {
-    if (!calendar.value) return;
-
-    let element = calendar.value.querySelector<HTMLElement>(
+    let element = calendarContainer.querySelector<HTMLElement>(
       `[data-date='${selectedDate.toLocaleDateString()}']`
     );
 
@@ -100,7 +106,7 @@ watch(
 </script>
 
 <template>
-  <div ref="calendar" :class="styles.container">
+  <div ref="calendarContainer" :class="styles.container">
     <DatePicker
       v-for="date in dates"
       :calender-date="date"

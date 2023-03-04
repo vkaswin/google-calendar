@@ -35,14 +35,14 @@ let handlePopup = () => {
     ) as HTMLElement;
   } else {
     element = eventPopup.value.container?.querySelector(
-      `[data-date=${selectedDate.value.toLocaleDateString()}]`
+      `[data-date='${selectedDate.value.toLocaleDateString()}']`
     ) as HTMLElement;
   }
 
   eventPopup.value.eventDetail.date = selectedDate.value.toISOString();
   eventPopup.value.reference = element;
   eventPopup.value.openPopup();
-  element.scrollIntoView({ behavior: "smooth" });
+  element.scrollIntoView({ behavior: "smooth", inline: "center" });
 };
 
 defineExpose({ datePicker });
