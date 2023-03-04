@@ -20,7 +20,7 @@ let emit = defineEmits<YearCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let calendarContainer: HTMLElement;
+let calendarContainer = ref<HTMLElement | null>(null);
 
 let isOpen = ref(false);
 
@@ -31,8 +31,8 @@ let popper = ref<HTMLElement | null>(null);
 let eventPopup = inject<EventPopUpType>("eventPopup");
 
 onMounted(() => {
-  if (!eventPopup) return;
-  eventPopup.value.container = calendarContainer;
+  if (!eventPopup || !calendarContainer.value) return;
+  eventPopup.value.container = calendarContainer.value;
 });
 
 usePopper(reference, popper, {
@@ -90,7 +90,9 @@ watch(isOpen, (isOpen) => {
 watch(
   selectedDate,
   async (selectedDate) => {
-    let element = calendarContainer.querySelector<HTMLElement>(
+    if (!calendarContainer.value) return;
+
+    let element = calendarContainer.value.querySelector<HTMLElement>(
       `[data-date='${selectedDate.toLocaleDateString()}']`
     );
 

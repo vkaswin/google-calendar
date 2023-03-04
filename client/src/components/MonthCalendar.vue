@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs, computed, inject, onMounted } from "vue";
+import { toRefs, computed, inject, onMounted, ref } from "vue";
 import { getAllDates, getDayName } from "@/utils";
 import { EventPopUpType } from "@/types/Calendar";
 
@@ -17,19 +17,21 @@ let emit = defineEmits<MonthCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let calendarContainer: HTMLElement;
+let calendarContainer = ref<HTMLElement | null>(null);
 
 let eventPopup = inject<EventPopUpType>("eventPopup");
 
 let dates = computed(() => getAllDates(selectedDate.value));
 
 onMounted(() => {
-  if (!eventPopup?.value) return;
-  eventPopup.value.container = calendarContainer;
+  if (!eventPopup?.value || !calendarContainer.value) return;
+  eventPopup.value.container = calendarContainer.value;
 });
 
 let handleEvent = (date: Date) => {
-  let element = calendarContainer.querySelector(
+  if (!calendarContainer.value) return;
+
+  let element = calendarContainer.value.querySelector(
     `[data-date='${date.toLocaleDateString()}']`
   ) as HTMLElement;
 

@@ -34,7 +34,7 @@ let { view, selectedDate } = toRefs(props);
 
 let todayDate = new Date();
 
-let calendarContainer: HTMLDivElement;
+let calendarContainer = ref<HTMLElement | null>(null);
 
 let indicator = ref<HTMLDivElement>();
 
@@ -79,9 +79,9 @@ onMounted(() => {
   handleIndicator();
   intervalId = setInterval(updateIndicatorPosition, 60000);
 
-  if (!eventPopup) return;
+  if (!eventPopup || !calendarContainer.value) return;
 
-  eventPopup.value.container = calendarContainer;
+  eventPopup.value.container = calendarContainer.value;
 });
 
 const updateIndicatorPosition = () => {
@@ -136,7 +136,9 @@ onUnmounted(() => {
 });
 
 let handleEvent = (date: Date, time: string) => {
-  let element = calendarContainer.querySelector(
+  if (!calendarContainer.value) return;
+
+  let element = calendarContainer.value.querySelector(
     `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
   ) as HTMLElement;
 
