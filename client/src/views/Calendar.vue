@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, defineAsyncComponent, watch, provide } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
+import useAuth from "@/store/useAuth";
 import Header from "@/components/Header.vue";
 import SideBar from "@/components/SideBar.vue";
 import Loader from "@/components/Loader.vue";
-import { storeToRefs } from "pinia";
-import useAuth from "@/store/useAuth";
-import { CalendarView, EventPopUpType } from "@/types/Calendar";
 import EventPopup from "@/components/EventPopup.vue";
+import { CalendarView, EventPopUpType } from "@/types/Event";
+import dayjs from "dayjs";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),
@@ -49,8 +50,8 @@ let eventPopup = ref({} as EventPopUpType);
 provide("eventPopup", eventPopup);
 
 watch(
-  [() => route.query.view, () => route.query.date],
-  ([view = "week", date = new Date().toISOString().split("T")[0]]) => {
+  () => route.query,
+  ({ view = "week", date = new Date().toISOString().split("T")[0] }) => {
     if (selectedDate.value.toISOString().split("T")[0] !== date) {
       selectedDate.value = new Date(date as string);
     }
@@ -137,17 +138,14 @@ const handlePrevious = () => {
   });
 };
 
-let handleChange = (date: Date, changeView: boolean = true) => {
-  if (changeView) {
-    calendarView.value = "day";
-  }
-
+let handleChange = (date: Date, view?: CalendarView) => {
   sideBar.value?.datePicker?.setCurrentDate(date);
 
   router.push({
     query: {
-      view: calendarView.value,
+      ...route.query,
       date: date.toISOString().split("T")[0],
+      ...(view && { view }),
     },
   });
 };
@@ -155,8 +153,8 @@ let handleChange = (date: Date, changeView: boolean = true) => {
 let handleViewChange = (view: CalendarView) => {
   router.push({
     query: {
+      ...route.query,
       view,
-      date: selectedDate.value.toISOString().split("T")[0],
     },
   });
 };
@@ -178,24 +176,24 @@ let handleViewChange = (view: CalendarView) => {
       ref="sideBar"
       :view="calendarView"
       :selected-date="selectedDate"
-      @on-change="(date) => handleChange(date)"
+      @on-change="handleChange"
     />
     <div :class="styles.calendar">
       <WeekCalendar
         v-if="calendarView === 'week' || calendarView === 'day'"
         :view="calendarView"
         :selected-date="selectedDate"
-        @on-change="(date) => handleChange(date)"
+        @on-change="handleChange"
       />
       <MonthCalendar
         v-else-if="calendarView === 'month'"
         :selected-date="selectedDate"
-        @on-change="(date) => handleChange(date)"
+        @on-change="handleChange"
       />
       <YearCalendar
         v-else-if="calendarView === 'year'"
         :selected-date="selectedDate"
-        @on-change="(date, changeView) => handleChange(date, changeView)"
+        @on-change="handleChange"
       />
     </div>
   </div>

@@ -11,6 +11,7 @@ const User = {
 
 const Event = {
   create: `${eventUrl}/create`,
+  getByDate: `${eventUrl}/date`,
 };
 
 export { User, Event };

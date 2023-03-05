@@ -1,3 +1,5 @@
+import { TimeSlots, EventListByDate, EventByDate } from "@/types/Event";
+
 const cookie = (() => {
   const set = <T>({
     name,
@@ -135,7 +137,7 @@ const getAllDates = (date: Date): Date[] => {
   return dates;
 };
 
-const timeSlots = [
+const timeSlots: TimeSlots = [
   {
     time: "12:00 PM - 1:00 AM",
     label: "12 PM",
@@ -234,25 +236,9 @@ const timeSlots = [
   },
 ];
 
-let eventCardColors = [
-  "#4185F4",
-  "#D50000",
-  "#E67C73",
-  "#F4511E",
-  "#F6BF26",
-  "#33B679",
-  "#0B8043",
-  "#039BE5",
-  "#3F51B5",
-  "#7986CB",
-  "#8E24AA",
-  "#616161",
-];
-
 export {
   cookie,
   timeSlots,
-  eventCardColors,
   debounce,
   getMonthName,
   getDayName,

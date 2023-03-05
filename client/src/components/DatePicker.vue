@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toRefs, computed, ref } from "vue";
 import { getMonthName, getAllDates } from "@/utils";
+import dayjs from "dayjs";
 
 type DatePickerProps = {
   selectedDate: Date;
@@ -25,8 +26,6 @@ let { selectedDate, calenderDate } = toRefs(props);
 let currentDate = ref(new Date());
 
 let weeks = ["S", "M", "T", "W", "T", "F", "S"];
-
-let todayDate = new Date();
 
 let actualDate = computed(() =>
   calenderDate && calenderDate.value ? calenderDate.value : currentDate.value
@@ -96,17 +95,17 @@ defineExpose({
           styles.day,
           actualDate.getMonth() !== date.getMonth()
             ? styles.in_active
-            : date.toLocaleDateString() === todayDate.toLocaleDateString()
+            : dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
             ? styles.highlight
-            : date.toLocaleDateString() === selectedDate.toLocaleDateString() &&
-              styles.active,
+            : dayjs(date).format('YYYY-MM-DD') ===
+                dayjs(selectedDate).format('YYYY-MM-DD') && styles.active,
           ,
         ]"
         :key="index"
         v-bind="{
           ...(actualDate.getMonth() === date.getMonth()
             ? {
-                'data-date': date.toLocaleDateString(),
+                'data-date': dayjs(date).format('YYYY-MM-DD'),
                 onClick: () => emit('onChange', date),
               }
             : {}),

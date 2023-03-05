@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { toRefs, ref, inject } from "vue";
 import DatePicker from "@/components/DatePicker.vue";
-import { CalendarView, EventPopUpType } from "@/types/Calendar";
+import { CalendarView, EventPopUpType } from "@/types/Event";
 import { timeSlots } from "@/utils";
+import dayjs from "dayjs";
 
 type SideBarProps = {
   view: CalendarView;
@@ -31,11 +32,13 @@ let handlePopup = () => {
     let time = timeSlots[new Date().getHours()].time;
     eventPopup.value.eventDetail.time = time;
     element = eventPopup.value.container?.querySelector(
-      `[data-date='${selectedDate.value.toLocaleDateString()}'][data-time='${time}']`
+      `[data-date='${dayjs(selectedDate.value).format(
+        "YYYY-MM-DD"
+      )}'][data-time='${time}']`
     ) as HTMLElement;
   } else {
     element = eventPopup.value.container?.querySelector(
-      `[data-date='${selectedDate.value.toLocaleDateString()}']`
+      `[data-date='${dayjs(selectedDate.value).format("YYYY-MM-DD")}']`
     ) as HTMLElement;
   }
 
@@ -77,7 +80,7 @@ defineExpose({ datePicker });
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   padding: 15px 10px;
   overflow-y: auto;
   .create_btn {

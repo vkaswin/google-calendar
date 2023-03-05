@@ -4,7 +4,7 @@ import { getMonthName } from "@/utils";
 import SearchBar from "@/components/SearchBar.vue";
 import Popper from "@/components/Popper.vue";
 import { User } from "@/types/User";
-import { CalendarView } from "@/types/Calendar";
+import { CalendarView } from "@/types/Event";
 
 type HeaderProps = {
   user: User | null;

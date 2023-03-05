@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "UserId is required to create an event"],
+      ref: "User",
+      index: true,
+    },
     title: {
       type: String,
     },
@@ -14,8 +20,9 @@ const eventSchema = new mongoose.Schema(
     time: {
       type: String,
     },
-    color: {
-      type: String,
+    completed: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

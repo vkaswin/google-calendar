@@ -4,14 +4,15 @@ import DatePicker from "@/components/DatePicker.vue";
 import { getDayName } from "@/utils";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
-import { EventPopUpType } from "@/types/Calendar";
+import { CalendarView, EventPopUpType } from "@/types/Event";
+import dayjs from "dayjs";
 
 type YearCalendarProps = {
   selectedDate: Date;
 };
 
 type YearCalendarEmits = {
-  (event: "onChange", date: Date, changeView: boolean): void;
+  (event: "onChange", date: Date, view?: CalendarView): void;
 };
 
 let props = defineProps<YearCalendarProps>();
@@ -60,13 +61,13 @@ let dates = computed(() => {
 });
 
 let handleChange = (date: Date) => {
-  let changeView =
+  let isViewChange =
     selectedDate.value.toISOString().split("T")[0] ===
       date.toISOString().split("T")[0] && isOpen.value;
 
-  emit("onChange", date, changeView);
+  emit("onChange", date, isViewChange ? "day" : undefined);
 
-  if (changeView) return;
+  if (isViewChange) return;
 
   if (!isOpen.value) toggle();
 };
@@ -93,7 +94,7 @@ watch(
     if (!calendarContainer.value) return;
 
     let element = calendarContainer.value.querySelector<HTMLElement>(
-      `[data-date='${selectedDate.toLocaleDateString()}']`
+      `[data-date='${dayjs(selectedDate).format("YYYY-MM-DD")}']`
     );
 
     if (element) {

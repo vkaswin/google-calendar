@@ -10,8 +10,18 @@ import {
   inject,
   watchEffect,
 } from "vue";
-import { CalendarView, EventPopUpType } from "@/types/Calendar";
+import dayjs from "dayjs";
+import { toast } from "vue3-toastify";
+import EventList from "./EventList.vue";
+import { getEventByDate } from "@/services/Event";
 import { getDayName, timeSlots } from "@/utils";
+import {
+  CalendarView,
+  EventPopUpType,
+  DateParams,
+  EventByDateAndTime,
+  EventDetail,
+} from "@/types/Event";
 
 type WeekCalendarProps = {
   selectedDate: Date;
@@ -19,7 +29,7 @@ type WeekCalendarProps = {
 };
 
 type WeekCalendarEmits = {
-  (event: "onChange", date: Date): void;
+  (event: "onChange", date: Date, view: CalendarView): void;
 };
 
 let props = defineProps<WeekCalendarProps>();
@@ -32,11 +42,11 @@ let styles = useCssModule("styles");
 
 let { view, selectedDate } = toRefs(props);
 
-let todayDate = new Date();
-
 let calendarContainer = ref<HTMLElement | null>(null);
 
 let indicator = ref<HTMLDivElement>();
+
+let eventList = ref<EventByDateAndTime>({});
 
 let intervalId: ReturnType<typeof setInterval>;
 
@@ -67,6 +77,39 @@ let dates = computed(() => {
   }
 
   return dates;
+});
+
+let getEvents = async (params: DateParams) => {
+  try {
+    let {
+      data: { data },
+    } = await getEventByDate(params);
+
+    let events = data.reduce((obj, { date, events, time }) => {
+      if (obj[date]) {
+        if (obj[date][time]) {
+          obj[date][time] = obj[date][time]?.concat(events);
+        } else {
+          obj[date][time] = events;
+        }
+      } else {
+        obj[date] = {
+          [time]: events,
+        };
+      }
+      return obj;
+    }, {} as any) as EventByDateAndTime;
+
+    eventList.value = events;
+  } catch (err: any) {
+    toast.error(err?.message || "Error");
+  }
+};
+
+watchEffect(() => {
+  let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
+  let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
+  getEvents({ startDate, endDate });
 });
 
 watchEffect(() => {
@@ -139,7 +182,7 @@ let handleEvent = (date: Date, time: string) => {
   if (!calendarContainer.value) return;
 
   let element = calendarContainer.value.querySelector(
-    `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
+    `[data-date='${dayjs(date).format("YYYY-MM-DD")}'][data-time='${time}']`
   ) as HTMLElement;
 
   if (!eventPopup?.value) return;
@@ -152,7 +195,14 @@ let handleEvent = (date: Date, time: string) => {
 };
 
 let handleViewChange = (date: Date) => {
-  if (view.value === "week") emit("onChange", date);
+  if (view.value === "week") emit("onChange", date, "day");
+};
+
+let handleViewEvent = (event: EventDetail) => {
+  console.log(
+    "🚀 ~ file: WeekCalendar.vue:203 ~ handleViewEvent ~ event:",
+    event
+  );
 };
 </script>
 
@@ -167,7 +217,7 @@ let handleViewChange = (date: Date) => {
         :key="index"
         :class="[
           styles.week,
-          todayDate.toLocaleDateString() === date.toLocaleDateString() &&
+          dayjs().format('YYYY-MM-DD') === dayjs(date).format('YYYY-MM-DD') &&
             styles.highlight,
         ]"
         @click="handleViewChange(date)"
@@ -188,13 +238,22 @@ let handleViewChange = (date: Date) => {
           <span v-if="index !== 0">{{ label }}</span>
         </div>
         <div
-          :class="styles.date"
+          :class="styles.date_slot"
           v-for="index in columns"
           :key="index"
-          :data-date="dates[index - 1].toLocaleDateString()"
+          :data-date="dayjs(dates[index - 1]).format('YYYY-MM-DD')"
           :data-time="time"
           @click="handleEvent(dates[index - 1], time)"
         >
+          <EventList
+            v-if="
+              eventList[dayjs(dates?.[index - 1])?.format('YYYY-MM-DD')]?.[time]
+            "
+            :events="
+              eventList[dayjs(dates[index - 1]).format('YYYY-MM-DD')][time]
+            "
+            @on-click="handleViewEvent"
+          />
           <div
             v-if="
               eventPopup?.isOpen &&
@@ -213,7 +272,7 @@ let handleViewChange = (date: Date) => {
         v-show="
           dates.some(
             (date) =>
-              date.toLocaleDateString() === todayDate.toLocaleDateString()
+              dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
           )
         "
         :class="styles.indicator"
@@ -350,13 +409,32 @@ let handleViewChange = (date: Date) => {
         display: flex;
         justify-content: flex-end;
         padding-right: 15px;
+        span {
+          margin-top: -4px;
+        }
       }
-      .date {
+      .date_slot {
         position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
         border-color: var(--light-gray);
         border-style: solid;
         border-width: 0px 1px 1px 0px;
+        overflow-y: auto;
+        padding: 2px 15px 2px 2px;
         cursor: pointer;
+        &::-webkit-scrollbar {
+          width: 5px;
+          border-top-right-radius: 10px;
+        }
+        &::-webkit-scrollbar-track {
+          background: white;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: #bec1c6;
+          border-radius: 10px;
+        }
         &:nth-child(2) {
           border-width: 0px 0px 1px 1px;
         }
@@ -415,7 +493,7 @@ let handleViewChange = (date: Date) => {
 .container[data-view="week"] {
   .time_slot_section {
     .time_slot_container {
-      .date {
+      .date_slot {
         &:nth-child(2) {
           border-width: 0px 1px 1px 1px;
         }

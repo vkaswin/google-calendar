@@ -2,12 +2,13 @@
 import { ref, computed, reactive, watch, toRefs } from "vue";
 import usePopper from "@/composables/usePopper";
 import TimeSlot from "./TimeSlot.vue";
-import { CalendarView, EventDetail } from "@/types/Calendar";
-import { getMonthName, eventCardColors } from "@/utils";
+import { CalendarView, EventDetail } from "@/types/Event";
+import { getMonthName } from "@/utils";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { createEvent } from "@/services/Calender";
+import { createEvent } from "@/services/Event";
 import { toast } from "vue3-toastify";
+import dayjs from "dayjs";
 
 type EventPopupProps = {
   view: CalendarView;
@@ -25,12 +26,14 @@ let { view } = toRefs(props);
 
 let isOpen = ref(false);
 
+let defaultColor = "#4185F4";
+
 let eventDetail = reactive<EventDetail>({
   date: "",
   description: "",
   time: "",
   title: "",
-  color: "",
+  color: defaultColor,
 });
 
 let rules = {
@@ -87,7 +90,6 @@ let reset = () => {
   eventDetail.description = "";
   eventDetail.time = "";
   eventDetail.title = "";
-  eventDetail.color = eventCardColors[0];
   $v.value.$reset();
 };
 
@@ -121,7 +123,7 @@ let handleTimeChange = (time: string) => {
 
   let date = new Date(eventDetail.date);
   let element = container.value?.querySelector<HTMLElement>(
-    `[data-date='${date.toLocaleDateString()}'][data-time='${time}']`
+    `[data-date='${dayjs(date).format("YYYY-MM-DD")}'][data-time='${time}']`
   );
 
   if (!element) return;
