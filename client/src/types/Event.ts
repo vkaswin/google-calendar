@@ -1,5 +1,7 @@
 import { Ref } from "vue";
+import { AxiosPromise } from "axios";
 import EventPopup from "@/components/EventPopup.vue";
+import axios from "axios";
 
 export type CalendarView = "day" | "week" | "month" | "year";
 
@@ -17,12 +19,22 @@ export type EventPopUpType = Ref<InstanceType<typeof EventPopup>>;
 export type DateParams = {
   startDate: string;
   endDate: string;
-  type: Extract<CalendarView, "week" | "month" | "year">;
 };
 
-export type GetEventByDate = (
-  params: DateParams
-) => DateParams["type"] extends "week" ? Date : string;
+export type GetEventByDate = <T extends "week" | "month" | "year">(
+  params: DateParams & { type: T }
+) => AxiosPromise<{
+  message: string;
+  data: T extends "week"
+    ? {
+        date: string;
+        time: EventTime;
+        events: EventDetail[];
+      }[]
+    : T extends "month"
+    ? { date: string; events: EventDetail[] }[]
+    : EventDetail[];
+}>;
 
 export type EventTime =
   | "12:00 PM - 1:00 AM"
@@ -48,22 +60,15 @@ export type EventTime =
   | "8:00 PM - 9:00 PM"
   | "9:00 PM - 10:00 PM"
   | "10:00 PM - 11:00 PM"
-  | "11:00 PM - 12:00 PM"
-  | "";
+  | "11:00 PM - 12:00 PM";
 
 export type TimeSlots = { time: EventTime; label: string }[];
 
-export type EventListByDate = {
-  date: string;
-  time: EventTime;
-  events: EventDetail[];
-}[];
-
-export type EventByDateAndTime = Record<
+export type EventByWeek = Record<
   string,
   {
     [key in EventTime]?: EventDetail[];
   }
 >;
 
-export type EventByDate = Record<string, EventDetail[]>;
+export type EventByMonth = Record<string, EventDetail[]>;

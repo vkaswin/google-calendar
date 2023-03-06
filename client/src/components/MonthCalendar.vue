@@ -9,7 +9,7 @@ import { getAllDates, getDayName } from "@/utils";
 import {
   EventPopUpType,
   DateParams,
-  EventByDate,
+  EventByMonth,
   EventDetail,
 } from "@/types/Event";
 
@@ -27,7 +27,7 @@ let emit = defineEmits<MonthCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let eventList = ref<EventByDate>({});
+let eventList = ref<EventByMonth>({});
 
 let calendarContainer = ref<HTMLElement | null>(null);
 
@@ -41,7 +41,7 @@ let getEvents = async (params: DateParams) => {
   try {
     let {
       data: { data },
-    } = await getEventByDate(params);
+    } = await getEventByDate({ ...params, type: "month" });
 
     let events = data.reduce((obj, { date, events }) => {
       if (obj[date]) {
@@ -52,7 +52,7 @@ let getEvents = async (params: DateParams) => {
       return obj;
     }, {} as any);
 
-    eventList.value = events as EventByDate;
+    eventList.value = events as EventByMonth;
   } catch (err: any) {
     toast.error(err?.message || "Error");
   }
@@ -66,7 +66,7 @@ onMounted(() => {
 watchEffect(() => {
   let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
   let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
-  getEvents({ startDate, endDate, type: "month" });
+  getEvents({ startDate, endDate });
 });
 
 let handleEvent = (date: Date) => {

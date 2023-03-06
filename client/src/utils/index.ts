@@ -1,4 +1,4 @@
-import { TimeSlots, EventListByDate, EventByDate } from "@/types/Event";
+import { TimeSlots } from "@/types/Event";
 
 const cookie = (() => {
   const set = <T>({

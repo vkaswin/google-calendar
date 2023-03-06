@@ -7,7 +7,7 @@ import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
 import { getEventByDate } from "@/services/Event";
 import { getDayName } from "@/utils";
-import { CalendarView, EventPopUpType } from "@/types/Event";
+import { CalendarView, EventPopUpType, EventDetail } from "@/types/Event";
 
 type YearCalendarProps = {
   selectedDate: Date;
@@ -23,7 +23,7 @@ let emit = defineEmits<YearCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let eventList = ref([]);
+let eventList = ref<EventDetail[]>([]);
 
 let calendarContainer = ref<HTMLElement | null>(null);
 

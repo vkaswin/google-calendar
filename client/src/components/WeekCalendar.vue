@@ -20,9 +20,9 @@ import {
   CalendarView,
   EventPopUpType,
   DateParams,
-  EventByDateAndTime,
   EventDetail,
   EventTime,
+  EventByWeek,
 } from "@/types/Event";
 
 type WeekCalendarProps = {
@@ -48,7 +48,7 @@ let calendarContainer = ref<HTMLElement | null>(null);
 
 let indicator = ref<HTMLDivElement>();
 
-let eventList = ref<EventByDateAndTime>({});
+let eventList = ref<EventByWeek>({});
 
 let contextMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
@@ -87,7 +87,7 @@ let getEvents = async (params: DateParams) => {
   try {
     let {
       data: { data },
-    } = await getEventByDate(params);
+    } = await getEventByDate({ ...params, type: "week" });
 
     let events = data.reduce((obj, { date, events, time }) => {
       if (obj[date]) {
@@ -102,7 +102,7 @@ let getEvents = async (params: DateParams) => {
         };
       }
       return obj;
-    }, {} as any) as EventByDateAndTime;
+    }, {} as any) as EventByWeek;
 
     eventList.value = events;
   } catch (err: any) {
@@ -113,7 +113,7 @@ let getEvents = async (params: DateParams) => {
 watchEffect(() => {
   let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
   let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
-  getEvents({ startDate, endDate, type: "week" });
+  getEvents({ startDate, endDate });
 });
 
 watchEffect(() => {
