@@ -184,7 +184,7 @@ watch(
       border-radius: 50%;
       background-color: transparent;
       color: rgb(95, 99, 104);
-      transition: background-color 0.25s ease-in-out;
+      transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       &:hover {
         background-color: #f1f3f4;

@@ -14,6 +14,8 @@ const User = {
 const Event = {
   create: `${eventUrl}/create`,
   getByDate: `${eventUrl}/date`,
+  delete: (id: string) => `${eventUrl}/${id}/remove`,
+  update: (id: string) => `${eventUrl}/${id}/edit`,
 };
 
-export { User, Event };
+export { User, Event, eventUrl };

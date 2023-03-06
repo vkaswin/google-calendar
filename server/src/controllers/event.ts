@@ -18,8 +18,8 @@ let deleteEvent = asyncHandler(async (req, res) => {
 });
 
 let updateEvent = asyncHandler(async (req, res) => {
-  let body = EventSchema.parse(req.body);
-  let data = await Event.findByIdAndUpdate(req.params.id, body);
+  let { body, params } = req;
+  let data = await Event.findByIdAndUpdate(params.id, body);
   res
     .status(200)
     .send({ data, message: "Event has been updated successfully" });
@@ -43,6 +43,20 @@ let getEventByDate = asyncHandler(async (req, res) => {
       },
     },
     {
+      $project: {
+        date: {
+          $dateToString: {
+            date: "$date",
+            format: "%G-%m-%d",
+          },
+        },
+        title: 1,
+        time: 1,
+        completed: 1,
+        description: 1,
+      },
+    },
+    {
       $group: {
         _id: {
           date: "$date",
@@ -63,12 +77,7 @@ let getEventByDate = asyncHandler(async (req, res) => {
     {
       $project: {
         _id: 0,
-        date: {
-          $dateToString: {
-            date: "$_id.date",
-            format: "%G-%m-%d",
-          },
-        },
+        date: "$_id.date",
         time: "$_id.time",
         events: "$events",
       },

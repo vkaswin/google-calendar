@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRefs, ref, watchEffect, watch } from "vue";
+import { toRefs, ref, watchPostEffect, watch } from "vue";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
 import { Placement } from "@popperjs/core";
@@ -34,20 +34,17 @@ usePopper(reference, popper, {
   ],
 });
 
-watchEffect(
-  () => {
-    if (!target?.value) return;
+watchPostEffect(() => {
+  if (!target?.value) return;
 
-    let element = document.querySelector<HTMLElement>(target.value);
+  let element = document.querySelector<HTMLElement>(target.value);
 
-    if (!element) return;
+  if (!element) return;
 
-    element.addEventListener("click", toggle);
+  element.addEventListener("click", toggle);
 
-    reference.value = element;
-  },
-  { flush: "post" }
-);
+  reference.value = element;
+});
 
 let toggle = () => {
   isOpen.value = !isOpen.value;
@@ -88,10 +85,8 @@ let unRegister = useClickOutSide(popper, toggle, (event) => {
     flex-direction: column;
     background: #fff;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    width: max-content;
     border-radius: 4px;
     padding: 5px 0px;
-    width: 100%;
     button {
       display: flex;
       align-items: center;

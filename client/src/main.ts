@@ -42,5 +42,6 @@ app
   .use(Vue3Toastify, {
     autoClose: 3000,
     closeButton: true,
+    pauseOnFocusLoss: false,
   } as ToastContainerOptions)
   .mount("#app");

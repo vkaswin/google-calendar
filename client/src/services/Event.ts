@@ -10,6 +10,21 @@ const createEvent = (data: EventDetail) => {
   });
 };
 
+const deleteEvent = (id: string) => {
+  return axios<{ message: string }>({
+    url: Event.delete(id),
+    method: "delete",
+  });
+};
+
+const updateEvent = (id: string, data: Partial<EventDetail>) => {
+  return axios<{ message: string; data: EventDetail }>({
+    url: Event.update(id),
+    method: "put",
+    data,
+  });
+};
+
 const getEventByDate = (params: DateParams) => {
   return axios<{
     message: string;
@@ -21,4 +36,4 @@ const getEventByDate = (params: DateParams) => {
   });
 };
 
-export { createEvent, getEventByDate };
+export { createEvent, deleteEvent, updateEvent, getEventByDate };

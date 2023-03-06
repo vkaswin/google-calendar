@@ -7,9 +7,9 @@ export type EventDetail = {
   readonly _id?: string;
   date: string;
   description: string;
-  time: string;
+  time: EventTime;
   title: string;
-  completed: boolean;
+  completed?: boolean;
 };
 
 export type EventPopUpType = Ref<InstanceType<typeof EventPopup>>;
@@ -40,7 +40,8 @@ export type EventTime =
   | "8:00 PM - 9:00 PM"
   | "9:00 PM - 10:00 PM"
   | "10:00 PM - 11:00 PM"
-  | "11:00 PM - 12:00 PM";
+  | "11:00 PM - 12:00 PM"
+  | "";
 
 export type TimeSlots = { time: EventTime; label: string }[];
 

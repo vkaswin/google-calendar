@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { toRefs } from "vue";
 import { EventDetail } from "@/types/Event";
+import { timeSlots } from "@/utils";
 
 type EventListProps = {
   events?: EventDetail[];
+  type: "week" | "month";
 };
 
 type EventListEmits = {
-  (event: "onClick", data: EventDetail): void;
+  (name: "onClick", data: EventDetail): void;
+  (name: "onContextMenu", event: MouseEvent, date: EventDetail): void;
 };
 
 let props = defineProps<EventListProps>();
@@ -23,22 +26,33 @@ let { events } = toRefs(props);
     :class="styles.card"
     :key="event._id"
     @click.stop="emit('onClick', event)"
+    @contextmenu.prevent="(e) => emit('onContextMenu', e, event)"
+    :data-type="type"
+    tabindex="-1"
   >
-    <i class="bx-check-circle"></i>
-    <span :class="[event.completed && styles.strike]">
-      {{ event.title }}
-    </span>
+    <template v-if="type === 'week'">
+      <i class="bx-check-circle"></i>
+      <span :class="[event.completed && styles.strike]">
+        {{ event.title }}
+      </span>
+    </template>
+    <template v-else>
+      <div :class="styles.time">
+        <i class="bxs-circle"></i>
+        <span :class="[event.completed && styles.strike]">12PM</span>
+      </div>
+      <div :class="styles.title">
+        <i class="bx-check-circle"></i>
+        <span :class="[event.completed && styles.strike]">
+          {{ event.title }}
+        </span>
+      </div>
+    </template>
   </div>
 </template>
 
 <style lang="scss" module="styles">
 .card {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background-color: #4185f4;
-  border-radius: 4px;
-  padding: 2px 5px;
   span {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -47,13 +61,62 @@ let { events } = toRefs(props);
     word-break: break-all;
     color: white;
     font-size: 12px;
-    &:is(.strike) {
-      text-decoration: line-through;
-    }
   }
+  .strike {
+    text-decoration: line-through;
+  }
+}
+.card[data-type="week"] {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #4185f4;
+  border-radius: 4px;
+  padding: 2px 5px;
   i {
     color: white;
     font-size: 18px;
+  }
+}
+
+.card[data-type="month"] {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 2px 5px;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    background-color: #f1f3f4;
+  }
+  .time {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    span {
+      display: block;
+      color: rgb(60, 64, 67);
+      font-size: 11px;
+      min-width: 30px;
+    }
+    i {
+      color: #4185f4;
+      font-size: 11px;
+    }
+  }
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    span {
+      color: rgb(60, 64, 67);
+      font-size: 12px;
+    }
+    i {
+      color: rgb(60, 64, 67);
+      font-size: 18px;
+    }
   }
 }
 </style>

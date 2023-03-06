@@ -3,6 +3,7 @@ import { toRefs, computed, inject, onMounted, ref, watchEffect } from "vue";
 import { toast } from "vue3-toastify";
 import dayjs from "dayjs";
 import EventList from "./EventList.vue";
+import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
 import { getAllDates, getDayName } from "@/utils";
 import {
@@ -31,6 +32,8 @@ let eventList = ref<EventByDate>({});
 let calendarContainer = ref<HTMLElement | null>(null);
 
 let eventPopup = inject<EventPopUpType>("eventPopup");
+
+let contextMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
 let dates = computed(() => getAllDates(selectedDate.value));
 
@@ -77,7 +80,6 @@ let handleEvent = (date: Date) => {
 
   eventPopup.value.reference = element;
   eventPopup.value.eventDetail.date = date.toISOString();
-  // eventPopup.value.eventDetail.time = time;
 
   if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
 };
@@ -87,6 +89,43 @@ let handleViewEvent = (event: EventDetail) => {
     "🚀 ~ file: MonthCalendar.vue:71 ~ handleViewEvent ~ event:",
     event
   );
+};
+
+let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
+  if (!contextMenu.value) return;
+
+  if (eventPopup?.value.isOpen) eventPopup.value.reset();
+
+  contextMenu.value.reference = {
+    getBoundingClientRect: () => {
+      return {
+        width: 0,
+        height: 0,
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
+      };
+    },
+  };
+
+  contextMenu.value.eventDetail = event;
+};
+
+let handleDelete = ({ _id, date }: EventDetail) => {
+  let events = eventList.value[date];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events.splice(index, 1);
+};
+
+let handleCompleted = ({ _id, date }: EventDetail) => {
+  let events = eventList.value[date];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events[index].completed = true;
 };
 </script>
 
@@ -111,11 +150,18 @@ let handleViewEvent = (event: EventDetail) => {
         <EventList
           v-if="eventList?.[dayjs(date).format('YYYY-MM-DD')]"
           :events="eventList?.[dayjs(date).format('YYYY-MM-DD')]"
+          type="month"
           @on-click="handleViewEvent"
+          @on-context-menu="handleContextMenu"
         />
       </div>
     </div>
   </div>
+  <ContextMenu
+    ref="contextMenu"
+    @on-completed="handleCompleted"
+    @on-delete="handleDelete"
+  />
 </template>
 
 <style lang="scss" module="styles">
@@ -169,7 +215,7 @@ let handleViewEvent = (event: EventDetail) => {
         color: #3c4043;
         font-size: 12px;
         border-radius: 50%;
-        transition: background-color 0.25ms ease-in-out;
+        transition: background-color 0.25ms cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         &:hover {
           background-color: #f1f3f4;
@@ -177,7 +223,6 @@ let handleViewEvent = (event: EventDetail) => {
       }
     }
     .events {
-      position: relative;
       display: flex;
       flex-direction: column;
       gap: 2px;

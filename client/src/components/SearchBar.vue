@@ -40,7 +40,7 @@
     color: #606368;
     font-size: 22px;
     border-radius: 50%;
-    transition: background-color 0.25s ease-in-out;
+    transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     &:hover {
       background-color: #dadce0;

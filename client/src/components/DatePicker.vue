@@ -155,7 +155,7 @@ defineExpose({
       font-family: "Poppins-Medium", sans-serif;
       color: #3c4043;
       border-radius: 50%;
-      transition: background-color 0.25ms ease-in-out;
+      transition: background-color 0.25ms cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       &:is(.highlight) {
         background-color: #1967d2;

@@ -25,7 +25,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   } catch (error: any) {
     console.log("🚀 ~ file: verifyToken.ts:26 ~ verifyToken ~ error:", error);
     if (error.message === "jwt expired")
-      return res.status(401).send({ message: "Unauthorized" });
+      res.status(401).send({ message: "Unauthorized" });
 
     res
       .status(error.message ? 400 : 500)

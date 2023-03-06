@@ -13,6 +13,7 @@ import {
 import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
 import EventList from "./EventList.vue";
+import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
 import { getDayName, timeSlots } from "@/utils";
 import {
@@ -21,6 +22,7 @@ import {
   DateParams,
   EventByDateAndTime,
   EventDetail,
+  EventTime,
 } from "@/types/Event";
 
 type WeekCalendarProps = {
@@ -47,6 +49,8 @@ let calendarContainer = ref<HTMLElement | null>(null);
 let indicator = ref<HTMLDivElement>();
 
 let eventList = ref<EventByDateAndTime>({});
+
+let contextMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
 let intervalId: ReturnType<typeof setInterval>;
 
@@ -178,7 +182,7 @@ onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-let handleEvent = (date: Date, time: string) => {
+let handleEvent = (date: Date, time: EventTime) => {
   if (!calendarContainer.value) return;
 
   let element = calendarContainer.value.querySelector(
@@ -203,6 +207,43 @@ let handleViewEvent = (event: EventDetail) => {
     "🚀 ~ file: WeekCalendar.vue:203 ~ handleViewEvent ~ event:",
     event
   );
+};
+
+let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
+  if (!contextMenu.value) return;
+
+  if (eventPopup?.value.isOpen) eventPopup.value.reset();
+
+  contextMenu.value.reference = {
+    getBoundingClientRect: () => {
+      return {
+        width: 0,
+        height: 0,
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
+      };
+    },
+  };
+
+  contextMenu.value.eventDetail = event;
+};
+
+let handleDelete = ({ _id, time, date }: EventDetail) => {
+  let events = eventList.value[date][time];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events.splice(index, 1);
+};
+
+let handleCompleted = ({ _id, time, date }: EventDetail) => {
+  let events = eventList.value[date][time];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events[index].completed = true;
 };
 </script>
 
@@ -249,10 +290,12 @@ let handleViewEvent = (event: EventDetail) => {
             v-if="
               eventList[dayjs(dates?.[index - 1])?.format('YYYY-MM-DD')]?.[time]
             "
+            type="week"
             :events="
               eventList[dayjs(dates[index - 1]).format('YYYY-MM-DD')][time]
             "
             @on-click="handleViewEvent"
+            @on-context-menu="handleContextMenu"
           />
           <div
             v-if="
@@ -279,6 +322,11 @@ let handleViewEvent = (event: EventDetail) => {
       ></div>
     </div>
   </div>
+  <ContextMenu
+    ref="contextMenu"
+    @on-completed="handleCompleted"
+    @on-delete="handleDelete"
+  />
 </template>
 
 <style lang="scss" module="styles">
@@ -355,7 +403,7 @@ let handleViewEvent = (event: EventDetail) => {
           color: rgb(60, 64, 67);
           font-size: 24px;
           font-family: "Poppins-Medium", sans-serif;
-          transition: background-color 0.25s ease-in-out;
+          transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
         }
       }

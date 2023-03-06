@@ -15,8 +15,8 @@ router.get("/date", getEventByDate);
 
 router.post("/create", createEvent);
 
-router.put("/:id", updateEvent);
+router.put("/:id/edit", updateEvent);
 
-router.delete("/:id", deleteEvent);
+router.delete("/:id/remove", deleteEvent);
 
 export default router;

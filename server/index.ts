@@ -13,7 +13,7 @@ app
   .use(
     cors({
       allowedOrigins: ["https://vkaswin.github.io", "http://localhost:3000"],
-      allowedHeaders: ["*"],
+      allowedHeaders: ["Authorization", "Content-Type"],
       credentials: true,
     })
   )
