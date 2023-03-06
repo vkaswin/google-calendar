@@ -14,7 +14,15 @@ export type EventDetail = {
 
 export type EventPopUpType = Ref<InstanceType<typeof EventPopup>>;
 
-export type DateParams = { startDate: string; endDate?: string };
+export type DateParams = {
+  startDate: string;
+  endDate: string;
+  type: Extract<CalendarView, "week" | "month" | "year">;
+};
+
+export type GetEventByDate = (
+  params: DateParams
+) => DateParams["type"] extends "week" ? Date : string;
 
 export type EventTime =
   | "12:00 PM - 1:00 AM"

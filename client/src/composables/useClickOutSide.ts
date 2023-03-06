@@ -12,18 +12,18 @@ const useClickOutSide: UseClickOutSide = (element, cb, handler) => {
   watch(element, (element) => {
     if (!element || isEventAttached) return;
     setTimeout(() => {
-      document.addEventListener("click", handleClick);
+      document.addEventListener("pointerdown", handlePointerDown);
       isEventAttached = true;
     }, 0);
   });
 
   let removeClickEvent = () => {
     if (!isEventAttached) return;
-    document.removeEventListener("click", handleClick);
+    document.removeEventListener("pointerdown", handlePointerDown);
     isEventAttached = false;
   };
 
-  let handleClick = (event: MouseEvent) => {
+  let handlePointerDown = (event: MouseEvent) => {
     if (!handler(event)) return;
 
     removeClickEvent();

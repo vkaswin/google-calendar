@@ -56,32 +56,40 @@ let getEventByDate = asyncHandler(async (req, res) => {
         description: 1,
       },
     },
-    {
-      $group: {
-        _id: {
-          date: "$date",
-          time: "$time",
-        },
-        events: {
-          $push: {
-            _id: "$_id",
-            title: "$title",
-            time: "$time",
-            date: "$date",
-            description: "$description",
-            completed: "$completed",
+    ...(query.type !== "year"
+      ? [
+          {
+            $group: {
+              _id: {
+                date: "$date",
+                ...(query.type !== "month" ? { time: "$time" } : {}),
+              },
+              events: {
+                $push: {
+                  _id: "$_id",
+                  title: "$title",
+                  time: "$time",
+                  date: "$date",
+                  description: "$description",
+                  completed: "$completed",
+                },
+              },
+            },
           },
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        date: "$_id.date",
-        time: "$_id.time",
-        events: "$events",
-      },
-    },
+          ...(query.type !== "year"
+            ? [
+                {
+                  $project: {
+                    _id: 0,
+                    date: "$_id.date",
+                    time: "$_id.time",
+                    events: "$events",
+                  },
+                },
+              ]
+            : []),
+        ]
+      : []),
   ]);
 
   res.status(200).send({ data, message: "Success" });

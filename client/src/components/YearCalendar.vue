@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { toRefs, computed, ref, watch, inject, onMounted } from "vue";
+import dayjs from "dayjs";
+import { toast } from "vue3-toastify";
 import DatePicker from "@/components/DatePicker.vue";
-import { getDayName } from "@/utils";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
+import { getEventByDate } from "@/services/Event";
+import { getDayName } from "@/utils";
 import { CalendarView, EventPopUpType } from "@/types/Event";
-import dayjs from "dayjs";
 
 type YearCalendarProps = {
   selectedDate: Date;
@@ -20,6 +22,8 @@ let props = defineProps<YearCalendarProps>();
 let emit = defineEmits<YearCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
+
+let eventList = ref([]);
 
 let calendarContainer = ref<HTMLElement | null>(null);
 
@@ -59,6 +63,17 @@ let dates = computed(() => {
 
   return dates;
 });
+
+let getEvents = async (date: string) => {
+  try {
+    let {
+      data: { data },
+    } = await getEventByDate({ startDate: date, endDate: date, type: "year" });
+    console.log(data);
+  } catch (err: any) {
+    toast.error(err?.message || "Error");
+  }
+};
 
 let handleChange = (date: Date) => {
   let isViewChange =
@@ -101,8 +116,9 @@ watch(
       reference.value = element;
     }
 
-    // api call to fetch events by date
-    console.log("🚀 ~ file: YearCalendar.vue:93 ~ watch ~ date:", selectedDate);
+    let date = dayjs(selectedDate).format("YYYY-MM-DD");
+
+    getEvents(date);
   },
   { flush: "post" }
 );

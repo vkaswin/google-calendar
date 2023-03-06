@@ -113,7 +113,7 @@ let getEvents = async (params: DateParams) => {
 watchEffect(() => {
   let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
   let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
-  getEvents({ startDate, endDate });
+  getEvents({ startDate, endDate, type: "week" });
 });
 
 watchEffect(() => {
