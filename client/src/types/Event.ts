@@ -1,7 +1,5 @@
 import { Ref } from "vue";
-import { AxiosPromise } from "axios";
 import EventPopup from "@/components/EventPopup.vue";
-import axios from "axios";
 
 export type CalendarView = "day" | "week" | "month" | "year";
 
@@ -20,21 +18,6 @@ export type DateParams = {
   startDate: string;
   endDate: string;
 };
-
-export type GetEventByDate = <T extends "week" | "month" | "year">(
-  params: DateParams & { type: T }
-) => AxiosPromise<{
-  message: string;
-  data: T extends "week"
-    ? {
-        date: string;
-        time: EventTime;
-        events: EventDetail[];
-      }[]
-    : T extends "month"
-    ? { date: string; events: EventDetail[] }[]
-    : EventDetail[];
-}>;
 
 export type EventTime =
   | "12:00 PM - 1:00 AM"
@@ -64,11 +47,11 @@ export type EventTime =
 
 export type TimeSlots = { time: EventTime; label: string }[];
 
-export type EventByWeek = Record<
+export type EventByDateAndTime = Record<
   string,
   {
     [key in EventTime]?: EventDetail[];
   }
 >;
 
-export type EventByMonth = Record<string, EventDetail[]>;
+export type EventByDate = Record<string, EventDetail[]>;

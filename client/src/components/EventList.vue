@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { toRefs } from "vue";
 import { EventDetail } from "@/types/Event";
-import { timeSlots } from "@/utils";
 
 type EventListProps = {
   events?: EventDetail[];
-  type: "week" | "month";
+  type: "week" | "month" | "year";
 };
 
 type EventListEmits = {
@@ -53,6 +52,7 @@ let { events } = toRefs(props);
 
 <style lang="scss" module="styles">
 .card {
+  cursor: pointer;
   span {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -79,7 +79,8 @@ let { events } = toRefs(props);
   }
 }
 
-.card[data-type="month"] {
+.card[data-type="month"],
+.card[data-type="year"] {
   display: flex;
   align-items: center;
   gap: 5px;

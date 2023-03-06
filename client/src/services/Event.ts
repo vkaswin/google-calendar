@@ -1,6 +1,6 @@
 import axios from "./axios";
 import { Event } from "./config";
-import { EventDetail, GetEventByDate } from "@/types/Event";
+import { DateParams, EventDetail, EventTime } from "@/types/Event";
 
 const createEvent = (data: EventDetail) => {
   return axios<{ message: string; data: EventDetail }>({
@@ -25,12 +25,25 @@ const updateEvent = (id: string, data: Partial<EventDetail>) => {
   });
 };
 
-const getEventByDate: GetEventByDate = (params) => {
-  return axios({
+const getEventByDate = <T extends "week" | "month" | "year">(
+  params: { type: T } & DateParams
+) => {
+  return axios<{
+    message: string;
+    data: T extends "week"
+      ? {
+          date: string;
+          time: EventTime;
+          events: EventDetail[];
+        }[]
+      : T extends "month"
+      ? { date: string; events: EventDetail[] }[]
+      : EventDetail[];
+  }>({
     url: Event.getByDate,
     method: "get",
     params,
-  }) as any;
+  });
 };
 
 export { createEvent, deleteEvent, updateEvent, getEventByDate };

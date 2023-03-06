@@ -9,7 +9,7 @@ import { getAllDates, getDayName } from "@/utils";
 import {
   EventPopUpType,
   DateParams,
-  EventByMonth,
+  EventByDate,
   EventDetail,
 } from "@/types/Event";
 
@@ -27,7 +27,7 @@ let emit = defineEmits<MonthCalendarEmits>();
 
 let { selectedDate } = toRefs(props);
 
-let eventList = ref<EventByMonth>({});
+let eventList = ref<EventByDate>({});
 
 let calendarContainer = ref<HTMLElement | null>(null);
 
@@ -52,7 +52,7 @@ let getEvents = async (params: DateParams) => {
       return obj;
     }, {} as any);
 
-    eventList.value = events as EventByMonth;
+    eventList.value = events as EventByDate;
   } catch (err: any) {
     toast.error(err?.message || "Error");
   }

@@ -2,9 +2,11 @@
 import { toRefs, computed, ref, watch, inject, onMounted } from "vue";
 import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
-import DatePicker from "@/components/DatePicker.vue";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
+import DatePicker from "@/components/DatePicker.vue";
+import EventList from "./EventList.vue";
+import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
 import { getDayName } from "@/utils";
 import { CalendarView, EventPopUpType, EventDetail } from "@/types/Event";
@@ -32,6 +34,10 @@ let isOpen = ref(false);
 let reference = ref<HTMLElement | null>(null);
 
 let popper = ref<HTMLElement | null>(null);
+
+let contextMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
+
+let isLoading = ref(true);
 
 let eventPopup = inject<EventPopUpType>("eventPopup");
 
@@ -65,26 +71,43 @@ let dates = computed(() => {
 });
 
 let getEvents = async (date: string) => {
+  if (!calendarContainer.value) return;
+
   try {
+    let element = calendarContainer.value.querySelector<HTMLElement>(
+      `[data-date='${date}']`
+    );
+
+    if (element) {
+      reference.value = element;
+    }
+
     let {
       data: { data },
     } = await getEventByDate({ startDate: date, endDate: date, type: "year" });
-    console.log(data);
+    eventList.value = data;
   } catch (err: any) {
     toast.error(err?.message || "Error");
+  } finally {
+    isLoading.value = false;
   }
 };
 
-let handleChange = (date: Date) => {
+let handleChange = (value: Date) => {
+  let date = dayjs(value).format("YYYY-MM-DD");
   let isViewChange =
-    selectedDate.value.toISOString().split("T")[0] ===
-      date.toISOString().split("T")[0] && isOpen.value;
+    isOpen.value && dayjs(selectedDate.value).format("YYYY-MM-DD") === date;
 
-  emit("onChange", date, isViewChange ? "day" : undefined);
+  emit("onChange", value, isViewChange ? "day" : undefined);
 
   if (isViewChange) return;
 
+  eventList.value = [];
+  isLoading.value = true;
+
   if (!isOpen.value) toggle();
+
+  getEvents(date);
 };
 
 let toggle = () => {
@@ -103,25 +126,45 @@ watch(isOpen, (isOpen) => {
   if (!isOpen) unRegister();
 });
 
-watch(
-  selectedDate,
-  async (selectedDate) => {
-    if (!calendarContainer.value) return;
+let handleViewEvent = (event: EventDetail) => {
+  console.log(
+    "🚀 ~ file: WeekCalendar.vue:203 ~ handleViewEvent ~ event:",
+    event
+  );
+};
 
-    let element = calendarContainer.value.querySelector<HTMLElement>(
-      `[data-date='${dayjs(selectedDate).format("YYYY-MM-DD")}']`
-    );
+let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
+  if (!contextMenu.value) return;
 
-    if (element) {
-      reference.value = element;
-    }
+  if (eventPopup?.value.isOpen) eventPopup.value.reset();
 
-    let date = dayjs(selectedDate).format("YYYY-MM-DD");
+  contextMenu.value.reference = {
+    getBoundingClientRect: () => {
+      return {
+        width: 0,
+        height: 0,
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
+      };
+    },
+  };
 
-    getEvents(date);
-  },
-  { flush: "post" }
-);
+  contextMenu.value.eventDetail = event;
+};
+
+let handleDelete = ({ _id }: EventDetail) => {
+  let index = eventList.value.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  eventList.value.splice(index, 1);
+};
+
+let handleCompleted = ({ _id }: EventDetail) => {
+  let index = eventList.value.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  eventList.value[index].completed = true;
+};
 </script>
 
 <template>
@@ -140,8 +183,26 @@ watch(
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
         <i class="bx-x" @click="toggle"></i>
       </div>
+      <div :class="styles.events">
+        <span v-if="isLoading" :class="styles.msg">Loading...</span>
+        <span v-else-if="eventList.length === 0" :class="styles.msg">
+          There are no events scheduled on this day.
+        </span>
+        <EventList
+          v-else
+          type="year"
+          :events="eventList"
+          @on-click="handleViewEvent"
+          @on-context-menu="handleContextMenu"
+        />
+      </div>
     </div>
   </div>
+  <ContextMenu
+    ref="contextMenu"
+    @on-completed="handleCompleted"
+    @on-delete="handleDelete"
+  />
 </template>
 
 <style lang="scss" module="styles">
@@ -206,6 +267,47 @@ watch(
         background-color: #f1f3f4;
       }
     }
+  }
+  .events {
+    max-height: 154px;
+    overflow-y: auto;
+    margin-top: 15px;
+    &::-webkit-scrollbar {
+      width: 5px;
+      border-top-right-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background: white;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #bec1c6;
+      border-radius: 10px;
+    }
+    .msg {
+      display: inline-block;
+      text-align: center;
+      font-size: 14px;
+      color: rgb(60, 64, 67);
+      line-height: 1.3;
+    }
+  }
+}
+
+@keyframes loader {
+  0% {
+    transform: translateX(-100px);
+  }
+  40% {
+    transform: translateX(35%);
+  }
+  60% {
+    transform: translateX(65%);
+  }
+  80% {
+    transform: translateX(85%);
+  }
+  100% {
+    transform: translateX(calc(100% + 100px));
   }
 }
 </style>

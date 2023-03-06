@@ -22,7 +22,7 @@ import {
   DateParams,
   EventDetail,
   EventTime,
-  EventByWeek,
+  EventByDateAndTime,
 } from "@/types/Event";
 
 type WeekCalendarProps = {
@@ -48,7 +48,7 @@ let calendarContainer = ref<HTMLElement | null>(null);
 
 let indicator = ref<HTMLDivElement>();
 
-let eventList = ref<EventByWeek>({});
+let eventList = ref<EventByDateAndTime>({});
 
 let contextMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
@@ -102,7 +102,7 @@ let getEvents = async (params: DateParams) => {
         };
       }
       return obj;
-    }, {} as any) as EventByWeek;
+    }, {} as any) as EventByDateAndTime;
 
     eventList.value = events;
   } catch (err: any) {
