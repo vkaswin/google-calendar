@@ -196,17 +196,18 @@ onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-let handleEvent = (date: Date, time: EventTime) => {
+let handleEvent = (value: Date, time: EventTime) => {
   if (!calendarContainer.value) return;
 
+  let date = dayjs(value).format("YYYY-MM-DD");
   let element = calendarContainer.value.querySelector(
-    `[data-date='${dayjs(date).format("YYYY-MM-DD")}'][data-time='${time}']`
+    `[data-date='${date}'][data-time='${time}']`
   ) as HTMLElement;
 
   if (!eventPopup?.value) return;
 
   eventPopup.value.reference = element;
-  eventPopup.value.eventDetail.date = date.toISOString();
+  eventPopup.value.eventDetail.date = date;
   eventPopup.value.eventDetail.time = time;
 
   if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
@@ -294,19 +295,21 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
         </div>
         <div
           :class="styles.date_slot"
-          v-for="index in columns"
-          :key="index"
-          :data-date="dayjs(dates[index - 1]).format('YYYY-MM-DD')"
+          v-for="column in columns"
+          :key="column"
+          :data-date="dayjs(dates[column - 1]).format('YYYY-MM-DD')"
           :data-time="time"
-          @click="handleEvent(dates[index - 1], time)"
+          @click="handleEvent(dates[column - 1], time)"
         >
           <EventList
             v-if="
-              eventList[dayjs(dates?.[index - 1])?.format('YYYY-MM-DD')]?.[time]
+              eventList[dayjs(dates?.[column - 1])?.format('YYYY-MM-DD')]?.[
+                time
+              ]
             "
             type="week"
             :events="
-              eventList[dayjs(dates[index - 1]).format('YYYY-MM-DD')][time]
+              eventList[dayjs(dates[column - 1]).format('YYYY-MM-DD')][time]
             "
             @on-click="handleViewEvent"
             @on-context-menu="handleContextMenu"
@@ -314,7 +317,8 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
           <div
             v-if="
               eventPopup?.isOpen &&
-              eventPopup?.eventDetail.date === dates[index - 1].toISOString() &&
+              eventPopup?.eventDetail.date ===
+                dayjs(dates[column - 1]).format('YYYY-MM-DD') &&
               eventPopup?.eventDetail.time == time
             "
             :class="styles.event_card"

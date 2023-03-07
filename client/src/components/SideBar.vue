@@ -28,21 +28,20 @@ let handlePopup = () => {
   if (!eventPopup) return;
 
   let element: HTMLElement;
+  let date = dayjs(selectedDate.value).format("YYYY-MM-DD");
   if (view.value === "week" || view.value === "day") {
     let time = timeSlots[new Date().getHours()].time;
     eventPopup.value.eventDetail.time = time;
     element = eventPopup.value.container?.querySelector(
-      `[data-date='${dayjs(selectedDate.value).format(
-        "YYYY-MM-DD"
-      )}'][data-time='${time}']`
+      `[data-date='${date}'][data-time='${time}']`
     ) as HTMLElement;
   } else {
     element = eventPopup.value.container?.querySelector(
-      `[data-date='${dayjs(selectedDate.value).format("YYYY-MM-DD")}']`
+      `[data-date='${date}']`
     ) as HTMLElement;
   }
 
-  eventPopup.value.eventDetail.date = selectedDate.value.toISOString();
+  eventPopup.value.eventDetail.date = date;
   eventPopup.value.reference = element;
   eventPopup.value.openPopup();
   element.scrollIntoView({ behavior: "smooth", inline: "center" });

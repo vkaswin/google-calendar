@@ -80,9 +80,10 @@ watchEffect(() => {
   getEvents({ startDate, endDate });
 });
 
-let handleEvent = (date: Date) => {
+let handleEvent = (value: Date) => {
   if (!calendarContainer.value) return;
 
+  let date = dayjs(value).format("YYYY-MM-DD");
   let element = calendarContainer.value.querySelector(
     `[data-date='${dayjs(date).format("YYYY-MM-DD")}']`
   ) as HTMLElement;
@@ -90,7 +91,7 @@ let handleEvent = (date: Date) => {
   if (!eventPopup?.value) return;
 
   eventPopup.value.reference = element;
-  eventPopup.value.eventDetail.date = date.toISOString();
+  eventPopup.value.eventDetail.date = date;
 
   if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
 };

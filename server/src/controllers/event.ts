@@ -27,11 +27,12 @@ let updateEvent = asyncHandler(async (req, res) => {
 });
 
 let getEventByDate = asyncHandler(async (req, res) => {
-  let { user, query } = req;
+  let {
+    user,
+    query: { startDate, endDate, type },
+  } = req;
 
   let userId = new mongoose.Types.ObjectId(user._id);
-  let startDate = new Date(query.startDate as string);
-  let endDate = new Date(query.endDate as string);
 
   let data = await Event.aggregate([
     {
@@ -43,27 +44,13 @@ let getEventByDate = asyncHandler(async (req, res) => {
         },
       },
     },
-    {
-      $project: {
-        date: {
-          $dateToString: {
-            date: "$date",
-            format: "%G-%m-%d",
-          },
-        },
-        title: 1,
-        time: 1,
-        completed: 1,
-        description: 1,
-      },
-    },
-    ...(query.type !== "year"
+    ...(type !== "year"
       ? [
           {
             $group: {
               _id: {
                 date: "$date",
-                ...(query.type !== "month" ? { time: "$time" } : {}),
+                ...(type !== "month" ? { time: "$time" } : {}),
               },
               events: {
                 $push: {
@@ -77,7 +64,7 @@ let getEventByDate = asyncHandler(async (req, res) => {
               },
             },
           },
-          ...(query.type !== "year"
+          ...(type !== "year"
             ? [
                 {
                   $project: {
