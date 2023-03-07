@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { toast } from "vue3-toastify";
 import { cookie } from "@/utils";
 
 const axios = Axios.create({});

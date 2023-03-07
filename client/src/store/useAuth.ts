@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
-import { cookie } from "@/utils";
-import jwtDecode from "jwt-decode";
-import { User, SignIn, SignUp } from "@/types/User";
-import { signInUser, signUpUser } from "@/services/User";
-import router, { RouteNames } from "@/router";
 import { toast } from "vue3-toastify";
+import jwtDecode from "jwt-decode";
+import router, { RouteNames } from "@/router";
+import { signInUser, signUpUser } from "@/services/User";
+import { cookie } from "@/utils";
+import { User, SignIn, SignUp } from "@/types/User";
 
 const useAuth = defineStore("auth", {
   state: () => {

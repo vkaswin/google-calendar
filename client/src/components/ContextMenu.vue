@@ -6,7 +6,6 @@ import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
 import { deleteEvent, updateEvent } from "@/services/Event";
 import { EventDetail } from "@/types/Event";
-import { debounce } from "@/utils";
 
 type ContextMenuEmits = {
   (name: "onCompleted", event: EventDetail): void;

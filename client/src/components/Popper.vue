@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { toRefs, ref, watchPostEffect, watch } from "vue";
+import { Placement } from "@popperjs/core";
 import usePopper from "@/composables/usePopper";
 import useClickOutSide from "@/composables/useClickOutSide";
-import { Placement } from "@popperjs/core";
 
 type DropDownProps = {
   target?: string;

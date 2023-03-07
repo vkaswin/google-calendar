@@ -231,7 +231,7 @@ let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
 };
 
 let handleDelete = ({ _id, time, date }: EventDetail) => {
-  let events = eventList.value[date][time];
+  let events = eventList.value[date][time!];
   if (!events) return;
   let index = events.findIndex((event) => _id === event._id);
   if (index === -1) return;
@@ -239,7 +239,7 @@ let handleDelete = ({ _id, time, date }: EventDetail) => {
 };
 
 let handleCompleted = ({ _id, time, date }: EventDetail) => {
-  let events = eventList.value[date][time];
+  let events = eventList.value[date][time!];
   if (!events) return;
   let index = events.findIndex((event) => _id === event._id);
   if (index === -1) return;

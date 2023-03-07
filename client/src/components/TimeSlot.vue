@@ -3,7 +3,7 @@ import { toRefs } from "vue";
 import { timeSlots } from "@/utils";
 
 type TimeSlotProps = {
-  defaultValue: string;
+  defaultValue?: string;
 };
 
 type TimeSlotEmits = {

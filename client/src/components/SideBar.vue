@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { toRefs, ref, inject } from "vue";
-import DatePicker from "@/components/DatePicker.vue";
-import { CalendarView, EventPopUpType } from "@/types/Event";
-import { timeSlots } from "@/utils";
 import dayjs from "dayjs";
+import DatePicker from "@/components/DatePicker.vue";
+import { timeSlots } from "@/utils";
+import { CalendarView, EventPopUpType } from "@/types/Event";
 
 type SideBarProps = {
   view: CalendarView;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted } from "vue";
-import useAuth from "@/store/useAuth";
 import { useVuelidate } from "@vuelidate/core";
 import {
   required,
@@ -10,6 +9,7 @@ import {
   minLength,
 } from "@vuelidate/validators";
 import { RouteNames } from "@/router";
+import useAuth from "@/store/useAuth";
 import Input from "@/components/Input.vue";
 
 let { signUp } = useAuth();

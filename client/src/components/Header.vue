@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { toRefs, computed } from "vue";
-import { getMonthName } from "@/utils";
 import SearchBar from "@/components/SearchBar.vue";
 import Popper from "@/components/Popper.vue";
+import { getMonthName } from "@/utils";
 import { User } from "@/types/User";
 import { CalendarView } from "@/types/Event";
 

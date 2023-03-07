@@ -18,4 +18,4 @@ const Event = {
   update: (id: string) => `${eventUrl}/${id}/edit`,
 };
 
-export { User, Event, eventUrl };
+export { User, Event };

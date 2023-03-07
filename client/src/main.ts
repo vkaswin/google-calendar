@@ -1,12 +1,12 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import App from "./App.vue";
-import router from "./router";
 import Vue3Toastify, { type ToastContainerOptions } from "vue3-toastify";
+import router from "./router";
+import App from "./App.vue";
 import { getMonthName } from "./utils";
 
-import "@/assets/scss/index.scss";
 import "vue3-toastify/dist/index.css";
+import "@/assets/scss/index.scss";
 
 let app = createApp(App);
 let pinia = createPinia();

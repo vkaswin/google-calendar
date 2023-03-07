@@ -7,7 +7,7 @@ export type EventDetail = {
   readonly _id?: string;
   date: string;
   description: string;
-  time: EventTime;
+  time: EventTime | undefined;
   title: string;
   completed?: boolean;
 };

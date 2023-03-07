@@ -1,14 +1,16 @@
 <script lang="ts" setup>
 import { ref, computed, reactive, watch, toRefs } from "vue";
-import usePopper from "@/composables/usePopper";
-import TimeSlot from "./TimeSlot.vue";
-import { CalendarView, EventDetail } from "@/types/Event";
-import { getMonthName } from "@/utils";
-import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { createEvent } from "@/services/Event";
+import { useVuelidate } from "@vuelidate/core";
 import { toast } from "vue3-toastify";
 import dayjs from "dayjs";
+import usePopper from "@/composables/usePopper";
+import TimeSlot from "./TimeSlot.vue";
+import { getMonthName } from "@/utils";
+
+import { createEvent } from "@/services/Event";
+
+import { CalendarView, EventDetail } from "@/types/Event";
 
 type EventPopupProps = {
   view: CalendarView;
@@ -29,7 +31,7 @@ let isOpen = ref(false);
 let eventDetail = reactive<EventDetail>({
   date: "",
   description: "",
-  time: "",
+  time: undefined,
   title: "",
 });
 
@@ -85,7 +87,7 @@ let reset = () => {
   closePopup();
   eventDetail.date = "";
   eventDetail.description = "";
-  eventDetail.time = "";
+  eventDetail.time = undefined;
   eventDetail.title = "";
   $v.value.$reset();
 };
