@@ -58,9 +58,20 @@ let getEvents = async (params: DateParams) => {
   }
 };
 
+let handleNewEvent = (event: EventDetail) => {
+  let events = eventList.value[event.date];
+
+  if (events) {
+    events.push(event);
+  } else {
+    eventList.value[event.date] = [event];
+  }
+};
+
 onMounted(() => {
   if (!eventPopup?.value || !calendarContainer.value) return;
   eventPopup.value.container = calendarContainer.value;
+  eventPopup.value.handleNewEvent = handleNewEvent;
 });
 
 watchEffect(() => {

@@ -7,7 +7,7 @@ import Header from "@/components/Header.vue";
 import SideBar from "@/components/SideBar.vue";
 import Loader from "@/components/Loader.vue";
 import EventPopup from "@/components/EventPopup.vue";
-import { CalendarView, EventPopUpType } from "@/types/Event";
+import { CalendarView, EventDetail, EventPopUpType } from "@/types/Event";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),

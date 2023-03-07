@@ -121,6 +121,19 @@ watchEffect(() => {
   eventPopup.value.placement = view.value === "day" ? "bottom" : "left";
 });
 
+let handleNewEvent = (event: EventDetail) => {
+  if (eventList.value[event.date]) {
+    let events = eventList.value[event.date][event.time!];
+    if (events) {
+      events.push(event);
+    } else {
+      eventList.value[event.date][event.time!] = [event];
+    }
+  } else {
+    eventList.value[event.date][event.time!] = [event];
+  }
+};
+
 onMounted(() => {
   window.addEventListener("resize", handleIndicator);
   handleIndicator();
@@ -129,6 +142,7 @@ onMounted(() => {
   if (!eventPopup || !calendarContainer.value) return;
 
   eventPopup.value.container = calendarContainer.value;
+  eventPopup.value.handleNewEvent = handleNewEvent;
 });
 
 const updateIndicatorPosition = () => {

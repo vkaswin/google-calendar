@@ -7,22 +7,14 @@ import dayjs from "dayjs";
 import usePopper from "@/composables/usePopper";
 import TimeSlot from "./TimeSlot.vue";
 import { getMonthName } from "@/utils";
-
 import { createEvent } from "@/services/Event";
-
 import { CalendarView, EventDetail } from "@/types/Event";
 
 type EventPopupProps = {
   view: CalendarView;
 };
 
-type EventPopupEmits = {
-  (event: "onNewEvent", data: EventDetail): void;
-};
-
 let props = defineProps<EventPopupProps>();
-
-let emit = defineEmits<EventPopupEmits>();
 
 let { view } = toRefs(props);
 
@@ -53,6 +45,8 @@ let placement = ref<"left" | "bottom">(
 let container = ref<HTMLElement | null>(null);
 
 let reference = ref<HTMLElement | null>(null);
+
+let handleNewEvent = ref<((event: EventDetail) => void) | undefined>(undefined);
 
 let options = {
   placement: placement.value,
@@ -100,7 +94,14 @@ let handleSubmit = async () => {
       data: { message, data },
     } = await createEvent({ ...eventDetail });
     reset();
-    emit("onNewEvent", data);
+    handleNewEvent.value?.({
+      _id: data._id,
+      time: data.time,
+      title: data.title,
+      description: data.description,
+      completed: data.completed,
+      date: dayjs(data.date).format("YYYY-MM-DD"),
+    });
     toast.success(message);
   } catch (err: any) {
     toast.error(err?.message || "Error");
@@ -137,9 +138,10 @@ defineExpose({
   placement,
   container,
   eventDetail,
+  reset,
   openPopup,
   closePopup,
-  reset,
+  handleNewEvent,
 });
 </script>
 
