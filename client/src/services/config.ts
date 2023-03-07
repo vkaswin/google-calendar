@@ -1,7 +1,7 @@
 const baseURL =
   process.env.NODE_ENV === "development"
     ? "http://localhost:8000"
-    : "http://localhost:8000";
+    : "https://google-calendar-six.vercel.app";
 
 const userUrl = `${baseURL}/api/user`;
 const eventUrl = `${baseURL}/api/event`;
