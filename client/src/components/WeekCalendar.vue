@@ -15,7 +15,7 @@ import { toast } from "vue3-toastify";
 import EventList from "./EventList.vue";
 import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
-import { getDayName, timeSlots } from "@/utils";
+import { timeSlots } from "@/utils";
 import {
   CalendarView,
   EventPopUpType,
@@ -102,7 +102,7 @@ let getEvents = async (params: DateParams) => {
       }
       return obj;
     }, {} as any) as EventByDateAndTime;
-    console.log(events);
+
     eventList.value = events;
   } catch (err: any) {
     toast.error(err?.message || "Error");
@@ -280,7 +280,7 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
         ]"
         @click="handleViewChange(date)"
       >
-        <span>{{ getDayName(date.getDay()) }}</span>
+        <span>{{ dayjs(date).format("ddd") }}</span>
         <span>{{ date.getDate() }}</span>
       </div>
       <div></div>

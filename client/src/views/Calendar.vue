@@ -2,12 +2,13 @@
 import { ref, defineAsyncComponent, watch, provide } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
 import useAuth from "@/store/useAuth";
 import Header from "@/components/Header.vue";
 import SideBar from "@/components/SideBar.vue";
 import Loader from "@/components/Loader.vue";
 import EventPopup from "@/components/EventPopup.vue";
-import { CalendarView, EventDetail, EventPopUpType } from "@/types/Event";
+import { CalendarView, EventPopUpType } from "@/types/Event";
 
 const WeekCalendar = defineAsyncComponent({
   loader: () => import("@/components/WeekCalendar.vue"),
@@ -50,8 +51,8 @@ provide("eventPopup", eventPopup);
 
 watch(
   () => route.query,
-  ({ view = "week", date = new Date().toISOString().split("T")[0] }) => {
-    if (selectedDate.value.toISOString().split("T")[0] !== date) {
+  ({ view = "week", date = dayjs().format("YYYY-MM-DD") }) => {
+    if (dayjs(selectedDate.value).format("YYYY-MM-DD") !== date) {
       selectedDate.value = new Date(date as string);
     }
 
@@ -72,7 +73,7 @@ let reset = () => {
   router.push({
     query: {
       view: "week",
-      date: date.toISOString().split("T")[0],
+      date: dayjs().format("YYYY-MM-DD"),
     },
   });
 };
@@ -102,7 +103,7 @@ const handleNext = () => {
   router.push({
     query: {
       view: calendarView.value,
-      date: temp.toISOString().split("T")[0],
+      date: dayjs(temp).format("YYYY-MM-DD"),
     },
   });
 };
@@ -132,7 +133,7 @@ const handlePrevious = () => {
   router.push({
     query: {
       view: calendarView.value,
-      date: temp.toISOString().split("T")[0],
+      date: dayjs(temp).format("YYYY-MM-DD"),
     },
   });
 };
@@ -143,7 +144,7 @@ let handleChange = (date: Date, view?: CalendarView) => {
   router.push({
     query: {
       ...route.query,
-      date: date.toISOString().split("T")[0],
+      date: dayjs(date).format("YYYY-MM-DD"),
       ...(view && { view }),
     },
   });

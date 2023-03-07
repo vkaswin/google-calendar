@@ -2,9 +2,9 @@
 import { toRefs, computed } from "vue";
 import SearchBar from "@/components/SearchBar.vue";
 import Popper from "@/components/Popper.vue";
-import { getMonthName } from "@/utils";
 import { User } from "@/types/User";
 import { CalendarView } from "@/types/Event";
+import dayjs from "dayjs";
 
 type HeaderProps = {
   user: User | null;
@@ -43,7 +43,10 @@ let userInitial = computed(() => {
 <template>
   <div :class="styles.container">
     <div :class="styles.logo">
-      <img :src="`${$publicPath}images/dates/${new Date().getDate()}.png`" alt="" />
+      <img
+        :src="`${$publicPath}images/dates/${new Date().getDate()}.png`"
+        alt=""
+      />
       <span>Calender</span>
     </div>
     <div :class="styles.date_section">
@@ -53,9 +56,7 @@ let userInitial = computed(() => {
           <i class="bx-chevron-left" @click="emit('onPrevious')"></i>
           <i class="bx-chevron-right" @click="emit('onNext')"></i>
         </div>
-        <span>{{
-          `${getMonthName(date.getMonth())} ${date.getFullYear()}`
-        }}</span>
+        <span>{{ dayjs(date).format("MMMM YYYY") }}</span>
       </div>
       <button id="view-dropdown" :class="styles.dropdown">
         <span>{{ view }}</span>

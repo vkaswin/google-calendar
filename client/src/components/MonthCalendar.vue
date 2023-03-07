@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import EventList from "./EventList.vue";
 import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
-import { getAllDates, getDayName } from "@/utils";
+import { getAllDates } from "@/utils";
 import {
   EventPopUpType,
   DateParams,
@@ -152,11 +152,20 @@ let handleCompleted = ({ _id, date }: EventDetail) => {
     >
       <div :class="styles.header">
         <span v-if="index <= 6" :class="styles.week">{{
-          getDayName(date.getDay())
+          dayjs(date).format("ddd")
         }}</span
-        ><span :class="styles.day" @click.stop="emit('onChange', date)">{{
-          date.getDate()
-        }}</span>
+        ><span
+          :class="[
+            styles.day,
+            dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
+              ? styles.highlight
+              : dayjs(date).format('YYYY-MM-DD') ===
+                  dayjs(selectedDate).format('YYYY-MM-DD') && styles.active,
+            ,
+          ]"
+          @click.stop="emit('onChange', date)"
+          >{{ date.getDate() }}</span
+        >
       </div>
       <div :class="styles.events">
         <EventList
@@ -222,14 +231,25 @@ let handleCompleted = ({ _id, date }: EventDetail) => {
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        width: 24px;
-        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
         color: #3c4043;
         font-size: 12px;
         border-radius: 50%;
         transition: background-color 0.25ms cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
-        &:hover {
+        &:is(.highlight) {
+          background-color: #1967d2;
+          color: white;
+        }
+        &:is(.active) {
+          background-color: #afcbfa;
+          color: #185abc;
+        }
+        &:is(.in_active) {
+          color: #70757a;
+        }
+        &:hover:not(.highlight, .active) {
           background-color: #f1f3f4;
         }
       }

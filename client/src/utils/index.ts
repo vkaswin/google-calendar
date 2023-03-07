@@ -38,73 +38,21 @@ const debounce = <T>(
   };
 };
 
-const getDayName = (day: number): string | undefined => {
-  switch (day) {
-    case 0:
-      return "Sunday";
-    case 1:
-      return "Monday";
-    case 2:
-      return "Wednesday";
-    case 3:
-      return "Tuesday";
-    case 4:
-      return "Thursday";
-    case 5:
-      return "Friday";
-    case 6:
-      return "Saturday";
-    default:
-      return;
-  }
-};
-
-const getMonthName = (month: number): string | undefined => {
-  switch (month) {
-    case 0:
-      return "January";
-    case 1:
-      return "February";
-    case 2:
-      return "March";
-    case 3:
-      return "April";
-    case 4:
-      return "May";
-    case 5:
-      return "June";
-    case 6:
-      return "July";
-    case 7:
-      return "August";
-    case 8:
-      return "Spetember";
-    case 9:
-      return "October";
-    case 10:
-      return "November";
-    case 11:
-      return "December";
-    default:
-      return;
-  }
-};
-
-const getTotalDaysInMonth = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-};
-
-const getLastDayInMonth = (date: Date) => {
-  let temp = new Date(date);
-  date.setDate(1);
-  date.setMonth(date.getMonth() + 1);
-  date.setDate(temp.getDate() - 1);
-  return date.getDate();
-};
-
 const getAllDates = (date: Date): Date[] => {
   let dates: Date[] = [];
   let temp = new Date(date);
+
+  const getTotalDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getLastDayInMonth = (date: Date) => {
+    let temp = new Date(date);
+    date.setDate(1);
+    date.setMonth(date.getMonth() + 1);
+    date.setDate(temp.getDate() - 1);
+    return date.getDate();
+  };
 
   for (let i = 1; i <= getTotalDaysInMonth(date); i++) {
     temp.setDate(i);
@@ -228,13 +176,4 @@ const timeSlots = [
   },
 ] as const;
 
-export {
-  cookie,
-  timeSlots,
-  debounce,
-  getMonthName,
-  getDayName,
-  getAllDates,
-  getTotalDaysInMonth,
-  getLastDayInMonth,
-};
+export { cookie, timeSlots, debounce, getAllDates };

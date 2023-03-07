@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toRefs, computed, ref } from "vue";
 import dayjs from "dayjs";
-import { getMonthName, getAllDates } from "@/utils";
+import { getAllDates } from "@/utils";
 
 type DatePickerProps = {
   selectedDate: Date;
@@ -76,9 +76,7 @@ defineExpose({
   <div :class="styles.container">
     <div :class="styles.header">
       <span>{{
-        `${getMonthName(actualDate.getMonth())} ${
-          showYear ? actualDate.getFullYear() : ""
-        }`
+        dayjs(actualDate).format(showYear ? "MMMM YYYY" : "MMMM")
       }}</span>
       <div v-if="showArrow" :class="styles.arrow">
         <i class="bx-chevron-left" @click="handlePrevious"></i>

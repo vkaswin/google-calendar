@@ -8,7 +8,6 @@ import DatePicker from "@/components/DatePicker.vue";
 import EventList from "./EventList.vue";
 import ContextMenu from "./ContextMenu.vue";
 import { getEventByDate } from "@/services/Event";
-import { getDayName } from "@/utils";
 import { CalendarView, EventPopUpType, EventDetail } from "@/types/Event";
 
 type YearCalendarProps = {
@@ -179,7 +178,7 @@ let handleCompleted = ({ _id }: EventDetail) => {
     />
     <div v-if="isOpen" ref="popper" :class="styles.popup">
       <div :class="styles.date">
-        <span>{{ getDayName(selectedDate.getDay()) }}</span>
+        <span>{{ dayjs(selectedDate).format("dddd") }}</span>
         <span :class="styles.highlight">{{ selectedDate.getDate() }}</span>
         <i class="bx-x" @click="toggle"></i>
       </div>

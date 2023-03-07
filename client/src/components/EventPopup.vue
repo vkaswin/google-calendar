@@ -6,7 +6,6 @@ import { toast } from "vue3-toastify";
 import dayjs from "dayjs";
 import usePopper from "@/composables/usePopper";
 import TimeSlot from "./TimeSlot.vue";
-import { getMonthName } from "@/utils";
 import { createEvent } from "@/services/Event";
 import { CalendarView, EventDetail } from "@/types/Event";
 
@@ -23,7 +22,7 @@ let isOpen = ref(false);
 let eventDetail = reactive<EventDetail>({
   date: "",
   description: "",
-  time: undefined,
+  time: NaN,
   title: "",
 });
 
@@ -81,7 +80,7 @@ let reset = () => {
   closePopup();
   eventDetail.date = "";
   eventDetail.description = "";
-  eventDetail.time = undefined;
+  eventDetail.time = NaN;
   eventDetail.title = "";
   $v.value.$reset();
 };
@@ -158,11 +157,7 @@ defineExpose({
           <div>
             <i class="bx-time-five"></i>
             <div v-if="eventDetail">
-              <span v-if="date">{{
-                ` ${getMonthName(
-                  date.getMonth()
-                )} ${date.getDate()}, ${date.getFullYear()}`
-              }}</span>
+              <span v-if="date">{{ dayjs(date).format("MMMM D, YYYY") }}</span>
               <div :class="styles.dropdown">
                 <TimeSlot
                   v-model="eventDetail.time"
