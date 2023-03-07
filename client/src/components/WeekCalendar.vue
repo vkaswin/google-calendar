@@ -130,6 +130,9 @@ let handleNewEvent = (event: EventDetail) => {
       eventList.value[event.date][event.time!] = [event];
     }
   } else {
+    if (!eventList.value[event.date]) {
+      eventList.value[event.date] = {};
+    }
     eventList.value[event.date][event.time!] = [event];
   }
 };

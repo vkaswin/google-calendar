@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
@@ -11,13 +11,28 @@ let router = useRouter();
 
 let route = useRoute();
 
-let eventList = ref<EventDetail[]>([]);
+let isOpen = ref(false);
+
+let isLoading = ref(true);
+
+let eventList = ref<EventDetail[] | null>(null);
 
 let pageMeta = ref<PageMeta | null>(null);
+
+let searchContainer = ref<HTMLElement | null>(null);
+
+let openPopup = () => {
+  isOpen.value = true;
+};
+
+let closePopup = () => {
+  isOpen.value = false;
+};
 
 let handleInput = debounce((event: Event) => {
   let { value } = event.target as HTMLInputElement;
   if (value.trim().length === 0) return;
+  if (!isLoading.value) isLoading.value = true;
   getEvents(value.trim());
 }, 500);
 
@@ -34,6 +49,8 @@ let getEvents = async (search: string, page: number = 1) => {
     pageMeta.value = data.pageMeta;
   } catch (err: any) {
     toast.error(err?.message || "Error");
+  } finally {
+    if (isLoading.value) isLoading.value = false;
   }
 };
 
@@ -48,11 +65,24 @@ let handleClick = (date: string) => {
 </script>
 
 <template>
-  <div :class="styles.container">
+  <div
+    ref="searchContainer"
+    :tabindex="-1"
+    :class="styles.container"
+    @focusin="openPopup"
+    @focusout="closePopup"
+  >
     <input placeholder="Search by title" @input="handleInput" />
     <i className="bx-search"></i>
-    <div :class="styles.events">
+    <div v-if="isOpen && eventList" :class="styles.events">
+      <div v-if="isLoading" :class="styles.msg">
+        <span>Loading...</span>
+      </div>
+      <div v-else-if="eventList.length === 0" :class="styles.msg">
+        <span>No events found</span>
+      </div>
       <div
+        v-else
         v-for="{ _id, date, title, time } in eventList"
         :key="_id"
         :class="styles.card"
@@ -79,26 +109,13 @@ let handleClick = (date: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  //   &:has(input:not(:focus)) {
-  //     .events {
-  //       display: none;
-  //     }
-  //     input {
-  //       border-radius: 8px;
-  //     }
-  //   }
-  //   &:has(.events:empty) {
-  //     input {
-  //       border-radius: 8px;
-  //     }
-  //   }
   input {
     height: 45px;
     max-width: 768px;
     width: 100%;
     background: #f1f3f4;
     border: 1px solid transparent;
-    border-radius: 8px 8px 0px 0px;
+    border-radius: 8px;
     padding: 0px 40px 0px 15px;
     outline: none;
     &:focus {
@@ -134,6 +151,7 @@ let handleClick = (date: string) => {
     overflow-y: auto;
     z-index: 2;
     border-radius: 0px 0px 8px 8px;
+    background-color: #fff;
     box-shadow: 0 1px 1px 0 rgba(65, 69, 73, 0.3),
       0 1px 3px 1px rgba(65, 69, 73, 0.15);
     &:not(:empty) {
@@ -149,6 +167,12 @@ let handleClick = (date: string) => {
     &::-webkit-scrollbar-thumb {
       background: #bec1c6;
       border-radius: 10px;
+    }
+    .msg {
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+      font-size: 14px;
     }
     .card {
       position: relative;

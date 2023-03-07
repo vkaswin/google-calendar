@@ -94,14 +94,7 @@ let handleSubmit = async () => {
       data: { message, data },
     } = await createEvent({ ...eventDetail });
     reset();
-    handleNewEvent.value?.({
-      _id: data._id,
-      time: data.time,
-      title: data.title,
-      description: data.description,
-      completed: data.completed,
-      date: dayjs(data.date).format("YYYY-MM-DD"),
-    });
+    handleNewEvent.value?.(data);
     toast.success(message);
   } catch (err: any) {
     toast.error(err?.message || "Error");
