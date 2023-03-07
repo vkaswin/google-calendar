@@ -1,6 +1,6 @@
 import axios from "./axios";
 import { Event } from "./config";
-import { DateParams, EventDetail, EventTime } from "@/types/Event";
+import { DateParams, EventDetail, EventTime, PageMeta } from "@/types/Event";
 
 const createEvent = (data: EventDetail) => {
   return axios<{ message: string; data: EventDetail }>({
@@ -46,4 +46,19 @@ const getEventByDate = <T extends "week" | "month" | "year">(
   });
 };
 
-export { createEvent, deleteEvent, updateEvent, getEventByDate };
+const searchEvents = (params: {
+  search: string;
+  page: number;
+  limit: number;
+}) => {
+  return axios<{
+    message: string;
+    data: { list: EventDetail[]; pageMeta: PageMeta };
+  }>({
+    url: Event.search,
+    method: "get",
+    params,
+  });
+};
+
+export { createEvent, deleteEvent, updateEvent, getEventByDate, searchEvents };

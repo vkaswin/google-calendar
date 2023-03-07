@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Event from "../models/event";
 import { EventSchema } from "../schema/event";
 import { asyncHandler } from "../utils/asyncHandler";
+import { getPagination } from "../utils";
 
 const createEvent = asyncHandler(async (req, res) => {
   let body = EventSchema.parse(req.body);
@@ -95,4 +96,29 @@ let getEventByDate = asyncHandler(async (req, res) => {
   res.status(200).send({ data, message: "Success" });
 });
 
-export { createEvent, updateEvent, deleteEvent, getEventByDate };
+let searchEvents = asyncHandler(async (req, res) => {
+  let {
+    query: { search, limit = 25, page = 1 },
+    user,
+  } = req;
+
+  limit = +limit;
+  page = +page;
+
+  let query = {
+    userId: user._id,
+    title: { $regex: search, $options: "i" },
+  };
+
+  let total = await Event.find(query).countDocuments();
+
+  let list = await Event.find(query)
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  let data = getPagination({ list, limit, page, total });
+
+  res.status(200).send({ data, message: "Success" });
+});
+
+export { createEvent, updateEvent, deleteEvent, getEventByDate, searchEvents };

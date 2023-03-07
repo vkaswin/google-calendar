@@ -4,6 +4,7 @@ import {
   getEventByDate,
   updateEvent,
   deleteEvent,
+  searchEvents,
 } from "../controllers/event";
 import verifyToken from "../middlewares/verifyToken";
 
@@ -12,6 +13,7 @@ const router = Router();
 router.use(verifyToken);
 
 router.get("/date", getEventByDate);
+router.get("/search", searchEvents);
 
 router.post("/create", createEvent);
 

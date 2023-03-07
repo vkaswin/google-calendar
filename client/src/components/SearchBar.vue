@@ -1,8 +1,40 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from "vue";
+import { debounce } from "@/utils";
+import { toast } from "vue3-toastify";
+import { searchEvents } from "@/services/Event";
+import { EventDetail, PageMeta } from "@/types/Event";
+
+let eventList = ref<EventDetail[]>([]);
+let pageMeta = ref<PageMeta | null>(null);
+
+let handleInput = debounce((event: Event) => {
+  let { value } = event.target as HTMLInputElement;
+  if (value.trim().length === 0) return;
+  getEvents(value.trim());
+}, 500);
+
+let getEvents = async (search: string, page: number = 1) => {
+  try {
+    let {
+      data: { data },
+    } = await searchEvents({
+      search,
+      page,
+      limit: 10,
+    });
+    eventList.value = data.list;
+    pageMeta.value = data.pageMeta;
+    console.log(data);
+  } catch (err: any) {
+    toast.error(err?.message || "Error");
+  }
+};
+</script>
 
 <template>
   <div :class="styles.container">
-    <input placeholder="Search" />
+    <input placeholder="Search by title" @input="handleInput" />
     <i className="bx-search"></i>
   </div>
 </template>

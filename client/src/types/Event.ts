@@ -55,3 +55,10 @@ export type EventByDateAndTime = Record<
 >;
 
 export type EventByDate = Record<string, EventDetail[]>;
+
+export type PageMeta = {
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+};

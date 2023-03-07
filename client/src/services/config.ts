@@ -16,6 +16,7 @@ const Event = {
   getByDate: `${eventUrl}/date`,
   delete: (id: string) => `${eventUrl}/${id}/remove`,
   update: (id: string) => `${eventUrl}/${id}/edit`,
+  search: `${eventUrl}/search`,
 };
 
 export { User, Event };
