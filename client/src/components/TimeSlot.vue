@@ -3,11 +3,11 @@ import { toRefs } from "vue";
 import { timeSlots } from "@/utils";
 
 type TimeSlotProps = {
-  defaultValue?: string;
+  defaultValue?: number;
 };
 
 type TimeSlotEmits = {
-  (event: "update:modelValue", value: string): void;
+  (event: "update:modelValue", value: number): void;
 };
 
 let emit = defineEmits<TimeSlotEmits>();
@@ -21,9 +21,13 @@ let { defaultValue } = toRefs(props);
   <div :class="styles.container">
     <select
       :value="defaultValue"
-      @input="({ target }) => emit('update:modelValue', (target as HTMLSelectElement).value)"
+      @input="({ target }) => emit('update:modelValue', parseInt((target as HTMLSelectElement).value))"
     >
-      <option v-for="({ time }, index) in timeSlots" :key="index" :value="time">
+      <option
+        v-for="({ time }, index) in timeSlots"
+        :key="index"
+        :value="index"
+      >
         {{ time }}
       </option>
     </select>

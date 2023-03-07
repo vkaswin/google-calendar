@@ -111,7 +111,7 @@ watch(placement, (placement) => {
   }
 });
 
-let handleTimeChange = (time: string) => {
+let handleTimeChange = (time: number) => {
   if (view.value !== "day" && view.value !== "week") return;
 
   let date = new Date(eventDetail.date);

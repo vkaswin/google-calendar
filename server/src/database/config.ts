@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import event from "../models/event";
 
 const connect = async () => {
   mongoose.set("strictQuery", true);

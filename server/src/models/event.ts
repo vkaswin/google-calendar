@@ -18,7 +18,7 @@ const eventSchema = new mongoose.Schema(
       type: String,
     },
     time: {
-      type: String,
+      type: Number,
     },
     completed: {
       type: Boolean,

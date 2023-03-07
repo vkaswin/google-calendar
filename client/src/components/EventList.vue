@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from "vue";
+import { timeSlots } from "@/utils";
 import { EventDetail } from "@/types/Event";
 
 type EventListProps = {
@@ -38,7 +39,9 @@ let { events } = toRefs(props);
     <template v-else>
       <div :class="styles.time">
         <i class="bxs-circle"></i>
-        <span :class="[event.completed && styles.strike]">12PM</span>
+        <span :class="[event.completed && styles.strike]">{{
+          timeSlots[event.time].label
+        }}</span>
       </div>
       <div :class="styles.title">
         <i class="bx-check-circle"></i>
@@ -100,6 +103,7 @@ let { events } = toRefs(props);
       color: rgb(60, 64, 67);
       font-size: 11px;
       min-width: 30px;
+      text-transform: lowercase;
     }
     i {
       color: #4185f4;

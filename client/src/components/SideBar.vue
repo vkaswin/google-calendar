@@ -2,7 +2,6 @@
 import { toRefs, ref, inject } from "vue";
 import dayjs from "dayjs";
 import DatePicker from "@/components/DatePicker.vue";
-import { timeSlots } from "@/utils";
 import { CalendarView, EventPopUpType } from "@/types/Event";
 
 type SideBarProps = {
@@ -30,7 +29,7 @@ let handlePopup = () => {
   let element: HTMLElement;
   let date = dayjs(selectedDate.value).format("YYYY-MM-DD");
   if (view.value === "week" || view.value === "day") {
-    let time = timeSlots[new Date().getHours()].time;
+    let time = new Date().getHours();
     eventPopup.value.eventDetail.time = time;
     element = eventPopup.value.container?.querySelector(
       `[data-date='${date}'][data-time='${time}']`

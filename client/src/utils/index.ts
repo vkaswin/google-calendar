@@ -1,5 +1,3 @@
-import { TimeSlots } from "@/types/Event";
-
 const cookie = {
   set: <T>({
     name,
@@ -131,7 +129,7 @@ const getAllDates = (date: Date): Date[] => {
   return dates;
 };
 
-const timeSlots: TimeSlots = [
+const timeSlots = [
   {
     time: "12:00 PM - 1:00 AM",
     label: "12 PM",
@@ -228,7 +226,7 @@ const timeSlots: TimeSlots = [
     time: "11:00 PM - 12:00 PM",
     label: "11 PM",
   },
-];
+] as const;
 
 export {
   cookie,

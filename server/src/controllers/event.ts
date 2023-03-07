@@ -44,6 +44,12 @@ let getEventByDate = asyncHandler(async (req, res) => {
         },
       },
     },
+    {
+      $sort: {
+        date: 1,
+        time: 1,
+      },
+    },
     ...(type !== "year"
       ? [
           {

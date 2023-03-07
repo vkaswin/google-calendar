@@ -21,7 +21,6 @@ import {
   EventPopUpType,
   DateParams,
   EventDetail,
-  EventTime,
   EventByDateAndTime,
 } from "@/types/Event";
 
@@ -103,7 +102,7 @@ let getEvents = async (params: DateParams) => {
       }
       return obj;
     }, {} as any) as EventByDateAndTime;
-
+    console.log(events);
     eventList.value = events;
   } catch (err: any) {
     toast.error(err?.message || "Error");
@@ -199,7 +198,7 @@ onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-let handleEvent = (value: Date, time: EventTime) => {
+let handleEvent = (value: Date, time: number) => {
   if (!calendarContainer.value) return;
 
   let date = dayjs(value).format("YYYY-MM-DD");
@@ -301,18 +300,18 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
           v-for="column in columns"
           :key="column"
           :data-date="dayjs(dates[column - 1]).format('YYYY-MM-DD')"
-          :data-time="time"
-          @click="handleEvent(dates[column - 1], time)"
+          :data-time="index"
+          @click="handleEvent(dates[column - 1], index)"
         >
           <EventList
             v-if="
               eventList[dayjs(dates?.[column - 1])?.format('YYYY-MM-DD')]?.[
-                time
+                index
               ]
             "
             type="week"
             :events="
-              eventList[dayjs(dates[column - 1]).format('YYYY-MM-DD')][time]
+              eventList[dayjs(dates[column - 1]).format('YYYY-MM-DD')][index]
             "
             @on-click="handleViewEvent"
             @on-context-menu="handleContextMenu"
@@ -322,7 +321,7 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
               eventPopup?.isOpen &&
               eventPopup?.eventDetail.date ===
                 dayjs(dates[column - 1]).format('YYYY-MM-DD') &&
-              eventPopup?.eventDetail.time == time
+              eventPopup?.eventDetail.time == index
             "
             :class="styles.event_card"
           >

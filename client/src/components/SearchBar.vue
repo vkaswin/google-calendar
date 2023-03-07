@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
 import { searchEvents } from "@/services/Event";
-import { debounce } from "@/utils";
+import { debounce, timeSlots } from "@/utils";
 import { EventDetail, PageMeta } from "@/types/Event";
 
 let router = useRouter();
@@ -90,12 +90,13 @@ let handleClick = (date: string) => {
       >
         <img
           :src="`${$publicPath}images/dates/${dayjs(date).get('date')}.png`"
+          alt=""
         />
         <div :class="styles.content">
           <span :class="styles.title">{{ title }}</span>
           <div :class="styles.date">
             <span>{{ dayjs(date).format("ddd MMM D, YYYY") }}</span>
-            <span>{{ time }}</span>
+            <span>{{ timeSlots[time].time }}</span>
           </div>
         </div>
       </div>
@@ -147,7 +148,7 @@ let handleClick = (date: string) => {
     width: 100%;
     top: 100%;
     left: 0px;
-    max-height: 249px;
+    max-height: 256px;
     overflow-y: auto;
     z-index: 2;
     border-radius: 0px 0px 8px 8px;
@@ -227,6 +228,9 @@ let handleClick = (date: string) => {
           gap: 5px;
           span {
             font-size: 12px;
+            &:last-child {
+              text-transform: lowercase;
+            }
           }
         }
       }

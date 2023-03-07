@@ -163,7 +163,7 @@ let handleSubmit = async () => {
       </div>
     </div>
     <div :class="styles.poster">
-      <img :src="`${$publicPath}images/account.svg`" />
+      <img :src="`${$publicPath}images/account.svg`" alt="" />
     </div>
   </div>
 </template>
