@@ -109,43 +109,37 @@ let getEvents = async (params: DateParams) => {
   }
 };
 
-watchEffect(() => {
-  let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
-  let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
-  getEvents({ startDate, endDate });
-});
-
-watchEffect(() => {
-  if (!eventPopup?.value) return;
-  eventPopup.value.placement = view.value === "day" ? "bottom" : "left";
-});
-
 let handleNewEvent = (event: EventDetail) => {
   if (eventList.value[event.date]) {
-    let events = eventList.value[event.date][event.time!];
+    let events = eventList.value[event.date][event.time];
     if (events) {
       events.push(event);
     } else {
-      eventList.value[event.date][event.time!] = [event];
+      eventList.value[event.date][event.time] = [event];
     }
   } else {
     if (!eventList.value[event.date]) {
       eventList.value[event.date] = {};
     }
-    eventList.value[event.date][event.time!] = [event];
+    eventList.value[event.date][event.time] = [event];
   }
 };
 
-onMounted(() => {
-  window.addEventListener("resize", handleIndicator);
-  handleIndicator();
-  intervalId = setInterval(updateIndicatorPosition, 60000);
+let handleUpdateEvent = (event: EventDetail) => {
+  let events = eventList.value[event.date][event.time];
+  if (!events) return;
+  let index = events.findIndex(({ _id }) => _id === event._id);
+  if (index === -1) return;
+  events[index] = { ...events[index], ...event };
+};
 
-  if (!eventPopup || !calendarContainer.value) return;
-
-  eventPopup.value.container = calendarContainer.value;
-  eventPopup.value.handleNewEvent = handleNewEvent;
-});
+let handleDeleteEvent = ({ _id, time, date }: EventDetail) => {
+  let events = eventList.value[date][time];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events.splice(index, 1);
+};
 
 const updateIndicatorPosition = () => {
   if (!indicator.value) return;
@@ -185,45 +179,8 @@ const handleIndicator = () => {
   updateIndicatorPosition();
 };
 
-watch(
-  [view, selectedDate],
-  () => {
-    handleIndicator();
-  },
-  { flush: "post" }
-);
-
-onUnmounted(() => {
-  window.removeEventListener("resize", handleIndicator);
-  clearInterval(intervalId);
-});
-
-let handleEvent = (value: Date, time: number) => {
-  if (!calendarContainer.value) return;
-
-  let date = dayjs(value).format("YYYY-MM-DD");
-  let element = calendarContainer.value.querySelector(
-    `[data-date='${date}'][data-time='${time}']`
-  ) as HTMLElement;
-
-  if (!eventPopup?.value) return;
-
-  eventPopup.value.reference = element;
-  eventPopup.value.eventDetail.date = date;
-  eventPopup.value.eventDetail.time = time;
-
-  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
-};
-
 let handleViewChange = (date: Date) => {
   if (view.value === "week") emit("onChange", date, "day");
-};
-
-let handleViewEvent = (event: EventDetail) => {
-  console.log(
-    "🚀 ~ file: WeekCalendar.vue:203 ~ handleViewEvent ~ event:",
-    event
-  );
 };
 
 let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
@@ -247,27 +204,80 @@ let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
   contextMenu.value.eventDetail = event;
 };
 
-let handleDelete = ({ _id, time, date }: EventDetail) => {
-  let events = eventList.value[date][time!];
-  if (!events) return;
-  let index = events.findIndex((event) => _id === event._id);
-  if (index === -1) return;
-  events.splice(index, 1);
+let handleTimeChange = (time?: number) => {
+  if (!eventPopup?.value || !time) return;
+
+  let element = eventPopup.value.container?.querySelector<HTMLElement>(
+    `[data-date='${dayjs(eventPopup.value.eventDetail.date).format(
+      "YYYY-MM-DD"
+    )}'][data-time='${time}']`
+  );
+
+  if (!element) return;
+
+  eventPopup.value.reference = element;
+  element?.scrollIntoView({ behavior: "smooth", inline: "center" });
 };
 
-let handleCompleted = ({ _id, time, date }: EventDetail) => {
-  let events = eventList.value[date][time!];
+let handleCompletedEvent = ({ _id, time, date }: EventDetail) => {
+  let events = eventList.value[date][time];
   if (!events) return;
   let index = events.findIndex((event) => _id === event._id);
   if (index === -1) return;
   events[index].completed = true;
 };
+
+let handleClickDate = (date: string, time: number) => {
+  if (!eventPopup?.value) return;
+
+  eventPopup.value.eventDetail.date = date;
+  eventPopup.value.eventDetail.time = time;
+
+  if (eventPopup.value.isReadOnly) eventPopup.value.isReadOnly = false;
+
+  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
+};
+
+watchEffect(() => {
+  let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
+  let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
+  getEvents({ startDate, endDate });
+});
+
+watchEffect(() => {
+  if (!eventPopup?.value) return;
+  eventPopup.value.placement = view.value === "day" ? "bottom" : "left";
+});
+
+watch([view, selectedDate], handleIndicator, { flush: "post" });
+
+watch(() => eventPopup?.value?.eventDetail?.time, handleTimeChange, {
+  flush: "post",
+});
+
+onMounted(() => {
+  window.addEventListener("resize", handleIndicator);
+  handleIndicator();
+  intervalId = setInterval(updateIndicatorPosition, 60000);
+
+  if (!eventPopup || !calendarContainer.value) return;
+
+  eventPopup.value.container = calendarContainer.value;
+  eventPopup.value.handleNewEvent = handleNewEvent;
+  eventPopup.value.handleDeleteEvent = handleDeleteEvent;
+  eventPopup.value.handleUpdateEvent = handleUpdateEvent;
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleIndicator);
+  clearInterval(intervalId);
+});
 </script>
 
 <template>
   <div :class="styles.container" :data-view="view">
     <div :class="styles.week_section">
-      <div :class="styles.title">
+      <div>
         <span>GMT+05:30</span>
       </div>
       <div
@@ -275,8 +285,10 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
         :key="index"
         :class="[
           styles.week,
-          dayjs().format('YYYY-MM-DD') === dayjs(date).format('YYYY-MM-DD') &&
-            styles.highlight,
+          dayjs().format('YYYY-MM-DD') === dayjs(date).format('YYYY-MM-DD')
+            ? styles.highlight
+            : dayjs(date).format('YYYY-MM-DD') ===
+                dayjs(selectedDate).format('YYYY-MM-DD') && styles.active,
         ]"
         @click="handleViewChange(date)"
       >
@@ -301,7 +313,12 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
           :key="column"
           :data-date="dayjs(dates[column - 1]).format('YYYY-MM-DD')"
           :data-time="index"
-          @click="handleEvent(dates[column - 1], index)"
+          @click="
+            handleClickDate(
+              dayjs(dates[column - 1]).format('YYYY-MM-DD'),
+              index
+            )
+          "
         >
           <EventList
             v-if="
@@ -313,12 +330,12 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
             :events="
               eventList[dayjs(dates[column - 1]).format('YYYY-MM-DD')][index]
             "
-            @on-click="handleViewEvent"
             @on-context-menu="handleContextMenu"
           />
           <div
             v-if="
               eventPopup?.isOpen &&
+              !eventPopup.isReadOnly &&
               eventPopup?.eventDetail.date ===
                 dayjs(dates[column - 1]).format('YYYY-MM-DD') &&
               eventPopup?.eventDetail.time == index
@@ -344,8 +361,8 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
   </div>
   <ContextMenu
     ref="contextMenu"
-    @on-completed="handleCompleted"
-    @on-delete="handleDelete"
+    @on-completed="handleCompletedEvent"
+    @on-delete="handleDeleteEvent"
   />
 </template>
 
@@ -387,6 +404,12 @@ let handleCompleted = ({ _id, time, date }: EventDetail) => {
         height: 25px;
         width: 1px;
         background-color: var(--light-gray);
+      }
+      &:is(.active) {
+        span:last-child {
+          background-color: #afcbfa;
+          color: #185abc;
+        }
       }
       &:is(.highlight) {
         span {

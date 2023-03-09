@@ -28,17 +28,15 @@ let handlePopup = () => {
 
   let element: HTMLElement;
   let date = dayjs(selectedDate.value).format("YYYY-MM-DD");
+  let time: number | undefined = undefined;
   if (view.value === "week" || view.value === "day") {
-    let time = new Date().getHours();
+    time = new Date().getHours();
     eventPopup.value.eventDetail.time = time;
-    element = eventPopup.value.container?.querySelector(
-      `[data-date='${date}'][data-time='${time}']`
-    ) as HTMLElement;
-  } else {
-    element = eventPopup.value.container?.querySelector(
-      `[data-date='${date}']`
-    ) as HTMLElement;
   }
+
+  element = eventPopup.value.container?.querySelector(
+    `[data-date='${date}']${time ? `[data-time='${time}']` : ""}`
+  ) as HTMLElement;
 
   eventPopup.value.eventDetail.date = date;
   eventPopup.value.reference = element;

@@ -9,14 +9,6 @@ type UseClickOutSide = (
 const useClickOutSide: UseClickOutSide = (element, cb, handler) => {
   let isEventAttached = false;
 
-  watch(element, (element) => {
-    if (!element || isEventAttached) return;
-    setTimeout(() => {
-      document.addEventListener("pointerdown", handlePointerDown);
-      isEventAttached = true;
-    }, 0);
-  });
-
   let removeClickEvent = () => {
     if (!isEventAttached) return;
     document.removeEventListener("pointerdown", handlePointerDown);
@@ -29,6 +21,14 @@ const useClickOutSide: UseClickOutSide = (element, cb, handler) => {
     removeClickEvent();
     cb();
   };
+
+  watch(element, (element) => {
+    if (!element || isEventAttached) return;
+    setTimeout(() => {
+      document.addEventListener("pointerdown", handlePointerDown);
+      isEventAttached = true;
+    }, 0);
+  });
 
   onUnmounted(removeClickEvent);
 

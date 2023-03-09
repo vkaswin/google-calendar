@@ -165,6 +165,7 @@ defineExpose({
       }
       &:is(.in_active) {
         color: #70757a;
+        cursor: default;
       }
       &:hover:not(.highlight, .active) {
         background-color: #f1f3f4;

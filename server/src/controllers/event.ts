@@ -20,10 +20,8 @@ let deleteEvent = asyncHandler(async (req, res) => {
 
 let updateEvent = asyncHandler(async (req, res) => {
   let { body, params } = req;
-  let data = await Event.findByIdAndUpdate(params.id, body);
-  res
-    .status(200)
-    .send({ data, message: "Event has been updated successfully" });
+  await Event.findByIdAndUpdate(params.id, body);
+  res.status(200).send({ message: "Event has been updated successfully" });
 });
 
 let getEventByDate = asyncHandler(async (req, res) => {

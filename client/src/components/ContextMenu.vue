@@ -29,9 +29,7 @@ let reference = ref({
 });
 let eventDetail = ref<EventDetail | null>(null);
 
-let clear = () => {
-  eventDetail.value = null;
-};
+usePopper(reference as Ref<VirtualElement>, popper);
 
 let handleCompleted = async () => {
   if (!eventDetail.value || !eventDetail.value._id) return;
@@ -63,7 +61,9 @@ let handleDelete = async () => {
   }
 };
 
-usePopper(reference as Ref<VirtualElement>, popper);
+let clear = () => {
+  eventDetail.value = null;
+};
 
 let unRegister = useClickOutSide(popper, clear, (event) => {
   if (!popper.value) return;

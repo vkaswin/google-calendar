@@ -68,14 +68,6 @@ let rules = {
 
 const $v = useVuelidate(rules, formState);
 
-onMounted(() => {
-  document.addEventListener("keydown", handleKeyDown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeyDown);
-});
-
 let handleKeyDown = (event: KeyboardEvent) => {
   if (event.key === "Enter") handleSubmit();
 };
@@ -94,6 +86,14 @@ let handleSubmit = async () => {
 
   signUp(data);
 };
+
+onMounted(() => {
+  document.addEventListener("keydown", handleKeyDown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeyDown);
+});
 </script>
 
 <template>

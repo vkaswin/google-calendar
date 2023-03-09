@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
+import { toRefs, inject } from "vue";
 import { timeSlots } from "@/utils";
-import { EventDetail } from "@/types/Event";
+import { EventDetail, EventPopUpType } from "@/types/Event";
 
 type EventListProps = {
   events?: EventDetail[];
@@ -18,6 +18,22 @@ let props = defineProps<EventListProps>();
 let emit = defineEmits<EventListEmits>();
 
 let { events } = toRefs(props);
+
+let eventPopup = inject<EventPopUpType>("eventPopup");
+
+let handleViewEvent = (event: EventDetail) => {
+  if (!eventPopup?.value) return;
+
+  if (!eventPopup.value.isReadOnly) eventPopup.value.isReadOnly = true;
+
+  eventPopup.value.eventDetail._id = event._id;
+  eventPopup.value.eventDetail.time = event.time;
+  eventPopup.value.eventDetail.date = event.date;
+  eventPopup.value.eventDetail.title = event.title;
+  eventPopup.value.eventDetail.description = event.description;
+
+  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
+};
 </script>
 
 <template>
@@ -25,9 +41,10 @@ let { events } = toRefs(props);
     v-for="event in events"
     :class="styles.card"
     :key="event._id"
-    @click.stop="emit('onClick', event)"
+    @click.stop="handleViewEvent(event)"
     @contextmenu.prevent="(e) => emit('onContextMenu', e, event)"
     :data-type="type"
+    :data-event-id="event._id"
     tabindex="-1"
   >
     <template v-if="type === 'week'">
@@ -102,7 +119,7 @@ let { events } = toRefs(props);
       display: block;
       color: rgb(60, 64, 67);
       font-size: 11px;
-      min-width: 30px;
+      min-width: 32px;
       text-transform: lowercase;
     }
     i {

@@ -1,10 +1,16 @@
 import { Ref } from "vue";
 import EventPopup from "@/components/EventPopup.vue";
 
+declare module "vue" {
+  interface ComponentCustomProperties {
+    $publicPath?: string;
+  }
+}
+
 export type CalendarView = "day" | "week" | "month" | "year";
 
 export type EventDetail = {
-  readonly _id?: string;
+  _id?: string;
   date: string;
   description: string;
   time: number;

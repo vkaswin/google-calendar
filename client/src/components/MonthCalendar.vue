@@ -68,39 +68,30 @@ let handleNewEvent = (event: EventDetail) => {
   }
 };
 
-onMounted(() => {
-  if (!eventPopup?.value || !calendarContainer.value) return;
-  eventPopup.value.container = calendarContainer.value;
-  eventPopup.value.handleNewEvent = handleNewEvent;
-});
-
-watchEffect(() => {
-  let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
-  let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
-  getEvents({ startDate, endDate });
-});
-
-let handleEvent = (value: Date) => {
-  if (!calendarContainer.value) return;
-
-  let date = dayjs(value).format("YYYY-MM-DD");
-  let element = calendarContainer.value.querySelector(
-    `[data-date='${dayjs(date).format("YYYY-MM-DD")}']`
-  ) as HTMLElement;
-
-  if (!eventPopup?.value) return;
-
-  eventPopup.value.reference = element;
-  eventPopup.value.eventDetail.date = date;
-
-  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
+let handleDeleteEvent = ({ _id, date }: EventDetail) => {
+  let events = eventList.value[date];
+  if (!events) return;
+  let index = events.findIndex((event) => _id === event._id);
+  if (index === -1) return;
+  events.splice(index, 1);
 };
 
-let handleViewEvent = (event: EventDetail) => {
-  console.log(
-    "🚀 ~ file: MonthCalendar.vue:71 ~ handleViewEvent ~ event:",
-    event
-  );
+let handleUpdateEvent = (event: EventDetail) => {
+  let events = eventList.value[event.date];
+  if (!events) return;
+  let index = events.findIndex(({ _id }) => _id === event._id);
+  if (index === -1) return;
+  events[index] = { ...events[index], ...event };
+};
+
+let handleClickDate = (date: string) => {
+  if (!eventPopup?.value) return;
+
+  eventPopup.value.eventDetail.date = date;
+
+  if (eventPopup.value.isReadOnly) eventPopup.value.isReadOnly = false;
+
+  if (!eventPopup.value.isOpen) eventPopup.value.openPopup();
 };
 
 let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
@@ -124,21 +115,27 @@ let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
   contextMenu.value.eventDetail = event;
 };
 
-let handleDelete = ({ _id, date }: EventDetail) => {
-  let events = eventList.value[date];
-  if (!events) return;
-  let index = events.findIndex((event) => _id === event._id);
-  if (index === -1) return;
-  events.splice(index, 1);
-};
-
-let handleCompleted = ({ _id, date }: EventDetail) => {
+let handleCompletedEvent = ({ _id, date }: EventDetail) => {
   let events = eventList.value[date];
   if (!events) return;
   let index = events.findIndex((event) => _id === event._id);
   if (index === -1) return;
   events[index].completed = true;
 };
+
+watchEffect(() => {
+  let startDate = dayjs(dates.value[0]).format("YYYY-MM-DD");
+  let endDate = dayjs(dates.value[dates.value.length - 1]).format("YYYY-MM-DD");
+  getEvents({ startDate, endDate });
+});
+
+onMounted(() => {
+  if (!eventPopup?.value || !calendarContainer.value) return;
+  eventPopup.value.container = calendarContainer.value;
+  eventPopup.value.handleNewEvent = handleNewEvent;
+  eventPopup.value.handleDeleteEvent = handleDeleteEvent;
+  eventPopup.value.handleUpdateEvent = handleUpdateEvent;
+});
 </script>
 
 <template>
@@ -148,7 +145,7 @@ let handleCompleted = ({ _id, date }: EventDetail) => {
       :key="index"
       :class="styles.date_slot"
       :data-date="dayjs(date).format('YYYY-MM-DD')"
-      @click="handleEvent(date)"
+      @click="handleClickDate(dayjs(date).format('YYYY-MM-DD'))"
     >
       <div :class="styles.header">
         <span v-if="index <= 6" :class="styles.week">{{
@@ -172,7 +169,6 @@ let handleCompleted = ({ _id, date }: EventDetail) => {
           v-if="eventList?.[dayjs(date).format('YYYY-MM-DD')]"
           :events="eventList?.[dayjs(date).format('YYYY-MM-DD')]"
           type="month"
-          @on-click="handleViewEvent"
           @on-context-menu="handleContextMenu"
         />
       </div>
@@ -180,8 +176,8 @@ let handleCompleted = ({ _id, date }: EventDetail) => {
   </div>
   <ContextMenu
     ref="contextMenu"
-    @on-completed="handleCompleted"
-    @on-delete="handleDelete"
+    @on-completed="handleCompletedEvent"
+    @on-delete="handleDeleteEvent"
   />
 </template>
 

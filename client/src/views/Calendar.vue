@@ -49,24 +49,6 @@ let eventPopup = ref({} as EventPopUpType);
 
 provide("eventPopup", eventPopup);
 
-watch(
-  () => route.query,
-  ({ view = "week", date = dayjs().format("YYYY-MM-DD") }) => {
-    if (dayjs(selectedDate.value).format("YYYY-MM-DD") !== date) {
-      selectedDate.value = new Date(date as string);
-    }
-
-    if (calendarView.value !== view) {
-      calendarView.value = view as CalendarView;
-    }
-
-    if (eventPopup.value) {
-      if (eventPopup.value.isOpen) eventPopup.value.reset();
-      eventPopup.value.placement = view === "day" ? "bottom" : "left";
-    }
-  }
-);
-
 let reset = () => {
   let date = new Date();
   sideBar.value?.datePicker?.setCurrentDate(date);
@@ -158,6 +140,54 @@ let handleViewChange = (view: CalendarView) => {
     },
   });
 };
+
+watch(
+  () => route.query,
+  ({ view = "week", date = dayjs().format("YYYY-MM-DD") }) => {
+    if (dayjs(selectedDate.value).format("YYYY-MM-DD") !== date) {
+      selectedDate.value = new Date(date as string);
+    }
+
+    if (calendarView.value !== view) {
+      calendarView.value = view as CalendarView;
+    }
+
+    if (eventPopup.value) {
+      if (eventPopup.value.isOpen) eventPopup.value.reset();
+      eventPopup.value.placement = view === "day" ? "bottom" : "left";
+    }
+  }
+);
+
+watch(
+  () => eventPopup?.value?.eventDetail?.date,
+  (date) => {
+    if (date && eventPopup.value && eventPopup.value.isOpen)
+      selectedDate.value = new Date(date);
+  }
+);
+
+watch(
+  selectedDate,
+  (selectedDate) => {
+    if (!eventPopup.value || !eventPopup.value.isOpen) return;
+
+    let date = dayjs(selectedDate).format("YYYY-MM-DD");
+
+    let element = eventPopup.value.container?.querySelector<HTMLElement>(
+      `[data-date='${date}']${
+        calendarView.value === "week" || calendarView.value === "day"
+          ? `[data-time='${eventPopup.value.eventDetail.time}']`
+          : ""
+      }`
+    );
+
+    if (!element) return;
+
+    eventPopup.value.reference = element;
+  },
+  { flush: "post" }
+);
 </script>
 
 <template>

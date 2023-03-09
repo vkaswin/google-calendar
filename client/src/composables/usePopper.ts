@@ -16,12 +16,6 @@ type UsePopper = (
 const usePopper: UsePopper = (reference, popper, options) => {
   let popperInstance = ref<Instance | null>(null);
 
-  onUnmounted(() => {
-    if (!popperInstance.value) return;
-
-    popperInstance.value.destroy();
-  });
-
   watch(
     [reference, popper],
     ([newReference, newPopper], [oldReference, oldPopper]) => {
@@ -41,6 +35,12 @@ const usePopper: UsePopper = (reference, popper, options) => {
     },
     { flush: "post" }
   );
+
+  onUnmounted(() => {
+    if (!popperInstance.value) return;
+
+    popperInstance.value.destroy();
+  });
 
   return popperInstance;
 };

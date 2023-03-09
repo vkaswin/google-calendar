@@ -40,11 +40,6 @@ let isLoading = ref(true);
 
 let eventPopup = inject<EventPopUpType>("eventPopup");
 
-onMounted(() => {
-  if (!eventPopup || !calendarContainer.value) return;
-  eventPopup.value.container = calendarContainer.value;
-});
-
 usePopper(reference, popper, {
   placement: "bottom",
   modifiers: [
@@ -113,25 +108,6 @@ let toggle = () => {
   isOpen.value = !isOpen.value;
 };
 
-let unRegister = useClickOutSide(popper, toggle, (event) => {
-  if (!popper.value) return;
-
-  let element = event.target as HTMLElement;
-
-  return !popper.value.contains(element) && !element.hasAttribute("data-date");
-});
-
-watch(isOpen, (isOpen) => {
-  if (!isOpen) unRegister();
-});
-
-let handleViewEvent = (event: EventDetail) => {
-  console.log(
-    "🚀 ~ file: WeekCalendar.vue:203 ~ handleViewEvent ~ event:",
-    event
-  );
-};
-
 let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
   if (!contextMenu.value) return;
 
@@ -153,17 +129,34 @@ let handleContextMenu = ({ x, y }: MouseEvent, event: EventDetail) => {
   contextMenu.value.eventDetail = event;
 };
 
-let handleDelete = ({ _id }: EventDetail) => {
+let handleDeleteEvent = ({ _id }: EventDetail) => {
   let index = eventList.value.findIndex((event) => _id === event._id);
   if (index === -1) return;
   eventList.value.splice(index, 1);
 };
 
-let handleCompleted = ({ _id }: EventDetail) => {
+let handleCompletedEvent = ({ _id }: EventDetail) => {
   let index = eventList.value.findIndex((event) => _id === event._id);
   if (index === -1) return;
   eventList.value[index].completed = true;
 };
+
+watch(isOpen, (isOpen) => {
+  if (!isOpen) unRegister();
+});
+
+onMounted(() => {
+  if (!eventPopup || !calendarContainer.value) return;
+  eventPopup.value.container = calendarContainer.value;
+});
+
+let unRegister = useClickOutSide(popper, toggle, (event) => {
+  if (!popper.value) return;
+
+  let element = event.target as HTMLElement;
+
+  return !popper.value.contains(element) && !element.hasAttribute("data-date");
+});
 </script>
 
 <template>
@@ -191,7 +184,6 @@ let handleCompleted = ({ _id }: EventDetail) => {
           v-else
           type="year"
           :events="eventList"
-          @on-click="handleViewEvent"
           @on-context-menu="handleContextMenu"
         />
       </div>
@@ -199,8 +191,8 @@ let handleCompleted = ({ _id }: EventDetail) => {
   </div>
   <ContextMenu
     ref="contextMenu"
-    @on-completed="handleCompleted"
-    @on-delete="handleDelete"
+    @on-completed="handleCompletedEvent"
+    @on-delete="handleDeleteEvent"
   />
 </template>
 

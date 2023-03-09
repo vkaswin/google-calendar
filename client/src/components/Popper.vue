@@ -34,6 +34,10 @@ usePopper(reference, popper, {
   ],
 });
 
+let toggle = () => {
+  isOpen.value = !isOpen.value;
+};
+
 watchPostEffect(() => {
   if (!target?.value) return;
 
@@ -45,10 +49,6 @@ watchPostEffect(() => {
 
   reference.value = element;
 });
-
-let toggle = () => {
-  isOpen.value = !isOpen.value;
-};
 
 watch(isOpen, (isOpen) => {
   if (!isOpen) unRegister();
