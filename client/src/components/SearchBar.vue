@@ -81,7 +81,7 @@ let handleClick = (date: string) => {
   closePopup();
   router.push({
     query: {
-      ...route.query,
+      view: "day",
       date,
     },
   });

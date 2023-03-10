@@ -101,7 +101,7 @@ let handleSubmit = async () => {
     if (!isValid) return;
 
     let {
-      data: { message, data },
+      data: { data },
     } = eventDetail._id
       ? await updateEvent(eventDetail._id, eventDetail)
       : await createEvent(eventDetail);
@@ -111,7 +111,6 @@ let handleSubmit = async () => {
       : handleNewEvent.value?.(data);
 
     reset();
-    toast.success(message);
   } catch (err: any) {
     toast.error(err?.message || "Error");
   }
@@ -121,11 +120,8 @@ let handleDelete = async () => {
   if (!eventDetail._id) return;
 
   try {
-    let {
-      data: { message },
-    } = await deleteEvent(eventDetail._id);
+    await deleteEvent(eventDetail._id);
     handleDeleteEvent.value?.(eventDetail);
-    toast.success(message);
     reset();
   } catch (err: any) {
     toast.error(err?.message || "Error");

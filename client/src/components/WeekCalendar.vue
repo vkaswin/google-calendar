@@ -216,7 +216,7 @@ let handleTimeChange = (time?: number) => {
   if (!element) return;
 
   eventPopup.value.reference = element;
-  element?.scrollIntoView({ behavior: "smooth", inline: "center" });
+  element?.scrollIntoView({ behavior: "smooth", block: "center" });
 };
 
 let handleCompletedEvent = ({ _id, time, date }: EventDetail) => {

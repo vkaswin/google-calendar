@@ -41,7 +41,7 @@ let handlePopup = () => {
   eventPopup.value.eventDetail.date = date;
   eventPopup.value.reference = element;
   eventPopup.value.openPopup();
-  element.scrollIntoView({ behavior: "smooth", inline: "center" });
+  element.scrollIntoView({ behavior: "smooth", block: "center" });
 };
 
 defineExpose({ datePicker });

@@ -37,10 +37,7 @@ let handleCompleted = async () => {
   if (!eventDetail.value || !eventDetail.value._id) return;
 
   try {
-    let {
-      data: { message },
-    } = await updateEvent(eventDetail.value._id, { completed: true });
-    toast.success(message);
+    await updateEvent(eventDetail.value._id, { completed: true });
     emit("onCompleted", eventDetail.value);
     clear();
   } catch (err: any) {
@@ -52,10 +49,7 @@ let handleDelete = async () => {
   if (!eventDetail.value || !eventDetail.value._id) return;
 
   try {
-    let {
-      data: { message },
-    } = await deleteEvent(eventDetail.value._id);
-    toast.success(message);
+    await deleteEvent(eventDetail.value._id);
     emit("onDelete", eventDetail.value);
     clear();
   } catch (err: any) {
