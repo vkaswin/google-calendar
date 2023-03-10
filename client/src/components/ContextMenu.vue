@@ -15,6 +15,7 @@ type ContextMenuEmits = {
 let emit = defineEmits<ContextMenuEmits>();
 
 let popper = ref<HTMLElement | null>(null);
+
 let reference = ref({
   getBoundingClientRect: () => {
     return {
@@ -27,6 +28,7 @@ let reference = ref({
     };
   },
 });
+
 let eventDetail = ref<EventDetail | null>(null);
 
 usePopper(reference as Ref<VirtualElement>, popper);

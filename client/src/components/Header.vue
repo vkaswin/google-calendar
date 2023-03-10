@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, watch } from "vue";
+import { toRefs, computed, ref } from "vue";
 import dayjs from "dayjs";
 import SearchBar from "@/components/SearchBar.vue";
 import Popper from "@/components/Popper.vue";
@@ -33,36 +33,11 @@ let options = [
   { label: "Year", value: "year" },
 ] as const;
 
-let isOpen = ref(false);
-
-let search = ref("");
-
-let searchContainer = ref<HTMLElement | null>(null);
-
 let userInitial = computed(() => {
   if (!user.value) return;
   let [firstName, lastName] = user.value.name.split(" ");
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
 });
-
-let handlePointerDown = (event: PointerEvent) => {
-  if (searchContainer.value?.contains(event.target as HTMLElement)) return;
-  document.removeEventListener("pointerdown", handlePointerDown);
-  closePopup();
-};
-
-let handleFocus = () => {
-  openPopup();
-  document.addEventListener("pointerdown", handlePointerDown);
-};
-
-let openPopup = () => {
-  isOpen.value = true;
-};
-
-let closePopup = () => {
-  isOpen.value = false;
-};
 </script>
 
 <template>
@@ -108,15 +83,7 @@ let closePopup = () => {
         </button>
       </Popper>
     </div>
-    <div ref="searchContainer" :class="styles.search_bar">
-      <input
-        placeholder="Search by title"
-        v-model="search"
-        @focus="handleFocus"
-      />
-      <i className="bx-search"></i>
-      <SearchBar v-if="isOpen" :search="search" @on-close="closePopup" />
-    </div>
+    <SearchBar />
     <div :class="styles.avatar">
       <div id="avatar">
         <span>{{ userInitial }}</span>
@@ -221,46 +188,6 @@ let closePopup = () => {
       }
     }
   }
-  .search_bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    input {
-      height: 45px;
-      max-width: 768px;
-      width: 100%;
-      background: #f1f3f4;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      padding: 0px 40px 0px 15px;
-      outline: none;
-      &:focus {
-        background: rgba(255, 255, 255, 1);
-        box-shadow: 0 1px 1px 0 rgba(65, 69, 73, 0.3),
-          0 1px 3px 1px rgba(65, 69, 73, 0.15);
-      }
-    }
-    i {
-      position: absolute;
-      right: 5px;
-      font-size: 22px;
-      width: 35px;
-      height: 35px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #606368;
-      font-size: 22px;
-      border-radius: 50%;
-      transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      &:hover {
-        background-color: #dadce0;
-      }
-    }
-  }
-
   .avatar {
     display: flex;
     justify-content: flex-end;
