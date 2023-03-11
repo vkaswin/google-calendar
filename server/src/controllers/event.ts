@@ -97,15 +97,18 @@ let searchEvents = asyncHandler(async (req, res) => {
   page = +page;
 
   let query = {
-    userId: user._id,
+    userId: new mongoose.Types.ObjectId(user._id),
     title: { $regex: search, $options: "i" },
   };
 
-  let total = await Event.find(query).countDocuments();
+  let list = await Event.aggregate([
+    { $match: query },
+    { $sort: { date: 1, time: 1 } },
+    { $skip: (page - 1) * limit },
+    { $limit: limit },
+  ]);
 
-  let list = await Event.find(query)
-    .skip((page - 1) * limit)
-    .limit(limit);
+  let total = await Event.find(query).countDocuments();
 
   let data = getPagination({ list, limit, page, total });
 
