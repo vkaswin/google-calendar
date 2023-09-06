@@ -35,7 +35,7 @@ let options = [
 
 let userInitial = computed(() => {
   if (!user.value) return;
-  let [firstName, lastName] = user.value.name.split(" ");
+  let [firstName, lastName = ""] = user.value.name.split(" ");
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
 });
 </script>
